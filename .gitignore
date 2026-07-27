@@ -1,0 +1,68 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+/playwright-report
+/test-results
+/blob-report
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files — never commit secrets; keep the example
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# supabase local
+supabase/.temp
+supabase/.branches
+
+# AI / agent configuration (local only — do not publish)
+AGENTS.md
+.cursor/
+.claude/
+.codex/
+.windsurf/
+.clinerules/
+.kiro/
+.qoder/
+.agent/
+.agents/
+.mcp.json
+.github/copilot-instructions.md
+*.local.mdc
+.aider*
+.continue/
+.swarm/
+.opencode/

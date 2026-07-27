@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+:root,
+[data-theme="light"] {
+  --hf-bg: #eef2f5;
+  --hf-fg: #10151c;
+  --hf-fg-muted: #5a6573;
+  --hf-surface: #f8fafc;
+  --hf-surface-2: #e4e9ef;
+  --hf-surface-3: #d5dde6;
+  --hf-border: #c8d1db;
+  --hf-brand: #1f6f8b;
+  --hf-brand-strong: #15556b;
+  --hf-brand-soft: #d5eaf1;
+  --hf-brand-fg: #f4fbfd;
+  --hf-success: #1f6b4a;
+  --hf-success-soft: #d5ebe0;
+  --hf-warning: #8a5a12;
+  --hf-warning-soft: #f3e3c4;
+  --hf-danger: #9b2f2f;
+  --hf-danger-soft: #f3d4d4;
+  --hf-ring: #1f6f8b;
+  --hf-glow: color-mix(in oklab, var(--hf-brand) 16%, transparent);
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --hf-bg: #0c1015;
+  --hf-fg: #e8edf2;
+  --hf-fg-muted: #9aa6b5;
+  --hf-surface: #141a22;
+  --hf-surface-2: #1c2430;
+  --hf-surface-3: #273142;
+  --hf-border: #314055;
+  --hf-brand: #3fa7c9;
+  --hf-brand-strong: #7bc7dd;
+  --hf-brand-soft: #163543;
+  --hf-brand-fg: #071018;
+  --hf-success: #7dcea0;
+  --hf-success-soft: #173328;
+  --hf-warning: #e0b15a;
+  --hf-warning-soft: #3a2c14;
+  --hf-danger: #f0a0a0;
+  --hf-danger-soft: #3a1c1c;
+  --hf-ring: #3fa7c9;
+  --hf-glow: color-mix(in oklab, var(--hf-brand) 20%, transparent);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
+  --color-background: var(--hf-bg);
+  --color-foreground: var(--hf-fg);
+}
+
+@layer base {
+  * {
+    border-color: var(--hf-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    min-height: 100%;
+    background:
+      radial-gradient(1100px 480px at 8% -12%, var(--hf-glow), transparent 58%),
+      radial-gradient(
+        800px 360px at 92% 0%,
+        color-mix(in oklab, var(--hf-brand) 9%, transparent),
+        transparent 52%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--hf-surface) 55%, transparent),
+        transparent 28%
+      ),
+      var(--hf-bg);
+    color: var(--hf-fg);
+    font-family: var(--font-body), ui-sans-serif, sans-serif;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--hf-ring);
+    outline-offset: 2px;
+  }
+}
