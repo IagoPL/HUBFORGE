@@ -15,6 +15,14 @@ test.describe("smoke", () => {
     await expect(page.getByRole("heading", { name: "Aurora Launch" })).toBeVisible();
   });
 
+  test("login offers GitHub OAuth CTA", async ({ page }) => {
+    await page.goto("/login");
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /Continue with GitHub/i }),
+    ).toBeVisible();
+  });
+
   test("landing has no serious accessibility violations", async ({ page }) => {
     await page.goto("/");
     const results = await new AxeBuilder({ page }).analyze();

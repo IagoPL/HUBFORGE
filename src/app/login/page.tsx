@@ -1,14 +1,25 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
+import { signInWithGitHub } from "@/features/authentication/actions";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { safeRedirectPath } from "@/features/authentication/safe-redirect";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
   title: "Sign in",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string; error?: string }>;
+}) {
+  const params = await searchParams;
+  const configured = isSupabaseConfigured();
+  const next = safeRedirectPath(params.next);
+  const showConfigError = params.error === "supabase-not-configured" || !configured;
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4 py-12">
       <div className="mb-8 flex items-center justify-between">
@@ -25,31 +36,50 @@ export default function LoginPage() {
           Sign in
         </h1>
         <p className="mt-2 text-sm text-[var(--hf-fg-muted)]">
-          Authentication will use GitHub OAuth via Supabase. This bootstrap screen is
-          visual only—continue into the demo workspace without credentials.
+          Continue with GitHub through Supabase Auth. Sessions are cookie-based and
+          refreshed by the Next.js proxy.
         </p>
-        <form className="mt-6 space-y-4" aria-label="Sign in preview">
-          <label className="block space-y-2 text-sm">
-            <span className="font-medium">Email</span>
-            <input
-              type="email"
-              name="email"
-              autoComplete="email"
-              placeholder="you@studio.example"
-              disabled
-              className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3 text-[var(--hf-fg)] disabled:cursor-not-allowed disabled:opacity-70"
-            />
-          </label>
-          <Button type="button" disabled className="w-full">
-            Continue with GitHub (coming soon)
-          </Button>
+
+        {showConfigError ? (
+          <p
+            role="status"
+            className="mt-4 rounded-lg bg-[var(--hf-warning-soft)] px-3 py-2 text-sm text-[var(--hf-warning)]"
+          >
+            Supabase is not configured yet. Add{" "}
+            <code className="font-[family-name:var(--font-mono)] text-xs">
+              NEXT_PUBLIC_SUPABASE_URL
+            </code>{" "}
+            and a publishable/anon key to{" "}
+            <code className="font-[family-name:var(--font-mono)] text-xs">
+              .env.local
+            </code>
+            , then enable the GitHub provider. See{" "}
+            <code className="font-[family-name:var(--font-mono)] text-xs">
+              docs/operations/supabase-auth-setup.md
+            </code>
+            .
+          </p>
+        ) : null}
+
+        <form action={signInWithGitHub} className="mt-6 space-y-3">
+          <input type="hidden" name="next" value={next} />
+          <button
+            type="submit"
+            disabled={!configured}
+            className={cn(buttonVariants({ size: "lg" }), "w-full disabled:opacity-60")}
+          >
+            Continue with GitHub
+          </button>
         </form>
-        <Link
-          href="/app"
-          className={cn(buttonVariants({ variant: "outline" }), "mt-3 flex w-full")}
-        >
-          Enter demo workspace
-        </Link>
+
+        {!configured ? (
+          <Link
+            href="/app"
+            className={cn(buttonVariants({ variant: "outline" }), "mt-3 flex w-full")}
+          >
+            Enter demo workspace
+          </Link>
+        ) : null}
       </section>
     </main>
   );

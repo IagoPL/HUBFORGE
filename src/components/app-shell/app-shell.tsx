@@ -28,10 +28,12 @@ const nav = [
 export function AppShell({
   organizationName,
   projectName,
+  userSlot,
   children,
 }: {
   organizationName: string;
   projectName: string;
+  userSlot?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -121,6 +123,7 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-2">
             <Badge tone="brand">Mock data</Badge>
+            {userSlot}
             <ThemeToggle />
           </div>
         </header>

@@ -14,18 +14,19 @@ HubForge centralizes planning, availability, responsibilities, communication, an
 
 ## Status
 
-**Bootstrap / foundation** — public demo UI with typed mock data. Authentication, Supabase persistence, and GitHub App sync are planned next.
+**Foundation** — demo UI with typed mock data, plus GitHub OAuth wiring (requires Supabase env). Org/project persistence and GitHub App sync are next.
 
-| Area                                                                | Status                  |
-| ------------------------------------------------------------------- | ----------------------- |
-| Landing + app shell                                                 | Implemented (demo)      |
-| Tasks board + team + calendar views                                 | Implemented (demo data) |
-| Design tokens + light/dark                                          | Implemented             |
-| Quality tooling (lint, format, typecheck, vitest, playwright smoke) | Implemented             |
-| CI workflow                                                         | Implemented             |
-| Supabase Auth + RLS data                                            | Planned                 |
-| GitHub App sync                                                     | Planned                 |
-| Chat + realtime                                                     | Planned                 |
+| Area                                                                | Status                                      |
+| ------------------------------------------------------------------- | ------------------------------------------- |
+| Landing + app shell                                                 | Implemented (demo)                          |
+| Tasks board + team + calendar views                                 | Implemented (demo data)                     |
+| Design tokens + light/dark                                          | Implemented                                 |
+| GitHub OAuth via Supabase Auth                                      | Implemented (requires env + provider setup) |
+| Quality tooling (lint, format, typecheck, vitest, playwright smoke) | Implemented                                 |
+| CI workflow                                                         | Implemented                                 |
+| Supabase RLS data / organizations                                   | Planned                                     |
+| GitHub App sync                                                     | Planned                                     |
+| Chat + realtime                                                     | Planned                                     |
 
 ## Stack
 
@@ -49,7 +50,7 @@ pnpm install
 pnpm dev
 ```
 
-Copy `.env.example` to `.env.local` when connecting Supabase. Leave placeholders empty to run the visual demo.
+Copy `.env.example` to `.env.local` when connecting Supabase Auth. Leave placeholders empty to run the visual demo. Full GitHub OAuth setup: `docs/operations/supabase-auth-setup.md`.
 
 ### Scripts
 

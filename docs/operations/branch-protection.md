@@ -1,26 +1,26 @@
-# Branch protection (manual guide)
+# Branch protection
 
-If CLI/API lacks permission to apply protection rules, configure in GitHub:
+Applied on `main` via GitHub API during HubForge bootstrap follow-up (2026-07-28):
 
-**Settings → Branches → Add classic branch protection rule** for `main`:
+- Require pull request before merging
+- Required status checks (strict): `Quality`, `E2E smoke`
+- Dismiss stale reviews
+- Required approving review count: `0` (solo maintainer; raise when collaborators join)
+- Enforce for administrators
+- Linear history required
+- Conversation resolution required
+- Force pushes blocked
+- Branch deletions blocked
 
-1. Require a pull request before merging
-2. Require approvals: at least 1 (when collaborators exist)
-3. Dismiss stale approvals when new commits are pushed
-4. Require status checks to pass:
-   - `Quality`
-   - `E2E smoke`
-5. Require branches to be up to date before merging
-6. Restrict force pushes
-7. Restrict deletions
-8. Do not allow bypassing the above settings for administrators when possible
+## Merge settings
 
-## Repository merge settings
+- Squash merge enabled
+- Merge commits disabled
+- Rebase merge disabled
+- Delete head branches on merge enabled
 
-Preferred:
+## Manual fallback
 
-- Allow squash merging
-- Disable merge commits (optional but recommended)
-- Automatically delete head branches
+If API access is unavailable, configure in:
 
-Already attempted via `gh repo edit` during bootstrap when permissions allowed.
+**Settings → Branches → Branch protection rule** for `main`, then **Settings → General → Pull Requests**.
