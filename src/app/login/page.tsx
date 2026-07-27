@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import { signInWithGitHub } from "@/features/authentication/actions";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { safeRedirectPath } from "@/features/authentication/safe-redirect";
+import { getDictionary, getLocale } from "@/i18n/get-dictionary";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
@@ -16,48 +18,45 @@ export default async function LoginPage({
   searchParams: Promise<{ next?: string; error?: string }>;
 }) {
   const params = await searchParams;
+  const locale = await getLocale();
+  const t = await getDictionary(locale);
   const configured = isSupabaseConfigured();
   const next = safeRedirectPath(params.next);
   const showConfigError = params.error === "supabase-not-configured" || !configured;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4 py-12">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex items-center justify-between gap-2">
         <Link
           href="/"
           className="font-[family-name:var(--font-display)] text-lg font-semibold"
         >
-          HubForge
+          {t.common.brand}
         </Link>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher
+            locale={locale}
+            labels={{
+              language: t.common.language,
+              english: t.common.english,
+              spanish: t.common.spanish,
+            }}
+          />
+          <ThemeToggle />
+        </div>
       </div>
-      <section className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-6 shadow-[0_20px_50px_-40px_rgba(16,21,28,0.5)]">
+      <section className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-6">
         <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">
-          Sign in
+          {t.login.title}
         </h1>
-        <p className="mt-2 text-sm text-[var(--hf-fg-muted)]">
-          Continue with GitHub through Supabase Auth. Sessions are cookie-based and
-          refreshed by the Next.js proxy.
-        </p>
+        <p className="mt-2 text-sm text-[var(--hf-fg-muted)]">{t.login.body}</p>
 
         {showConfigError ? (
           <p
             role="status"
             className="mt-4 rounded-lg bg-[var(--hf-warning-soft)] px-3 py-2 text-sm text-[var(--hf-warning)]"
           >
-            Supabase is not configured yet. Add{" "}
-            <code className="font-[family-name:var(--font-mono)] text-xs">
-              NEXT_PUBLIC_SUPABASE_URL
-            </code>{" "}
-            and a publishable/anon key to{" "}
-            <code className="font-[family-name:var(--font-mono)] text-xs">
-              .env.local
-            </code>
-            , then enable the GitHub provider. See{" "}
-            <code className="font-[family-name:var(--font-mono)] text-xs">
-              docs/operations/supabase-auth-setup.md
-            </code>
-            .
+            {t.login.configWarning}
           </p>
         ) : null}
 
@@ -68,7 +67,7 @@ export default async function LoginPage({
             disabled={!configured}
             className={cn(buttonVariants({ size: "lg" }), "w-full disabled:opacity-60")}
           >
-            Continue with GitHub
+            {t.login.continueGithub}
           </button>
         </form>
 
@@ -77,7 +76,7 @@ export default async function LoginPage({
             href="/app"
             className={cn(buttonVariants({ variant: "outline" }), "mt-3 flex w-full")}
           >
-            Enter demo workspace
+            {t.login.enterDemo}
           </Link>
         ) : null}
       </section>

@@ -3,11 +3,19 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { AuthUserSummary } from "@/features/authentication/get-current-user";
 
-export function UserMenu({ user }: { user: AuthUserSummary | null }) {
+export function UserMenu({
+  user,
+  demoLabel = "Demo mode",
+  signOutLabel = "Sign out",
+}: {
+  user: AuthUserSummary | null;
+  demoLabel?: string;
+  signOutLabel?: string;
+}) {
   if (!user) {
     return (
       <span className="hidden text-xs text-[var(--hf-fg-muted)] sm:inline">
-        Demo mode
+        {demoLabel}
       </span>
     );
   }
@@ -27,7 +35,7 @@ export function UserMenu({ user }: { user: AuthUserSummary | null }) {
           type="submit"
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
-          Sign out
+          {signOutLabel}
         </button>
       </form>
     </div>

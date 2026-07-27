@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Sora } from "next/font/google";
+import { getLocale } from "@/i18n/get-dictionary";
 import "./globals.css";
 
 const display = Sora({
@@ -29,14 +30,16 @@ export const metadata: Metadata = {
     "Collaborative project workspace with GitHub synchronization, team availability, roles, planning, communication and real-time notifications.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
     <html
-      lang="en"
+      lang={locale}
       data-theme="light"
       className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
       suppressHydrationWarning

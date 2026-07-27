@@ -29,6 +29,7 @@ Defined as CSS variables in `src/app/globals.css`:
 - Light and dark themes via `data-theme`
 - Brand accent: steel blue (`#1F6F8B` light / `#3FA7C9` dark)
 - Do not encode status with color alone—pair with labels/badges
+- Prefer flat surfaces (`--hf-bg`, `--hf-surface`); avoid decorative background gradients
 
 ## Layout
 

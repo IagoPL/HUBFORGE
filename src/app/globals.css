@@ -20,7 +20,6 @@
   --hf-danger: #9b2f2f;
   --hf-danger-soft: #f3d4d4;
   --hf-ring: #1f6f8b;
-  --hf-glow: color-mix(in oklab, var(--hf-brand) 16%, transparent);
   color-scheme: light;
 }
 
@@ -43,7 +42,6 @@
   --hf-danger: #f0a0a0;
   --hf-danger-soft: #3a1c1c;
   --hf-ring: #3fa7c9;
-  --hf-glow: color-mix(in oklab, var(--hf-brand) 20%, transparent);
   color-scheme: dark;
 }
 
@@ -79,19 +77,7 @@
 
   body {
     min-height: 100%;
-    background:
-      radial-gradient(1100px 480px at 8% -12%, var(--hf-glow), transparent 58%),
-      radial-gradient(
-        800px 360px at 92% 0%,
-        color-mix(in oklab, var(--hf-brand) 9%, transparent),
-        transparent 52%
-      ),
-      linear-gradient(
-        180deg,
-        color-mix(in oklab, var(--hf-surface) 55%, transparent),
-        transparent 28%
-      ),
-      var(--hf-bg);
+    background: var(--hf-bg);
     color: var(--hf-fg);
     font-family: var(--font-body), ui-sans-serif, sans-serif;
   }

@@ -23,7 +23,7 @@
 
 1. `chore/bootstrap-hubforge` — foundation (this PR)
 2. `feat/authentication` — Supabase GitHub OAuth
-3. `feat/organizations-projects` — real CRUD + RLS
+3. `feat/organizations-projects` — demo CRUD + RLS-ready model (in progress)
 4. `feat/members-roles-tasks` — vertical slice completion
 5. `feat/availability-notifications`
 6. `feat/github-app-sync`

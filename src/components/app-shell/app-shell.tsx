@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Building2,
   CalendarDays,
   FolderKanban,
   LayoutDashboard,
@@ -12,32 +13,58 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useWorkspace } from "@/features/organizations/workspace-provider";
+import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
-const nav = [
-  { href: "/app", label: "Overview", icon: LayoutDashboard },
-  { href: "/app/projects", label: "Projects", icon: FolderKanban },
-  { href: "/app/tasks", label: "Tasks", icon: ListTodo },
-  { href: "/app/team", label: "Team", icon: Users },
-  { href: "/app/calendar", label: "Calendar", icon: CalendarDays },
-] as const;
+type ShellLabels = {
+  brand: string;
+  organization: string;
+  demoWorkspace: string;
+  mockData: string;
+  language: string;
+  english: string;
+  spanish: string;
+  appNav: string;
+  mobileNav: string;
+  overview: string;
+  projects: string;
+  tasks: string;
+  team: string;
+  calendar: string;
+  organizations: string;
+};
 
 export function AppShell({
-  organizationName,
-  projectName,
+  locale,
+  labels,
   userSlot,
   children,
 }: {
-  organizationName: string;
-  projectName: string;
+  locale: Locale;
+  labels: ShellLabels;
   userSlot?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { activeOrganization, activeProject } = useWorkspace();
+
+  const nav = [
+    { href: "/app", label: labels.overview, icon: LayoutDashboard },
+    { href: "/app/organizations", label: labels.organizations, icon: Building2 },
+    { href: "/app/projects", label: labels.projects, icon: FolderKanban },
+    { href: "/app/tasks", label: labels.tasks, icon: ListTodo },
+    { href: "/app/team", label: labels.team, icon: Users },
+    { href: "/app/calendar", label: labels.calendar, icon: CalendarDays },
+  ] as const;
+
+  const organizationName = activeOrganization?.name ?? "—";
+  const projectName = activeProject?.name ?? "—";
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[16rem_1fr]">
@@ -52,7 +79,7 @@ export function AppShell({
             href="/"
             className="font-[family-name:var(--font-display)] text-lg font-semibold"
           >
-            HubForge
+            {labels.brand}
           </Link>
           <Button
             variant="ghost"
@@ -66,12 +93,14 @@ export function AppShell({
         </div>
         <div className="mb-6 space-y-2 rounded-xl bg-[var(--hf-surface-2)] p-3">
           <p className="text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
-            Organization
+            {labels.organization}
           </p>
           <p className="text-sm font-medium">{organizationName}</p>
-          <p className="text-xs text-[var(--hf-fg-muted)]">Project · {projectName}</p>
+          <p className="text-xs text-[var(--hf-fg-muted)]">
+            {labels.projects} · {projectName}
+          </p>
         </div>
-        <nav aria-label="App" className="space-y-1">
+        <nav aria-label={labels.appNav} className="space-y-1">
           {nav.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
@@ -105,7 +134,7 @@ export function AppShell({
       ) : null}
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[var(--hf-border)] bg-[color-mix(in_oklab,var(--hf-bg)_90%,transparent)] px-4 backdrop-blur-md sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[var(--hf-border)] bg-[var(--hf-bg)] px-4 sm:px-6">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -118,19 +147,27 @@ export function AppShell({
             </Button>
             <div>
               <p className="text-sm font-medium">{projectName}</p>
-              <p className="text-xs text-[var(--hf-fg-muted)]">Demo workspace</p>
+              <p className="text-xs text-[var(--hf-fg-muted)]">{labels.demoWorkspace}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge tone="brand">Mock data</Badge>
+            <Badge tone="brand">{labels.mockData}</Badge>
+            <LanguageSwitcher
+              locale={locale}
+              labels={{
+                language: labels.language,
+                english: labels.english,
+                spanish: labels.spanish,
+              }}
+            />
             {userSlot}
             <ThemeToggle />
           </div>
         </header>
         <main className="flex-1 px-4 py-6 sm:px-6">{children}</main>
         <nav
-          aria-label="Mobile"
-          className="sticky bottom-0 grid grid-cols-5 border-t border-[var(--hf-border)] bg-[var(--hf-surface)] px-1 py-2 lg:hidden"
+          aria-label={labels.mobileNav}
+          className="sticky bottom-0 grid grid-cols-6 border-t border-[var(--hf-border)] bg-[var(--hf-surface)] px-1 py-2 lg:hidden"
         >
           {nav.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;

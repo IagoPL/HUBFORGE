@@ -17,10 +17,21 @@ test.describe("smoke", () => {
 
   test("login offers GitHub OAuth CTA", async ({ page }) => {
     await page.goto("/login");
-    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
     await expect(
-      page.getByRole("button", { name: /Continue with GitHub/i }),
+      page.getByRole("heading", { name: /Sign in|Iniciar sesión/i }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /Continue with GitHub|Continuar con GitHub/i }),
+    ).toBeVisible();
+  });
+
+  test("language switcher is available on landing", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("group", { name: /Language|Idioma/i })).toBeVisible();
+    await page.getByRole("button", { name: /Spanish|Español/i }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "Construid juntos sin perder el contexto",
+    );
   });
 
   test("landing has no serious accessibility violations", async ({ page }) => {
@@ -30,5 +41,22 @@ test.describe("smoke", () => {
       ["serious", "critical"].includes(v.impact ?? ""),
     );
     expect(serious).toEqual([]);
+  });
+
+  test("can create organization and project in demo mode", async ({ page }) => {
+    await page.goto("/app/organizations");
+    await page
+      .getByLabel(/Organization name|Nombre de la organización/i)
+      .fill("Forge Studio");
+    await page
+      .getByRole("button", { name: /Create organization|Crear organización/i })
+      .click();
+    await expect(page.getByText("Forge Studio").first()).toBeVisible();
+
+    await page.goto("/app/projects");
+    await page.getByLabel(/Project name|Nombre del proyecto/i).fill("Alpha Board");
+    await page.getByLabel(/Description|Descripción/i).fill("First real project");
+    await page.getByRole("button", { name: /Create project|Crear proyecto/i }).click();
+    await expect(page.getByRole("heading", { name: "Alpha Board" })).toBeVisible();
   });
 });
