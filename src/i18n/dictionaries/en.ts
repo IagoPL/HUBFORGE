@@ -123,6 +123,29 @@ export const en = {
     stepOrg: "1. Organization",
     stepProject: "2. Project",
   },
+  team: {
+    title: "Team",
+    subtitle:
+      "Access roles control permissions. Functional roles describe what people do.",
+    invite: "Invite member",
+    email: "Email",
+    accessRole: "Access role",
+    functionalRole: "Functional role",
+    pending: "Pending invitations",
+    saveRoles: "Save roles",
+    empty: "Invite teammates to this organization.",
+  },
+  tasks: {
+    title: "Tasks",
+    subtitle: "Create work, assign owners, and move cards across the board.",
+    create: "Create task",
+    taskTitle: "Title",
+    description: "Description",
+    priority: "Priority",
+    assignee: "Assignee",
+    emptyProject: "Select or create a project before managing tasks.",
+    unassigned: "Unassigned",
+  },
 } as const satisfies MessageTree;
 
 export type Dictionary = {

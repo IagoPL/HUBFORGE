@@ -59,4 +59,20 @@ test.describe("smoke", () => {
     await page.getByRole("button", { name: /Create project|Crear proyecto/i }).click();
     await expect(page.getByRole("heading", { name: "Alpha Board" })).toBeVisible();
   });
+
+  test("can invite a member and create a task in demo mode", async ({ page }) => {
+    await page.goto("/app/team");
+    await page.getByLabel(/Email|Correo/i).fill("casey@example.com");
+    await page
+      .getByLabel(/Functional role|Rol funcional/i)
+      .first()
+      .fill("QA Engineer");
+    await page.getByRole("button", { name: /Invite member|Invitar miembro/i }).click();
+    await expect(page.getByText("casey@example.com")).toBeVisible();
+
+    await page.goto("/app/tasks");
+    await page.getByLabel(/^Title$|^Título$/i).fill("Write acceptance checks");
+    await page.getByRole("button", { name: /Create task|Crear tarea/i }).click();
+    await expect(page.getByText("Write acceptance checks").first()).toBeVisible();
+  });
 });

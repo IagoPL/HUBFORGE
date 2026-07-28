@@ -121,4 +121,27 @@ export const es = {
     stepOrg: "1. Organización",
     stepProject: "2. Proyecto",
   },
+  team: {
+    title: "Equipo",
+    subtitle:
+      "Los roles de acceso controlan permisos. Los roles funcionales describen qué hace cada persona.",
+    invite: "Invitar miembro",
+    email: "Correo",
+    accessRole: "Rol de acceso",
+    functionalRole: "Rol funcional",
+    pending: "Invitaciones pendientes",
+    saveRoles: "Guardar roles",
+    empty: "Invita a compañeros a esta organización.",
+  },
+  tasks: {
+    title: "Tareas",
+    subtitle: "Crea trabajo, asigna responsables y mueve tarjetas en el tablero.",
+    create: "Crear tarea",
+    taskTitle: "Título",
+    description: "Descripción",
+    priority: "Prioridad",
+    assignee: "Asignado",
+    emptyProject: "Selecciona o crea un proyecto antes de gestionar tareas.",
+    unassigned: "Sin asignar",
+  },
 } as const satisfies Dictionary;

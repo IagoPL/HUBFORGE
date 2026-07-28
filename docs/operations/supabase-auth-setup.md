@@ -60,8 +60,9 @@ Or paste these files in the SQL editor, in order:
 
 1. `supabase/migrations/20260728190000_profiles.sql`
 2. `supabase/migrations/20260728210000_organizations_projects.sql`
+3. `supabase/migrations/20260728220000_members_roles_tasks.sql`
 
-The second migration creates `organizations`, `organization_members`, and `projects` with RLS.
+Later migrations add invitations, tasks, assignees, and org-peer profile reads.
 
 ## 7. Verify
 

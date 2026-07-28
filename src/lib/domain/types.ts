@@ -38,6 +38,7 @@ export const projectSchema = z.object({
 
 export const memberSchema = z.object({
   id: z.string(),
+  organizationId: z.string(),
   name: z.string(),
   email: z.string().email(),
   accessRole: memberRoleSchema,

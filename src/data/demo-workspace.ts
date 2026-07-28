@@ -31,6 +31,7 @@ export function getDemoWorkspace(): WorkspaceSnapshot {
   const members = [
     memberSchema.parse({
       id: "mem_alex",
+      organizationId: organization.id,
       name: "Alex Rivera",
       email: "alex@northlight.example",
       accessRole: "project_lead",
@@ -40,6 +41,7 @@ export function getDemoWorkspace(): WorkspaceSnapshot {
     }),
     memberSchema.parse({
       id: "mem_sam",
+      organizationId: organization.id,
       name: "Sam Okonkwo",
       email: "sam@northlight.example",
       accessRole: "member",
@@ -49,6 +51,7 @@ export function getDemoWorkspace(): WorkspaceSnapshot {
     }),
     memberSchema.parse({
       id: "mem_jin",
+      organizationId: organization.id,
       name: "Jin Park",
       email: "jin@northlight.example",
       accessRole: "member",
