@@ -63,6 +63,7 @@ Or paste these files in the SQL editor, in order:
 3. `supabase/migrations/20260728220000_members_roles_tasks.sql`
 4. `supabase/migrations/20260728230000_availability_notifications.sql`
 5. `supabase/migrations/20260728240000_github_app_sync.sql`
+6. `supabase/migrations/20260728250000_chat_realtime.sql`
 
 See also `docs/operations/github-app-setup.md` for GitHub App wiring.
 

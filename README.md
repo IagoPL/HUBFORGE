@@ -14,34 +14,34 @@ HubForge centralizes planning, availability, responsibilities, communication, an
 
 ## Status
 
-**Foundation** — demo UI with typed mock data, plus GitHub OAuth wiring (requires Supabase env). Org/project persistence and GitHub App sync are next.
+**MVP code complete** — demo mode works without credentials; live mode needs Supabase + GitHub OAuth and (for sync) a GitHub App.
 
 | Area                                                                | Status                                      |
 | ------------------------------------------------------------------- | ------------------------------------------- |
-| Landing + app shell                                                 | Implemented (demo)                          |
-| Tasks board + team + calendar views                                 | Implemented (demo data)                     |
-| Design tokens + light/dark                                          | Implemented                                 |
+| Landing + app shell + i18n (EN/ES)                                  | Implemented                                 |
+| Organizations + projects (Postgres + RLS)                           | Implemented                                 |
+| Members, access/functional roles, task board                        | Implemented                                 |
+| Availability calendar + internal notifications                      | Implemented                                 |
+| Project chat channels + Realtime messages                           | Implemented                                 |
+| GitHub App link, webhooks, issue sync                               | Implemented (requires App + env)            |
 | GitHub OAuth via Supabase Auth                                      | Implemented (requires env + provider setup) |
 | Quality tooling (lint, format, typecheck, vitest, playwright smoke) | Implemented                                 |
-| CI workflow                                                         | Implemented                                 |
-| Supabase RLS data / organizations                                   | Planned                                     |
-| GitHub App sync                                                     | Planned                                     |
-| Chat + realtime                                                     | Planned                                     |
+| CI + branch protection on `main`                                    | Implemented                                 |
 
 ## Stack
 
 - Next.js (App Router) + React + TypeScript (strict)
 - Tailwind CSS
 - Zod
-- Supabase (prepared, not required for demo UI)
+- Supabase (Auth, Postgres RLS, Realtime)
 - Vitest + Playwright + axe
 - Vercel-ready deployment
 
 ## Architecture
 
-Modular monolith: one Next.js app with domain-oriented folders under `src/`. Demo data is isolated behind `getDemoWorkspace()` so screens can later switch to Supabase without a rewrite.
+Modular monolith: one Next.js app with domain-oriented folders under `src/`. Demo data uses browser storage / `getDemoWorkspace()`; signed-in sessions use Supabase with RLS.
 
-See `docs/architecture/` for ADRs and boundaries.
+See `docs/architecture/` for ADRs and boundaries. Product scope: `docs/product/mvp.md`.
 
 ## Local setup
 
@@ -50,7 +50,10 @@ pnpm install
 pnpm dev
 ```
 
-Copy `.env.example` to `.env.local` when connecting Supabase Auth. Leave placeholders empty to run the visual demo. Full GitHub OAuth setup: `docs/operations/supabase-auth-setup.md`.
+Copy `.env.example` to `.env.local` when connecting Supabase Auth. Leave placeholders empty to run the visual demo.
+
+- Auth: `docs/operations/supabase-auth-setup.md`
+- GitHub App sync: `docs/operations/github-app-setup.md`
 
 ### Scripts
 
@@ -67,15 +70,16 @@ Copy `.env.example` to `.env.local` when connecting Supabase Auth. Leave placeho
 
 ## Testing
 
-- Unit: domain parsing and demo graph integrity
-- E2E smoke: landing CTA, demo workspace, axe serious/critical gate on landing
+- Unit: domain schemas, GitHub helpers, workspace mapping
+- E2E smoke: landing, demo org/project/task/availability/GitHub/chat flows, axe gate on landing
 
-## Roadmap (high level)
+## Roadmap
 
-1. Auth + organizations + projects (vertical slice with real data)
-2. Members, roles, tasks, notifications, availability
-3. GitHub App integration
-4. Chat/realtime and richer planning
+**Done (MVP):** auth wiring, orgs/projects, members/roles/tasks, availability/notifications, GitHub App sync foundation, chat Realtime.
+
+**Next (ops / polish):** configure live OAuth + GitHub App, optional Vercel demo, Dependabot majors.
+
+**Post-MVP:** AI assistant, sprints/analytics, PWA/push, richer chat.
 
 ## Security
 

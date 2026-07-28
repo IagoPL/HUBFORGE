@@ -27,6 +27,6 @@
 4. `feat/members-roles-tasks` — invitations, roles, tasks board
 5. `feat/availability-notifications` — calendar + internal alerts
 6. `feat/github-app-sync` — GitHub App link + signed webhooks (done)
-7. `feat/chat-realtime` — project channels + Realtime messages (in progress)
+7. `feat/chat-realtime` — project channels + Realtime messages (done)
 
 Trunk-based: short feature branches into `main`. No `develop` unless coordination pain appears.
