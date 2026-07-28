@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { NotificationsPanel } from "@/features/availability/notifications-panel";
 import { getDemoWorkspace } from "@/data/demo-workspace";
 import { getDictionary, getLocale } from "@/i18n/get-dictionary";
 
@@ -9,7 +10,7 @@ export const metadata = {
 export default async function AppOverviewPage() {
   const locale = await getLocale();
   const t = await getDictionary(locale);
-  const { project, members, tasks, notifications } = getDemoWorkspace();
+  const { project, members, tasks } = getDemoWorkspace();
   const openTasks = tasks.filter((task) => task.status !== "done").length;
 
   return (
@@ -25,10 +26,7 @@ export default async function AppOverviewPage() {
         {[
           { label: t.app.openTasks, value: String(openTasks) },
           { label: t.app.members, value: String(members.length) },
-          {
-            label: t.app.unread,
-            value: String(notifications.filter((item) => !item.read).length),
-          },
+          { label: t.app.unread, value: "—" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -45,22 +43,14 @@ export default async function AppOverviewPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5">
-          <h2 className="mb-4 font-[family-name:var(--font-display)] text-lg font-semibold">
-            {t.app.latestNotifications}
-          </h2>
-          <ul className="space-y-3">
-            {notifications.map((item) => (
-              <li key={item.id} className="rounded-xl bg-[var(--hf-surface-2)] p-3">
-                <div className="mb-1 flex items-center gap-2">
-                  <p className="text-sm font-medium">{item.title}</p>
-                  {!item.read ? <Badge tone="brand">{t.app.new}</Badge> : null}
-                </div>
-                <p className="text-sm text-[var(--hf-fg-muted)]">{item.body}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <NotificationsPanel
+          labels={{
+            title: t.app.latestNotifications,
+            markRead: t.notifications.markRead,
+            empty: t.notifications.empty,
+            unread: t.app.unread,
+          }}
+        />
         <div className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5">
           <h2 className="mb-4 font-[family-name:var(--font-display)] text-lg font-semibold">
             {t.app.teamPresence}

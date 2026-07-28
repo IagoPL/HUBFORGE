@@ -144,4 +144,20 @@ export const es = {
     emptyProject: "Selecciona o crea un proyecto antes de gestionar tareas.",
     unassigned: "Sin asignar",
   },
+  calendar: {
+    title: "Disponibilidad",
+    subtitle:
+      "La capacidad del equipo va junto a la planificación para respetar horarios reales.",
+    create: "Añadir ventana de disponibilidad",
+    startsAt: "Empieza",
+    endsAt: "Termina",
+    kind: "Tipo",
+    note: "Nota",
+    empty: "Todavía no hay ventanas de disponibilidad.",
+    remove: "Eliminar",
+  },
+  notifications: {
+    markRead: "Marcar como leída",
+    empty: "Todavía no hay notificaciones.",
+  },
 } as const satisfies Dictionary;

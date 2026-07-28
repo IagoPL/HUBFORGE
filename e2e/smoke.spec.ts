@@ -75,4 +75,28 @@ test.describe("smoke", () => {
     await page.getByRole("button", { name: /Create task|Crear tarea/i }).click();
     await expect(page.getByText("Write acceptance checks").first()).toBeVisible();
   });
+
+  test("can add availability and mark a notification as read", async ({ page }) => {
+    await page.goto("/app/calendar");
+    await page.getByLabel(/Note|Nota/i).fill("Deep work block");
+    await page
+      .getByRole("button", {
+        name: /Add availability window|Añadir ventana de disponibilidad/i,
+      })
+      .click();
+    await expect(page.getByText("Deep work block")).toBeVisible();
+
+    await page.goto("/app");
+    await expect(
+      page.getByRole("heading", {
+        name: /Latest notifications|Últimas notificaciones/i,
+      }),
+    ).toBeVisible();
+    const markRead = page
+      .getByRole("button", { name: /Mark as read|Marcar como leída/i })
+      .first();
+    if (await markRead.isVisible()) {
+      await markRead.click();
+    }
+  });
 });

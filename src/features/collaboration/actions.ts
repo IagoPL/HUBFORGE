@@ -310,6 +310,23 @@ export async function createTaskAction(input: {
       })),
     );
     if (assignError) return { ok: false, error: assignError.message };
+
+    const { data: project } = await gate.supabase
+      .from("projects")
+      .select("organization_id")
+      .eq("id", input.projectId)
+      .maybeSingle();
+
+    if (project?.organization_id) {
+      const { createNotificationForUsers } =
+        await import("@/features/availability/actions");
+      await createNotificationForUsers({
+        organizationId: project.organization_id,
+        userIds: input.assigneeIds,
+        title: "Task assigned",
+        body: `You were assigned to “${title}”.`,
+      });
+    }
   }
 
   revalidatePath("/app", "layout");

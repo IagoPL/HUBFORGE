@@ -24,8 +24,8 @@
 1. `chore/bootstrap-hubforge` — foundation (this PR)
 2. `feat/authentication` — Supabase GitHub OAuth
 3. `feat/organizations-projects` — Postgres CRUD + RLS
-4. `feat/members-roles-tasks` — invitations, roles, tasks board (in progress)
-5. `feat/availability-notifications`
+4. `feat/members-roles-tasks` — invitations, roles, tasks board
+5. `feat/availability-notifications` — calendar + internal alerts (in progress)
 6. `feat/github-app-sync`
 7. `feat/chat-realtime`
 

@@ -61,8 +61,9 @@ Or paste these files in the SQL editor, in order:
 1. `supabase/migrations/20260728190000_profiles.sql`
 2. `supabase/migrations/20260728210000_organizations_projects.sql`
 3. `supabase/migrations/20260728220000_members_roles_tasks.sql`
+4. `supabase/migrations/20260728230000_availability_notifications.sql`
 
-Later migrations add invitations, tasks, assignees, and org-peer profile reads.
+Later migrations add invitations, tasks, availability windows, and internal notifications.
 
 ## 7. Verify
 

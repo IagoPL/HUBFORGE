@@ -146,6 +146,22 @@ export const en = {
     emptyProject: "Select or create a project before managing tasks.",
     unassigned: "Unassigned",
   },
+  calendar: {
+    title: "Availability",
+    subtitle:
+      "Team capacity sits next to planning so assignments respect real schedules.",
+    create: "Add availability window",
+    startsAt: "Starts at",
+    endsAt: "Ends at",
+    kind: "Kind",
+    note: "Note",
+    empty: "No availability windows yet.",
+    remove: "Remove",
+  },
+  notifications: {
+    markRead: "Mark as read",
+    empty: "No notifications yet.",
+  },
 } as const satisfies MessageTree;
 
 export type Dictionary = {
