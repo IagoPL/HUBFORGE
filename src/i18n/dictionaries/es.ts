@@ -30,6 +30,7 @@ export const es = {
     calendar: "Calendario",
     organization: "Organización",
     github: "GitHub",
+    chat: "Chat",
   },
   landing: {
     headline: "Construid juntos sin perder el contexto.",
@@ -175,5 +176,18 @@ export const es = {
     setupHint:
       "Configura las variables de la GitHub App y apunta los webhooks a /api/github/webhooks.",
     demoHint: "En modo demo el repositorio vinculado se guarda en este navegador.",
+  },
+  chat: {
+    title: "Chat",
+    subtitle:
+      "Los canales de proyecto mantienen las decisiones junto al trabajo. Solo texto plano.",
+    channels: "Canales",
+    messages: "Mensajes",
+    placeholder: "Escribe un mensaje",
+    send: "Enviar",
+    emptyProject: "Selecciona o crea un proyecto antes de abrir el chat.",
+    emptyMessages: "Todavía no hay mensajes. Saluda al equipo.",
+    demoHint: "En modo demo los mensajes se guardan en este navegador.",
+    liveHint: "Con sesión iniciada, el chat usa Supabase Realtime para mensajes nuevos.",
   },
 } as const satisfies Dictionary;

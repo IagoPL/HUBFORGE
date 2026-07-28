@@ -109,4 +109,15 @@ test.describe("smoke", () => {
     await expect(page.getByRole("link", { name: "IagoPL/HUBFORGE" })).toBeVisible();
     await expect(page.getByText(/Wire GitHub App webhooks/i)).toBeVisible();
   });
+
+  test("can send a chat message in demo mode", async ({ page }) => {
+    await page.goto("/app/chat");
+    await expect(page.getByRole("heading", { name: /^Chat$/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /#general/i })).toBeVisible();
+    await page
+      .getByLabel(/Write a message|Escribe un mensaje/i)
+      .fill("Hello from demo chat");
+    await page.getByRole("button", { name: /^Send$|^Enviar$/i }).click();
+    await expect(page.getByText("Hello from demo chat")).toBeVisible();
+  });
 });

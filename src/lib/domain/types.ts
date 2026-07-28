@@ -74,12 +74,31 @@ export const notificationSchema = z.object({
   read: z.boolean(),
 });
 
+export const chatChannelKindSchema = z.enum(["project", "direct"]);
+
+export const chatMessageBodySchema = z
+  .string()
+  .trim()
+  .min(1, "Message cannot be empty.")
+  .max(4000, "Message is too long.");
+
+export const chatMessageSchema = z.object({
+  id: z.string(),
+  channelId: z.string(),
+  authorId: z.string(),
+  body: chatMessageBodySchema,
+  createdAt: z.string(),
+});
+
 export type Organization = z.infer<typeof organizationSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type Member = z.infer<typeof memberSchema>;
 export type Task = z.infer<typeof taskSchema>;
 export type AvailabilityEntry = z.infer<typeof availabilityEntrySchema>;
 export type Notification = z.infer<typeof notificationSchema>;
+export type ChatMessageBody = z.infer<typeof chatMessageBodySchema>;
+export type ChatMessageRecord = z.infer<typeof chatMessageSchema>;
+export type ChatChannelKind = z.infer<typeof chatChannelKindSchema>;
 
 export type WorkspaceSnapshot = {
   organization: Organization;

@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   ListTodo,
   Menu,
+  MessageSquare,
   Users,
   X,
 } from "lucide-react";
@@ -39,6 +40,7 @@ type ShellLabels = {
   calendar: string;
   organizations: string;
   github: string;
+  chat: string;
 };
 
 export function AppShell({
@@ -64,6 +66,7 @@ export function AppShell({
     { href: "/app/team", label: labels.team, icon: Users },
     { href: "/app/calendar", label: labels.calendar, icon: CalendarDays },
     { href: "/app/github", label: labels.github, icon: FolderGit },
+    { href: "/app/chat", label: labels.chat, icon: MessageSquare },
   ] as const;
 
   const organizationName = activeOrganization?.name ?? "—";
@@ -170,7 +173,7 @@ export function AppShell({
         <main className="flex-1 px-4 py-6 sm:px-6">{children}</main>
         <nav
           aria-label={labels.mobileNav}
-          className="sticky bottom-0 grid grid-cols-7 border-t border-[var(--hf-border)] bg-[var(--hf-surface)] px-1 py-2 lg:hidden"
+          className="sticky bottom-0 grid grid-cols-4 gap-1 overflow-x-auto border-t border-[var(--hf-border)] bg-[var(--hf-surface)] px-1 py-2 sm:grid-cols-8 lg:hidden"
         >
           {nav.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;

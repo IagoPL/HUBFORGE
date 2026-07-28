@@ -34,6 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           calendar: t.nav.calendar,
           organizations: t.organizations.title,
           github: t.nav.github,
+          chat: t.nav.chat,
         }}
         userSlot={
           <UserMenu

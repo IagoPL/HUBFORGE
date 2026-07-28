@@ -32,6 +32,7 @@ export const en = {
     calendar: "Calendar",
     organization: "Organization",
     github: "GitHub",
+    chat: "Chat",
   },
   landing: {
     headline: "Build together without losing context.",
@@ -177,6 +178,19 @@ export const en = {
     setupHint:
       "Configure the GitHub App env vars and point webhooks to /api/github/webhooks.",
     demoHint: "Demo mode stores the linked repository in this browser.",
+  },
+  chat: {
+    title: "Chat",
+    subtitle:
+      "Project channels keep decisions next to the work. Messages are plain text.",
+    channels: "Channels",
+    messages: "Messages",
+    placeholder: "Write a message",
+    send: "Send",
+    emptyProject: "Select or create a project before opening chat.",
+    emptyMessages: "No messages yet. Say hello to the team.",
+    demoHint: "Demo mode stores chat messages in this browser.",
+    liveHint: "Signed-in chat uses Supabase Realtime for new messages.",
   },
 } as const satisfies MessageTree;
 
