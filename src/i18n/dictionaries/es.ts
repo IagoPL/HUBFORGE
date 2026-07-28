@@ -29,6 +29,7 @@ export const es = {
     team: "Equipo",
     calendar: "Calendario",
     organization: "Organización",
+    github: "GitHub",
   },
   landing: {
     headline: "Construid juntos sin perder el contexto.",
@@ -159,5 +160,20 @@ export const es = {
   notifications: {
     markRead: "Marcar como leída",
     empty: "Todavía no hay notificaciones.",
+  },
+  github: {
+    title: "Sincronización GitHub",
+    subtitle:
+      "Vincula un repositorio al proyecto activo. GitHub sigue siendo la fuente de verdad de los issues.",
+    link: "Vincular repositorio",
+    unlink: "Desvincular repositorio",
+    repo: "Repositorio",
+    installationId: "ID de instalación",
+    emptyProject: "Selecciona o crea un proyecto antes de vincular GitHub.",
+    emptyRepo: "Todavía no hay repositorio vinculado.",
+    syncedIssues: "Issues sincronizados",
+    setupHint:
+      "Configura las variables de la GitHub App y apunta los webhooks a /api/github/webhooks.",
+    demoHint: "En modo demo el repositorio vinculado se guarda en este navegador.",
   },
 } as const satisfies Dictionary;

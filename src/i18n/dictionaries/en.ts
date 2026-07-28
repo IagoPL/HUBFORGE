@@ -31,6 +31,7 @@ export const en = {
     team: "Team",
     calendar: "Calendar",
     organization: "Organization",
+    github: "GitHub",
   },
   landing: {
     headline: "Build together without losing context.",
@@ -161,6 +162,21 @@ export const en = {
   notifications: {
     markRead: "Mark as read",
     empty: "No notifications yet.",
+  },
+  github: {
+    title: "GitHub sync",
+    subtitle:
+      "Link a repository to the active project. GitHub remains source of truth for issues.",
+    link: "Link repository",
+    unlink: "Unlink repository",
+    repo: "Repository",
+    installationId: "Installation ID",
+    emptyProject: "Select or create a project before linking GitHub.",
+    emptyRepo: "No repository linked yet.",
+    syncedIssues: "Synced issues",
+    setupHint:
+      "Configure the GitHub App env vars and point webhooks to /api/github/webhooks.",
+    demoHint: "Demo mode stores the linked repository in this browser.",
   },
 } as const satisfies MessageTree;
 

@@ -25,8 +25,8 @@
 2. `feat/authentication` — Supabase GitHub OAuth
 3. `feat/organizations-projects` — Postgres CRUD + RLS
 4. `feat/members-roles-tasks` — invitations, roles, tasks board
-5. `feat/availability-notifications` — calendar + internal alerts (in progress)
-6. `feat/github-app-sync`
+5. `feat/availability-notifications` — calendar + internal alerts
+6. `feat/github-app-sync` — GitHub App link + signed webhooks (in progress)
 7. `feat/chat-realtime`
 
 Trunk-based: short feature branches into `main`. No `develop` unless coordination pain appears.

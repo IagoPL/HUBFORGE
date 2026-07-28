@@ -62,8 +62,9 @@ Or paste these files in the SQL editor, in order:
 2. `supabase/migrations/20260728210000_organizations_projects.sql`
 3. `supabase/migrations/20260728220000_members_roles_tasks.sql`
 4. `supabase/migrations/20260728230000_availability_notifications.sql`
+5. `supabase/migrations/20260728240000_github_app_sync.sql`
 
-Later migrations add invitations, tasks, availability windows, and internal notifications.
+See also `docs/operations/github-app-setup.md` for GitHub App wiring.
 
 ## 7. Verify
 

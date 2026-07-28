@@ -99,4 +99,14 @@ test.describe("smoke", () => {
       await markRead.click();
     }
   });
+
+  test("can link a GitHub repository in demo mode", async ({ page }) => {
+    await page.goto("/app/github");
+    await page.getByLabel(/Repository|Repositorio/i).fill("IagoPL/HUBFORGE");
+    await page
+      .getByRole("button", { name: /Link repository|Vincular repositorio/i })
+      .click();
+    await expect(page.getByRole("link", { name: "IagoPL/HUBFORGE" })).toBeVisible();
+    await expect(page.getByText(/Wire GitHub App webhooks/i)).toBeVisible();
+  });
 });
