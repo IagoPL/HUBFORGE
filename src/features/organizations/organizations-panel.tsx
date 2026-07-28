@@ -15,10 +15,18 @@ export function OrganizationsPanel({
     name: string;
     current: string;
     switchHint: string;
+    liveHint: string;
   };
 }) {
-  const { state, activeOrganization, addOrganization, setActiveOrganization } =
-    useWorkspace();
+  const {
+    mode,
+    state,
+    activeOrganization,
+    addOrganization,
+    setActiveOrganization,
+    pending,
+    error,
+  } = useWorkspace();
   const [name, setName] = useState("");
 
   return (
@@ -28,14 +36,16 @@ export function OrganizationsPanel({
           {labels.title}
         </h1>
         <p className="max-w-2xl text-[var(--hf-fg-muted)]">{labels.subtitle}</p>
-        <p className="text-xs text-[var(--hf-fg-muted)]">{labels.switchHint}</p>
+        <p className="text-xs text-[var(--hf-fg-muted)]">
+          {mode === "live" ? labels.liveHint : labels.switchHint}
+        </p>
       </header>
 
       <section className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5">
         <p className="mb-2 text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
           {labels.current}
         </p>
-        <p className="font-medium">{activeOrganization?.name}</p>
+        <p className="font-medium">{activeOrganization?.name ?? "—"}</p>
       </section>
 
       <ul className="grid gap-3 md:grid-cols-2">
@@ -64,9 +74,8 @@ export function OrganizationsPanel({
         className="max-w-lg space-y-3 rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!name.trim()) return;
-          addOrganization(name);
-          setName("");
+          if (!name.trim() || pending) return;
+          void addOrganization(name).then(() => setName(""));
         }}
       >
         <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold">
@@ -79,9 +88,13 @@ export function OrganizationsPanel({
             onChange={(event) => setName(event.target.value)}
             className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
             required
+            disabled={pending}
           />
         </label>
-        <Button type="submit">{labels.create}</Button>
+        {error ? <p className="text-sm text-[var(--hf-danger)]">{error}</p> : null}
+        <Button type="submit" disabled={pending}>
+          {labels.create}
+        </Button>
       </form>
     </div>
   );

@@ -113,10 +113,11 @@ export const es = {
       "Las organizaciones son el tenant superior para proyectos, miembros y permisos.",
     current: "Organización actual",
     switchHint: "En modo demo las organizaciones se guardan en este navegador.",
+    liveHint: "Con sesión iniciada, el espacio se guarda en Supabase con RLS.",
   },
   onboarding: {
     title: "Configura tu espacio",
-    body: "Crea una organización y después un proyecto. Puedes seguir con datos demo hasta conectar Supabase.",
+    body: "Crea una organización y después un proyecto. El modo demo usa datos locales hasta que inicies sesión.",
     stepOrg: "1. Organización",
     stepProject: "2. Proyecto",
   },

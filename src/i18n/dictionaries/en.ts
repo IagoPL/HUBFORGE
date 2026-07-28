@@ -115,10 +115,11 @@ export const en = {
       "Organizations are the top-level tenant for projects, members, and permissions.",
     current: "Current organization",
     switchHint: "Demo mode stores organizations in this browser.",
+    liveHint: "Signed-in workspaces persist in Supabase with RLS.",
   },
   onboarding: {
     title: "Set up your workspace",
-    body: "Create an organization, then a project. You can keep using demo data until Supabase is connected.",
+    body: "Create an organization, then a project. Demo mode uses local data until you sign in.",
     stepOrg: "1. Organization",
     stepProject: "2. Project",
   },

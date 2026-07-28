@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/authentication/user-menu";
 import { getCurrentUser } from "@/features/authentication/get-current-user";
+import { getWorkspaceSnapshot } from "@/features/organizations/get-workspace";
 import { WorkspaceProvider } from "@/features/organizations/workspace-provider";
 import { getDictionary, getLocale } from "@/i18n/get-dictionary";
 
@@ -8,9 +9,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const locale = await getLocale();
   const t = await getDictionary(locale);
   const user = await getCurrentUser();
+  const workspace = user
+    ? await getWorkspaceSnapshot()
+    : { mode: "demo" as const, state: undefined };
 
   return (
-    <WorkspaceProvider>
+    <WorkspaceProvider mode={workspace.mode} initialState={workspace.state}>
       <AppShell
         locale={locale}
         labels={{

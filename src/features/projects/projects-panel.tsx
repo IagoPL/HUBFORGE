@@ -24,6 +24,8 @@ export function ProjectsPanel({
     activeProject,
     addProject,
     setActiveProject,
+    pending,
+    error,
   } = useWorkspace();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -59,7 +61,7 @@ export function ProjectsPanel({
                 </div>
                 <p className="text-sm text-[var(--hf-fg-muted)]">{project.description}</p>
                 <p className="mt-4 text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
-                  {labels.organization} · {activeOrganization?.name}
+                  {labels.organization} · {activeOrganization?.name ?? "—"}
                 </p>
               </button>
             </li>
@@ -71,10 +73,11 @@ export function ProjectsPanel({
         className="max-w-lg space-y-3 rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!name.trim()) return;
-          addProject({ name, description });
-          setName("");
-          setDescription("");
+          if (!name.trim() || pending) return;
+          void addProject({ name, description }).then(() => {
+            setName("");
+            setDescription("");
+          });
         }}
       >
         <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold">
@@ -87,6 +90,7 @@ export function ProjectsPanel({
             onChange={(event) => setName(event.target.value)}
             className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
             required
+            disabled={pending || !activeOrganization}
           />
         </label>
         <label className="block space-y-2 text-sm">
@@ -95,9 +99,13 @@ export function ProjectsPanel({
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             className="min-h-24 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3 py-2"
+            disabled={pending || !activeOrganization}
           />
         </label>
-        <Button type="submit">{labels.create}</Button>
+        {error ? <p className="text-sm text-[var(--hf-danger)]">{error}</p> : null}
+        <Button type="submit" disabled={pending || !activeOrganization}>
+          {labels.create}
+        </Button>
       </form>
     </div>
   );

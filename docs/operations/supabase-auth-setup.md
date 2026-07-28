@@ -49,14 +49,19 @@ Dashboard → Authentication → URL Configuration:
   - `http://localhost:3000/auth/callback`
   - `https://<your-production-domain>/auth/callback`
 
-## 6. Apply profiles migration
+## 6. Apply migrations
 
 ```bash
 # After linking the project with Supabase CLI
-supabase db push
+npx supabase db push
 ```
 
-Or paste `supabase/migrations/20260728190000_profiles.sql` in the SQL editor.
+Or paste these files in the SQL editor, in order:
+
+1. `supabase/migrations/20260728190000_profiles.sql`
+2. `supabase/migrations/20260728210000_organizations_projects.sql`
+
+The second migration creates `organizations`, `organization_members`, and `projects` with RLS.
 
 ## 7. Verify
 
