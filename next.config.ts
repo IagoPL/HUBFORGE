@@ -1,9 +1,18 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { NextConfig } from "next";
+
+// Pin Turbopack to the app root so it does not mis-infer `src/app` as the workspace
+// (seen as "Next.js package not found" after dependency installs while `pnpm dev` runs).
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   allowedDevOrigins: ["127.0.0.1"],
+  turbopack: {
+    root: projectRoot,
+  },
 };
 
 export default nextConfig;
