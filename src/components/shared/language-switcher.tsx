@@ -17,7 +17,7 @@ export function LanguageSwitcher({
   const [pending, startTransition] = useTransition();
 
   function change(next: Locale) {
-    if (next === locale) return;
+    if (next === locale || pending) return;
     startTransition(async () => {
       await setLocale(next);
       router.refresh();
@@ -26,40 +26,35 @@ export function LanguageSwitcher({
 
   return (
     <div
-      className="inline-flex items-center rounded-md border border-[var(--hf-border)] bg-[var(--hf-surface)] p-0.5"
       role="group"
       aria-label={labels.language}
+      className="inline-flex items-center rounded-[var(--radius-md)] border border-[var(--hf-rule)] p-0.5"
     >
-      <button
-        type="button"
-        disabled={pending}
-        aria-pressed={locale === "en"}
-        onClick={() => change("en")}
-        className={cn(
-          "rounded px-2 py-1 text-xs font-medium transition-colors",
-          locale === "en"
-            ? "bg-[var(--hf-brand-soft)] text-[var(--hf-brand-strong)]"
-            : "text-[var(--hf-fg-muted)] hover:text-[var(--hf-fg)]",
-        )}
-      >
-        EN
-        <span className="sr-only">{labels.english}</span>
-      </button>
-      <button
-        type="button"
-        disabled={pending}
-        aria-pressed={locale === "es"}
-        onClick={() => change("es")}
-        className={cn(
-          "rounded px-2 py-1 text-xs font-medium transition-colors",
-          locale === "es"
-            ? "bg-[var(--hf-brand-soft)] text-[var(--hf-brand-strong)]"
-            : "text-[var(--hf-fg-muted)] hover:text-[var(--hf-fg)]",
-        )}
-      >
-        ES
-        <span className="sr-only">{labels.spanish}</span>
-      </button>
+      {(
+        [
+          ["en", "EN", labels.english],
+          ["es", "ES", labels.spanish],
+        ] as const
+      ).map(([value, short, full]) => (
+        <button
+          key={value}
+          type="button"
+          disabled={pending}
+          aria-pressed={locale === value}
+          onClick={() => change(value)}
+          className={cn(
+            "t-label rounded-[var(--radius-sm)] px-2 py-1 transition-colors",
+            "duration-[var(--motion-feedback)] focus-visible:outline-2",
+            "focus-visible:outline-offset-1 focus-visible:outline-[var(--hf-accent)]",
+            locale === value
+              ? "bg-[var(--hf-ground-3)] text-[var(--hf-ink)]"
+              : "text-[var(--hf-ink-faint)] hover:text-[var(--hf-ink)]",
+          )}
+        >
+          {short}
+          <span className="sr-only">{full}</span>
+        </button>
+      ))}
     </div>
   );
 }

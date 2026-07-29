@@ -16,29 +16,34 @@ export function SiteHeader({
   const t = dictionary;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--hf-border)] bg-[var(--hf-bg)]">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link
-          href="/"
-          className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-[var(--hf-fg)]"
-        >
+    <header className="sticky top-0 z-40 border-b border-[var(--hf-rule)] bg-[var(--hf-ground-1)]/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+        <Link href="/" className="t-display-sm text-[var(--hf-ink)]">
           {t.common.brand}
         </Link>
+
         <nav
           aria-label={t.nav.marketing}
-          className="hidden items-center gap-6 text-sm text-[var(--hf-fg-muted)] md:flex"
+          className="hidden items-center gap-5 md:flex"
         >
-          <a href="#problem" className="hover:text-[var(--hf-fg)]">
-            {t.nav.problem}
-          </a>
-          <a href="#product" className="hover:text-[var(--hf-fg)]">
-            {t.nav.product}
-          </a>
-          <a href="#security" className="hover:text-[var(--hf-fg)]">
-            {t.nav.security}
-          </a>
+          {(
+            [
+              ["#problem", t.nav.problem],
+              ["#product", t.nav.product],
+              ["#security", t.nav.security],
+            ] as const
+          ).map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="t-body-sm text-[var(--hf-ink-muted)] transition-colors duration-[var(--motion-feedback)] hover:text-[var(--hf-ink)]"
+            >
+              {label}
+            </a>
+          ))}
         </nav>
-        <div className="flex items-center gap-2">
+
+        <div className="flex items-center gap-1 sm:gap-2">
           <LanguageSwitcher
             locale={locale}
             labels={{

@@ -30,6 +30,8 @@ export default async function GitHubPage() {
         syncedIssues: t.github.syncedIssues,
         setupHint: t.github.setupHint,
         demoHint: t.github.demoHint,
+        install: t.github.install,
+        repoFormat: t.github.repoFormat,
       }}
     />
   );

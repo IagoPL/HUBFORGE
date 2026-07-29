@@ -2,18 +2,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
+// Focus is the document-wide accent outline, not a second ring idiom.
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-[color,background-color,box-shadow,transform,opacity] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hf-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hf-bg)] disabled:pointer-events-none disabled:opacity-50 active:translate-y-px",
+  "inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] text-sm font-medium transition-[color,background-color,transform,opacity] duration-[var(--motion-feedback)] disabled:pointer-events-none disabled:opacity-50 active:translate-y-px",
   {
     variants: {
       variant: {
         primary:
-          "bg-[var(--hf-brand)] text-[var(--hf-brand-fg)] shadow-sm hover:bg-[var(--hf-brand-strong)]",
+          "bg-[var(--hf-accent)] text-[var(--hf-accent-ink)] hover:bg-[var(--hf-accent-hover)]",
         secondary:
-          "bg-[var(--hf-surface-2)] text-[var(--hf-fg)] hover:bg-[var(--hf-surface-3)]",
-        ghost: "bg-transparent text-[var(--hf-fg)] hover:bg-[var(--hf-surface-2)]",
+          "bg-[var(--hf-ground-3)] text-[var(--hf-ink)] hover:bg-[var(--hf-rule)]",
+        ghost:
+          "bg-transparent text-[var(--hf-ink-muted)] hover:bg-[var(--hf-ground-3)] hover:text-[var(--hf-ink)]",
         outline:
-          "border border-[var(--hf-border)] bg-transparent text-[var(--hf-fg)] hover:bg-[var(--hf-surface-2)]",
+          "border border-[var(--hf-rule)] bg-transparent text-[var(--hf-ink)] hover:bg-[var(--hf-ground-3)]",
       },
       size: {
         sm: "h-9 px-3",

@@ -1,84 +1,169 @@
 @import "tailwindcss";
 
+/* ── Palette ─────────────────────────────────────────────────────────────────
+   Semantic roles only. Every ink clears 4.5:1 against all four grounds and
+   primary text clears 7:1; the paired badge and button tokens are verified too.
+   See DESIGN.md for the reasoning behind each role. */
+
 :root,
 [data-theme="light"] {
-  --hf-bg: #eef2f5;
-  --hf-fg: #10151c;
-  --hf-fg-muted: #5a6573;
-  --hf-surface: #f8fafc;
-  --hf-surface-2: #e4e9ef;
-  --hf-surface-3: #d5dde6;
-  --hf-border: #c8d1db;
-  --hf-brand: #1f6f8b;
-  --hf-brand-strong: #15556b;
-  --hf-brand-soft: #d5eaf1;
-  --hf-brand-fg: #f4fbfd;
-  --hf-success: #1f6b4a;
-  --hf-success-soft: #d5ebe0;
-  --hf-warning: #8a5a12;
-  --hf-warning-soft: #f3e3c4;
-  --hf-danger: #9b2f2f;
-  --hf-danger-soft: #f3d4d4;
-  --hf-ring: #1f6f8b;
+  /* Paper-white sheet with graphite ink. Authored, not an inversion. */
+  --hf-ground-0: #f1f4f6;
+  --hf-ground-1: #ffffff;
+  --hf-ground-2: #f8fafb;
+  --hf-ground-3: #eaeef1;
+
+  --hf-rule-faint: #e2e7eb;
+  --hf-rule: #cdd5dc;
+  --hf-rule-strong: #a9b4bf;
+
+  --hf-ink: #0f141a;
+  --hf-ink-muted: #4a5560;
+  --hf-ink-faint: #5c6873;
+
+  /* Drafting vermilion, darkened for contrast against paper. */
+  --hf-accent: #bf3410;
+  --hf-accent-hover: #a32c0d;
+  --hf-accent-ink: #ffffff;
+  --hf-accent-quiet: #fdece7;
+  --hf-accent-line: #d64a25;
+
+  --hf-revision: #bf3410;
+  --hf-revision-quiet: #fdece7;
+
+  /* Danger sits apart from vermilion in hue, lightness and density. */
+  --hf-error: #a41d2b;
+  --hf-error-quiet: #fbe4e7;
+  --hf-caution: #7a5310;
+  --hf-caution-quiet: #f8eed6;
+  --hf-ok: #1a6444;
+  --hf-ok-quiet: #dcefe5;
+  --hf-info: #1f5c7a;
+  --hf-info-quiet: #e2eef4;
+
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --hf-bg: #0c1015;
-  --hf-fg: #e8edf2;
-  --hf-fg-muted: #9aa6b5;
-  --hf-surface: #141a22;
-  --hf-surface-2: #1c2430;
-  --hf-surface-3: #273142;
-  --hf-border: #314055;
-  --hf-brand: #3fa7c9;
-  --hf-brand-strong: #7bc7dd;
-  --hf-brand-soft: #163543;
-  --hf-brand-fg: #071018;
-  --hf-success: #7dcea0;
-  --hf-success-soft: #173328;
-  --hf-warning: #e0b15a;
-  --hf-warning-soft: #3a2c14;
-  --hf-danger: #f0a0a0;
-  --hf-danger-soft: #3a1c1c;
-  --hf-ring: #3fa7c9;
+  /* Graphite, cooled so it never reads as dead grey. */
+  --hf-ground-0: #0b0e11;
+  --hf-ground-1: #11151a;
+  --hf-ground-2: #171c23;
+  --hf-ground-3: #1f262f;
+
+  --hf-rule-faint: #232b34;
+  --hf-rule: #2e3844;
+  --hf-rule-strong: #3d4956;
+
+  --hf-ink: #e6eaef;
+  --hf-ink-muted: #a2adba;
+  --hf-ink-faint: #8b96a3;
+
+  --hf-accent: #ff5c38;
+  --hf-accent-hover: #ff7a5c;
+  --hf-accent-ink: #180701;
+  --hf-accent-quiet: #2a1409;
+  --hf-accent-line: #ff5c38;
+
+  --hf-revision: #ff5c38;
+  --hf-revision-quiet: #2a1409;
+
+  --hf-error: #ff8a95;
+  --hf-error-quiet: #3a1419;
+  --hf-caution: #e3b45f;
+  --hf-caution-quiet: #33270f;
+  --hf-ok: #6fd39b;
+  --hf-ok-quiet: #102c1e;
+  --hf-info: #6cc2e8;
+  --hf-info-quiet: #0e2836;
+
   color-scheme: dark;
+}
+
+/* Earlier role names, kept as aliases so there is exactly one palette. Both
+   sides are declared on the document element, so they resolve per theme. */
+:root {
+  --hf-bg: var(--hf-ground-0);
+  --hf-fg: var(--hf-ink);
+  --hf-fg-muted: var(--hf-ink-muted);
+  --hf-surface: var(--hf-ground-1);
+  --hf-surface-2: var(--hf-ground-2);
+  --hf-surface-3: var(--hf-ground-3);
+  --hf-border: var(--hf-rule);
+  --hf-brand: var(--hf-accent);
+  --hf-brand-strong: var(--hf-accent-hover);
+  --hf-brand-soft: var(--hf-accent-quiet);
+  --hf-brand-fg: var(--hf-accent-ink);
+  --hf-success: var(--hf-ok);
+  --hf-success-soft: var(--hf-ok-quiet);
+  --hf-warning: var(--hf-caution);
+  --hf-warning-soft: var(--hf-caution-quiet);
+  --hf-danger: var(--hf-error);
+  --hf-danger-soft: var(--hf-error-quiet);
+  --hf-ring: var(--hf-accent);
+}
+
+:root {
+  /* Space: one 4px rhythm. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Motion. Components read these, never literals. */
+  --motion-feedback: 110ms;
+  --motion-micro: 170ms;
+  --motion-panel: 220ms;
+  --motion-structural: 300ms;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+}
+
+/* Density is a register, not a global padding multiplier: it moves row height
+   and secondary metadata by one documented step, leaving the type scale intact. */
+[data-density="comfortable"] {
+  --row-h: 2.75rem;
+  --row-pad-y: var(--space-3);
+  --row-pad-x: var(--space-4);
+  --list-gap: var(--space-1);
+}
+
+[data-density="compact"] {
+  --row-h: 2rem;
+  --row-pad-y: var(--space-1);
+  --row-pad-x: var(--space-3);
+  --list-gap: 0px;
 }
 
 @theme inline {
   --font-sans: var(--font-body);
   --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
   --color-background: var(--hf-bg);
   --color-foreground: var(--hf-fg);
 }
 
 @layer base {
   * {
-    border-color: var(--hf-border);
+    border-color: var(--hf-rule);
   }
 
   html {
     scroll-behavior: smooth;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
-
   body {
     min-height: 100%;
-    background: var(--hf-bg);
-    color: var(--hf-fg);
+    background: var(--hf-ground-0);
+    color: var(--hf-ink);
     font-family: var(--font-body), ui-sans-serif, sans-serif;
   }
 
@@ -88,7 +173,143 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--hf-ring);
+    outline: 2px solid var(--hf-accent);
     outline-offset: 2px;
+  }
+
+  /* Numbers that share a column must share a width. */
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Documented type scale from DESIGN_SYSTEM.md. Archivo is display only. */
+@layer components {
+  .t-display-lg {
+    font-family: var(--font-display), ui-sans-serif, sans-serif;
+    font-size: 2rem;
+    line-height: 2.375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .t-display {
+    font-family: var(--font-display), ui-sans-serif, sans-serif;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .t-display-sm {
+    font-family: var(--font-display), ui-sans-serif, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+    font-weight: 600;
+  }
+
+  .t-body-lg {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .t-body {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .t-body-sm {
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+  }
+
+  .t-label {
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .t-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .t-mono-sm {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Grouping earns a hairline and a ground shift, never a technical box. */
+  .panel {
+    border: 1px solid var(--hf-rule);
+    border-radius: var(--radius-lg);
+    background: var(--hf-ground-2);
+  }
+
+  /* Controls read as cut into the sheet, one ground below their panel. */
+  .input {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--hf-rule);
+    border-radius: var(--radius-md);
+    background: var(--hf-ground-1);
+    color: var(--hf-ink);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .input::placeholder {
+    color: var(--hf-ink-faint);
+  }
+
+  .input:disabled {
+    background: var(--hf-ground-3);
+    color: var(--hf-ink-faint);
+    cursor: not-allowed;
+  }
+
+  /* The sentence under a surface title. Never a second heading. */
+  .lead {
+    max-width: 62ch;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--hf-ink-muted);
+  }
+}
+
+/* Compact drops one documented step of secondary metadata. Handled in CSS so a
+   density change never needs to travel through React state. */
+@layer utilities {
+  [data-density="compact"] [data-density-optional] {
+    display: none;
+  }
+}
+
+/* Reduced motion is a first-class path: transforms become instant, and every
+   animated affordance keeps a text or state equivalent. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

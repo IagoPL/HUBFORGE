@@ -25,15 +25,12 @@ export default async function LoginPage({
   const showConfigError = params.error === "supabase-not-configured" || !configured;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4 py-12">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-4 py-12">
       <div className="mb-8 flex items-center justify-between gap-2">
-        <Link
-          href="/"
-          className="font-[family-name:var(--font-display)] text-lg font-semibold"
-        >
+        <Link href="/" className="t-display-sm text-[var(--hf-accent)]">
           {t.common.brand}
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <LanguageSwitcher
             locale={locale}
             labels={{
@@ -45,22 +42,23 @@ export default async function LoginPage({
           <ThemeToggle />
         </div>
       </div>
-      <section className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-6">
-        <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">
-          {t.login.title}
-        </h1>
-        <p className="mt-2 text-sm text-[var(--hf-fg-muted)]">{t.login.body}</p>
+
+      <section className="panel grid gap-4 p-5">
+        <div className="grid gap-1">
+          <h1 className="t-display text-[var(--hf-ink)]">{t.login.title}</h1>
+          <p className="t-body text-[var(--hf-ink-muted)]">{t.login.body}</p>
+        </div>
 
         {showConfigError ? (
           <p
             role="status"
-            className="mt-4 rounded-lg bg-[var(--hf-warning-soft)] px-3 py-2 text-sm text-[var(--hf-warning)]"
+            className="t-body-sm rounded-[var(--radius-md)] bg-[var(--hf-caution-quiet)] px-3 py-2 text-[var(--hf-caution)]"
           >
             {t.login.configWarning}
           </p>
         ) : null}
 
-        <form action={signInWithGitHub} className="mt-6 space-y-3">
+        <form action={signInWithGitHub} className="grid gap-3">
           <input type="hidden" name="next" value={next} />
           <button
             type="submit"
@@ -74,7 +72,7 @@ export default async function LoginPage({
         {!configured ? (
           <Link
             href="/app"
-            className={cn(buttonVariants({ variant: "outline" }), "mt-3 flex w-full")}
+            className={cn(buttonVariants({ variant: "outline" }), "flex w-full")}
           >
             {t.login.enterDemo}
           </Link>
