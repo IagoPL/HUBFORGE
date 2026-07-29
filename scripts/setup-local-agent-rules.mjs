@@ -74,6 +74,33 @@ alwaysApply: true
 - No Co-authored-by AI trailers.
 - No secrets in diffs.
 - Open a PR; do not force-push \`main\`.
+
+## Autoría de Git
+
+Cursor puede analizar, editar, ejecutar pruebas y preparar cambios, pero nunca debe atribuirse commits.
+
+Antes de cada commit debe comprobar:
+
+- La cuenta GitHub activa es \`IagoPL\`.
+- El remoto pertenece a \`IagoPL/HubForge\`.
+- El nombre local es \`Iago Prieto Lamas\`.
+- El correo local está verificado para \`IagoPL\`.
+- El mensaje no contiene coautorías ni atribuciones a herramientas de IA.
+- El script de validación de identidad ha finalizado correctamente.
+
+Cursor no puede:
+
+- Utilizar \`cursoragent\` como autor o committer.
+- Añadirse como coautor.
+- Añadir trailers \`Generated-by\`.
+- Usar \`--no-verify\`.
+- Hacer push directo a \`main\`.
+- Modificar la identidad Git sin autorización.
+- Crear commits desde agentes remotos que impongan una identidad propia.
+
+Dependabot mantiene la autoría de sus propios commits.
+
+Si Cursor Cloud Agent o Background Agent obliga a usar \`cursoragent\`, esos agentes no pueden publicar commits en este repositorio. Deben limitarse a proponer cambios o parches. Los commits y ramas deben crearse desde el entorno local autenticado como \`IagoPL\`.
 `,
 
   "frontend-quality.mdc": `---
@@ -189,6 +216,33 @@ Local-only guidance. This file is gitignored.
 - Follow Ponytail **full** mode without sacrificing security or accessibility.
 - Work on feature branches; verify git identity before commits.
 - Keep secrets out of the repo.
+
+## Autoría de Git
+
+Cursor puede analizar, editar, ejecutar pruebas y preparar cambios, pero nunca debe atribuirse commits.
+
+Antes de cada commit debe comprobar:
+
+- La cuenta GitHub activa es \`IagoPL\`.
+- El remoto pertenece a \`IagoPL/HubForge\`.
+- El nombre local es \`Iago Prieto Lamas\`.
+- El correo local está verificado para \`IagoPL\`.
+- El mensaje no contiene coautorías ni atribuciones a herramientas de IA.
+- El script \`pnpm verify:git-identity\` ha finalizado correctamente.
+
+Cursor no puede:
+
+- Utilizar \`cursoragent\` como autor o committer.
+- Añadirse como coautor.
+- Añadir trailers \`Generated-by\`.
+- Usar \`--no-verify\`.
+- Hacer push directo a \`main\`.
+- Modificar la identidad Git sin autorización.
+- Crear commits desde agentes remotos que impongan una identidad propia.
+
+Dependabot mantiene la autoría de sus propios commits.
+
+Si Cursor Cloud Agent o Background Agent obliga a usar \`cursoragent\`, esos agentes no pueden publicar commits en este repositorio. Deben limitarse a proponer cambios o parches. Los commits y ramas deben crearse desde el entorno local autenticado como \`IagoPL\`.
 `,
   "utf8",
 );
