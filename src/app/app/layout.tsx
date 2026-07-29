@@ -21,6 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           brand: t.common.brand,
           organization: t.nav.organization,
           demoWorkspace: t.app.demoWorkspace,
+          liveWorkspace: t.app.liveWorkspace,
           mockData: t.common.mockData,
           language: t.common.language,
           english: t.common.english,

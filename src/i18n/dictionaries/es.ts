@@ -89,6 +89,7 @@ export const es = {
   },
   app: {
     demoWorkspace: "Espacio demo",
+    liveWorkspace: "Espacio en vivo",
     openTasks: "Tareas abiertas",
     members: "Miembros",
     unread: "Sin leer",

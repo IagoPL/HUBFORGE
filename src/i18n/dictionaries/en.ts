@@ -91,6 +91,7 @@ export const en = {
   },
   app: {
     demoWorkspace: "Demo workspace",
+    liveWorkspace: "Live workspace",
     openTasks: "Open tasks",
     members: "Members",
     unread: "Unread",

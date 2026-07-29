@@ -27,6 +27,7 @@ type ShellLabels = {
   brand: string;
   organization: string;
   demoWorkspace: string;
+  liveWorkspace: string;
   mockData: string;
   language: string;
   english: string;
@@ -56,7 +57,7 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const { activeOrganization, activeProject } = useWorkspace();
+  const { mode, activeOrganization, activeProject } = useWorkspace();
 
   const nav = [
     { href: "/app", label: labels.overview, icon: LayoutDashboard },
@@ -153,11 +154,13 @@ export function AppShell({
             </Button>
             <div>
               <p className="text-sm font-medium">{projectName}</p>
-              <p className="text-xs text-[var(--hf-fg-muted)]">{labels.demoWorkspace}</p>
+              <p className="text-xs text-[var(--hf-fg-muted)]">
+                {mode === "demo" ? labels.demoWorkspace : labels.liveWorkspace}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge tone="brand">{labels.mockData}</Badge>
+            {mode === "demo" ? <Badge tone="brand">{labels.mockData}</Badge> : null}
             <LanguageSwitcher
               locale={locale}
               labels={{
