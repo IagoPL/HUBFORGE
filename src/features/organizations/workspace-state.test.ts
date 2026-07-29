@@ -15,7 +15,7 @@ describe("workspace-state", () => {
   it("creates organizations and projects under the active org", () => {
     let state = createDefaultWorkspaceState();
     state = createOrganization(state, { name: "Coyote Labs" });
-    expect(state.organizations).toHaveLength(2);
+    expect(state.organizations).toHaveLength(1);
     expect(state.activeOrganizationId).toBe(state.organizations.at(-1)?.id);
 
     state = createProject(state, {

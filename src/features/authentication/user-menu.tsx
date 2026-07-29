@@ -5,21 +5,11 @@ import type { AuthUserSummary } from "@/features/authentication/get-current-user
 
 export function UserMenu({
   user,
-  demoLabel = "Demo mode",
   signOutLabel = "Sign out",
 }: {
-  user: AuthUserSummary | null;
-  demoLabel?: string;
+  user: AuthUserSummary;
   signOutLabel?: string;
 }) {
-  if (!user) {
-    return (
-      <span className="hidden text-xs text-[var(--hf-fg-muted)] sm:inline">
-        {demoLabel}
-      </span>
-    );
-  }
-
   return (
     <div className="flex items-center gap-2">
       <div className="hidden text-right sm:block">

@@ -41,15 +41,15 @@ export default async function LandingPage() {
               {t.landing.subtitle}
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <Link href="/app" className={cn(buttonVariants({ size: "lg" }))}>
-                {t.landing.enterDemo}
+              <Link href="/login" className={cn(buttonVariants({ size: "lg" }))}>
+                {t.common.openWorkspace}
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
               <Link
                 href="/login"
                 className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
               >
-                {t.landing.signInPreview}
+                {t.common.signIn}
               </Link>
             </div>
           </div>
@@ -140,8 +140,8 @@ export default async function LandingPage() {
               </h2>
               <p className="text-[var(--hf-fg-muted)]">{t.landing.securityBody}</p>
             </div>
-            <Link href="/app" className={cn(buttonVariants({ size: "lg" }))}>
-              {t.landing.exploreDemo}
+            <Link href="/login" className={cn(buttonVariants({ size: "lg" }))}>
+              {t.common.openWorkspace}
               <ArrowRight className="size-4" aria-hidden />
             </Link>
           </div>

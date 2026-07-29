@@ -40,5 +40,5 @@ export async function signOut() {
   if (supabase) {
     await supabase.auth.signOut();
   }
-  redirect("/");
+  redirect("/login");
 }

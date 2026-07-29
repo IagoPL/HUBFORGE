@@ -70,15 +70,6 @@ export default async function LoginPage({
             {t.login.continueGithub}
           </button>
         </form>
-
-        {!configured ? (
-          <Link
-            href="/app"
-            className={cn(buttonVariants({ variant: "outline" }), "mt-3 flex w-full")}
-          >
-            {t.login.enterDemo}
-          </Link>
-        ) : null}
       </section>
     </main>
   );

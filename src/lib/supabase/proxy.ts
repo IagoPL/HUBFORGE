@@ -3,12 +3,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getPublicSupabaseConfig } from "@/lib/supabase/config";
 
 /**
- * Refresh the auth session on the request/response cookie pair.
- * Returns null when Supabase is not configured.
+ * Refresh the auth session and gate /app behind sign-in.
  */
 export async function updateSession(request: NextRequest) {
   const config = getPublicSupabaseConfig();
   if (!config) {
+    if (request.nextUrl.pathname.startsWith("/app")) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.searchParams.set("next", request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
     return NextResponse.next({ request });
   }
 
@@ -34,15 +39,22 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // Validate JWT claims (do not trust getSession() alone for authz).
-  // Unsigned visitors can still use /app in demo mode; live writes stay gated in server actions.
   const { data } = await supabase.auth.getClaims();
   const isAuthenticated = Boolean(data?.claims?.sub);
   const pathname = request.nextUrl.pathname;
 
+  if (pathname.startsWith("/app") && !isAuthenticated) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
   if (pathname === "/login" && isAuthenticated) {
     const appUrl = request.nextUrl.clone();
-    appUrl.pathname = "/app";
+    const next = request.nextUrl.searchParams.get("next");
+    appUrl.pathname =
+      next && next.startsWith("/") && !next.startsWith("//") ? next : "/app";
     appUrl.search = "";
     return NextResponse.redirect(appUrl);
   }

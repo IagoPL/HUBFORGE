@@ -17,7 +17,6 @@ import {
 import { useState } from "react";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
 import type { Locale } from "@/i18n/config";
@@ -26,9 +25,7 @@ import { cn } from "@/lib/utils";
 type ShellLabels = {
   brand: string;
   organization: string;
-  demoWorkspace: string;
   liveWorkspace: string;
-  mockData: string;
   language: string;
   english: string;
   spanish: string;
@@ -57,7 +54,7 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const { mode, activeOrganization, activeProject } = useWorkspace();
+  const { activeOrganization, activeProject } = useWorkspace();
 
   const nav = [
     { href: "/app", label: labels.overview, icon: LayoutDashboard },
@@ -83,7 +80,7 @@ export function AppShell({
       >
         <div className="mb-8 flex items-center justify-between">
           <Link
-            href="/"
+            href="/app"
             className="font-[family-name:var(--font-display)] text-lg font-semibold"
           >
             {labels.brand}
@@ -154,13 +151,10 @@ export function AppShell({
             </Button>
             <div>
               <p className="text-sm font-medium">{projectName}</p>
-              <p className="text-xs text-[var(--hf-fg-muted)]">
-                {mode === "demo" ? labels.demoWorkspace : labels.liveWorkspace}
-              </p>
+              <p className="text-xs text-[var(--hf-fg-muted)]">{labels.liveWorkspace}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {mode === "demo" ? <Badge tone="brand">{labels.mockData}</Badge> : null}
             <LanguageSwitcher
               locale={locale}
               labels={{

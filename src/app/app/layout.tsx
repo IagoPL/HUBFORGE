@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/authentication/user-menu";
 import { getCurrentUser } from "@/features/authentication/get-current-user";
@@ -9,20 +10,20 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const locale = await getLocale();
   const t = await getDictionary(locale);
   const user = await getCurrentUser();
-  const workspace = user
-    ? await getWorkspaceSnapshot()
-    : { mode: "demo" as const, state: undefined };
+  if (!user) {
+    redirect("/login?next=/app");
+  }
+
+  const workspace = await getWorkspaceSnapshot();
 
   return (
-    <WorkspaceProvider mode={workspace.mode} initialState={workspace.state}>
+    <WorkspaceProvider initialState={workspace.state}>
       <AppShell
         locale={locale}
         labels={{
           brand: t.common.brand,
           organization: t.nav.organization,
-          demoWorkspace: t.app.demoWorkspace,
           liveWorkspace: t.app.liveWorkspace,
-          mockData: t.common.mockData,
           language: t.common.language,
           english: t.common.english,
           spanish: t.common.spanish,
@@ -37,13 +38,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           github: t.nav.github,
           chat: t.nav.chat,
         }}
-        userSlot={
-          <UserMenu
-            user={user}
-            demoLabel={t.common.demoMode}
-            signOutLabel={t.common.signOut}
-          />
-        }
+        userSlot={<UserMenu user={user} signOutLabel={t.common.signOut} />}
       >
         {children}
       </AppShell>

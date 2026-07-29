@@ -38,8 +38,8 @@ export const en = {
     headline: "Build together without losing context.",
     subtitle:
       "HubForge connects planning, availability, responsibilities, and GitHub activity in one collaborative workspace for small technical and creative teams.",
-    enterDemo: "Enter demo workspace",
-    signInPreview: "Sign in preview",
+    enterDemo: "Open workspace",
+    signInPreview: "Sign in",
     boardProject: "Aurora Launch",
     boardOrg: "Northlight Studio",
     ready: "Ready",
@@ -77,20 +77,20 @@ export const en = {
     securityTitle: "Built for trust between organizations",
     securityBody:
       "Multi-tenant boundaries, least privilege, and audit-ready actions are part of the product foundation—not a later patch.",
-    exploreDemo: "Explore the demo",
+    exploreDemo: "Open workspace",
     footerTagline: "HubForge · collaborative project workspace",
-    footerStatus: "MVP · demo mode without credentials",
+    footerStatus: "Sign in with GitHub to start your workspace",
   },
   login: {
     title: "Sign in",
     body: "Continue with GitHub through Supabase Auth. Sessions are cookie-based and refreshed by the Next.js proxy.",
     continueGithub: "Continue with GitHub",
-    enterDemo: "Enter demo workspace",
+    enterDemo: "Open workspace",
     configWarning:
       "Supabase is not configured yet. Add NEXT_PUBLIC_SUPABASE_URL and a publishable/anon key to .env.local, then enable the GitHub provider.",
   },
   app: {
-    demoWorkspace: "Demo workspace",
+    demoWorkspace: "Workspace",
     liveWorkspace: "Live workspace",
     openTasks: "Open tasks",
     members: "Members",
@@ -117,12 +117,12 @@ export const en = {
     subtitle:
       "Organizations are the top-level tenant for projects, members, and permissions.",
     current: "Current organization",
-    switchHint: "Demo mode stores organizations in this browser.",
-    liveHint: "Signed-in workspaces persist in Supabase with RLS.",
+    switchHint: "Switch organization from the list below.",
+    liveHint: "Your workspace persists in Supabase with RLS.",
   },
   onboarding: {
     title: "Set up your workspace",
-    body: "Create an organization, then a project. Demo mode uses local data until you sign in.",
+    body: "Create an organization, then a project to start planning with your team.",
     stepOrg: "1. Organization",
     stepProject: "2. Project",
   },

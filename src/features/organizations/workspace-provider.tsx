@@ -6,7 +6,6 @@ import {
   useContext,
   useMemo,
   useState,
-  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import {
@@ -15,16 +14,12 @@ import {
 } from "@/features/organizations/actions";
 import type { WorkspaceMode } from "@/features/organizations/get-workspace";
 import {
-  WORKSPACE_STORAGE_KEY,
-  createDefaultWorkspaceState,
-  createOrganization,
-  createProject,
   getActiveOrganization,
   getActiveProject,
   getProjectsForOrganization,
-  parseWorkspaceState,
   type WorkspaceState,
 } from "@/features/organizations/workspace-state";
+import { emptyWorkspaceState } from "@/features/organizations/workspace-mapping";
 
 const PREFS_STORAGE_KEY = "hubforge.workspace.prefs.v1";
 
@@ -44,47 +39,6 @@ type WorkspaceContextValue = {
 
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
-let memoryState = createDefaultWorkspaceState();
-const listeners = new Set<() => void>();
-let hydrated = false;
-
-function emit() {
-  for (const listener of listeners) listener();
-}
-
-function ensureHydrated() {
-  if (hydrated || typeof window === "undefined") return;
-  hydrated = true;
-  memoryState = parseWorkspaceState(window.localStorage.getItem(WORKSPACE_STORAGE_KEY));
-}
-
-function subscribe(onStoreChange: () => void) {
-  ensureHydrated();
-  listeners.add(onStoreChange);
-  return () => {
-    listeners.delete(onStoreChange);
-  };
-}
-
-function getSnapshot() {
-  ensureHydrated();
-  return memoryState;
-}
-
-const serverSnapshot = createDefaultWorkspaceState();
-
-function getServerSnapshot() {
-  return serverSnapshot;
-}
-
-function writeDemoState(next: WorkspaceState) {
-  memoryState = next;
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(next));
-  }
-  emit();
-}
-
 function writePrefs(organizationId: string, projectId: string) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(
@@ -96,67 +50,17 @@ function writePrefs(organizationId: string, projectId: string) {
   );
 }
 
-function DemoWorkspaceProvider({ children }: { children: ReactNode }) {
-  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-
-  const addOrganization = useCallback(async (name: string) => {
-    writeDemoState(createOrganization(getSnapshot(), { name }));
-  }, []);
-
-  const addProject = useCallback(async (input: { name: string; description: string }) => {
-    const current = getSnapshot();
-    const organizationId =
-      current.activeOrganizationId || current.organizations[0]?.id || "";
-    if (!organizationId) return;
-    writeDemoState(createProject(current, { ...input, organizationId }));
-  }, []);
-
-  const setActiveOrganization = useCallback((organizationId: string) => {
-    const current = getSnapshot();
-    const projects = getProjectsForOrganization(current, organizationId);
-    writeDemoState({
-      ...current,
-      activeOrganizationId: organizationId,
-      activeProjectId: projects[0]?.id ?? current.activeProjectId,
-    });
-  }, []);
-
-  const setActiveProject = useCallback((projectId: string) => {
-    writeDemoState({ ...getSnapshot(), activeProjectId: projectId });
-  }, []);
-
-  const value = useMemo<WorkspaceContextValue>(() => {
-    const activeOrganization = getActiveOrganization(state);
-    const activeProject = getActiveProject(state);
-    return {
-      mode: "demo",
-      state,
-      activeOrganization,
-      activeProject,
-      organizationProjects: getProjectsForOrganization(
-        state,
-        activeOrganization?.id ?? "",
-      ),
-      pending: false,
-      error: null,
-      addOrganization,
-      addProject,
-      setActiveOrganization,
-      setActiveProject,
-    };
-  }, [state, addOrganization, addProject, setActiveOrganization, setActiveProject]);
-
-  return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;
-}
-
-function LiveWorkspaceProvider({
+export function WorkspaceProvider({
   children,
   initialState,
 }: {
   children: ReactNode;
-  initialState: WorkspaceState;
+  mode?: WorkspaceMode;
+  initialState?: WorkspaceState;
 }) {
-  const [state, setState] = useState(initialState);
+  const [state, setState] = useState<WorkspaceState>(
+    initialState ?? emptyWorkspaceState(),
+  );
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -251,26 +155,6 @@ function LiveWorkspaceProvider({
   ]);
 
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;
-}
-
-export function WorkspaceProvider({
-  children,
-  mode = "demo",
-  initialState,
-}: {
-  children: ReactNode;
-  mode?: WorkspaceMode;
-  initialState?: WorkspaceState;
-}) {
-  if (mode === "live" && initialState) {
-    return (
-      <LiveWorkspaceProvider initialState={initialState}>
-        {children}
-      </LiveWorkspaceProvider>
-    );
-  }
-
-  return <DemoWorkspaceProvider>{children}</DemoWorkspaceProvider>;
 }
 
 export function useWorkspace() {

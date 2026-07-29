@@ -36,8 +36,8 @@ export const es = {
     headline: "Construid juntos sin perder el contexto.",
     subtitle:
       "HubForge conecta planificación, disponibilidad, responsabilidades y actividad de GitHub en un espacio colaborativo para equipos técnicos y creativos pequeños.",
-    enterDemo: "Entrar al espacio demo",
-    signInPreview: "Vista previa de acceso",
+    enterDemo: "Abrir espacio",
+    signInPreview: "Iniciar sesión",
     boardProject: "Aurora Launch",
     boardOrg: "Northlight Studio",
     ready: "Listo",
@@ -75,20 +75,20 @@ export const es = {
     securityTitle: "Hecho para confiar entre organizaciones",
     securityBody:
       "Límites multi-tenant, mínimo privilegio y acciones auditables forman parte de la base del producto.",
-    exploreDemo: "Explorar la demo",
+    exploreDemo: "Abrir espacio",
     footerTagline: "HubForge · espacio colaborativo de proyectos",
-    footerStatus: "MVP · modo demo sin credenciales",
+    footerStatus: "Inicia sesión con GitHub para crear tu espacio",
   },
   login: {
     title: "Iniciar sesión",
     body: "Continúa con GitHub mediante Supabase Auth. Las sesiones van en cookies y se renuevan con el proxy de Next.js.",
     continueGithub: "Continuar con GitHub",
-    enterDemo: "Entrar al espacio demo",
+    enterDemo: "Abrir espacio",
     configWarning:
       "Supabase aún no está configurado. Añade NEXT_PUBLIC_SUPABASE_URL y una clave publishable/anon en .env.local y activa el proveedor de GitHub.",
   },
   app: {
-    demoWorkspace: "Espacio demo",
+    demoWorkspace: "Espacio",
     liveWorkspace: "Espacio en vivo",
     openTasks: "Tareas abiertas",
     members: "Miembros",
@@ -115,12 +115,12 @@ export const es = {
     subtitle:
       "Las organizaciones son el tenant superior para proyectos, miembros y permisos.",
     current: "Organización actual",
-    switchHint: "En modo demo las organizaciones se guardan en este navegador.",
-    liveHint: "Con sesión iniciada, el espacio se guarda en Supabase con RLS.",
+    switchHint: "Cambia de organización en la lista inferior.",
+    liveHint: "Tu espacio se guarda en Supabase con RLS.",
   },
   onboarding: {
     title: "Configura tu espacio",
-    body: "Crea una organización y después un proyecto. El modo demo usa datos locales hasta que inicies sesión.",
+    body: "Crea una organización y después un proyecto para empezar a planificar con tu equipo.",
     stepOrg: "1. Organización",
     stepProject: "2. Proyecto",
   },
