@@ -78,7 +78,9 @@ test.describe("smoke", () => {
 
   test("can add availability and mark a notification as read", async ({ page }) => {
     await page.goto("/app/calendar");
-    await page.getByLabel(/Note|Nota/i).fill("Deep work block");
+    const note = page.getByLabel(/Note|Nota/i);
+    await note.fill("Deep work block");
+    await expect(note).toHaveValue("Deep work block");
     await page
       .getByRole("button", {
         name: /Add availability window|Añadir ventana de disponibilidad/i,

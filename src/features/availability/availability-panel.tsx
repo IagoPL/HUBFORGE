@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,7 +76,7 @@ export function AvailabilityPanel({
   const [startsAt, setStartsAt] = useState(toLocalInputValue(now));
   const [endsAt, setEndsAt] = useState(toLocalInputValue(later));
   const [kind, setKind] = useState<AvailabilityEntry["kind"]>("unavailable");
-  const [note, setNote] = useState("");
+  const noteInputRef = useRef<HTMLInputElement | null>(null);
 
   const demoEntries = useMemo(() => {
     void demoTick;
@@ -115,9 +115,10 @@ export function AvailabilityPanel({
     };
   }, [mode, organizationId]);
 
-  function createEntry() {
+  function createEntry(submittedNote: string) {
     if (!organizationId) return;
     setError(null);
+    const resolvedNote = submittedNote.trim() || "Personal window";
 
     if (mode === "demo") {
       const entry: AvailabilityEntry = {
@@ -126,11 +127,11 @@ export function AvailabilityPanel({
         startsAt: new Date(startsAt).toISOString(),
         endsAt: new Date(endsAt).toISOString(),
         kind,
-        note: note.trim() || "Personal window",
+        note: resolvedNote,
       };
       saveDemoAvailability(organizationId, [...demoEntries, entry]);
       setDemoTick((value) => value + 1);
-      setNote("");
+      if (noteInputRef.current) noteInputRef.current.value = "";
       return;
     }
 
@@ -140,7 +141,7 @@ export function AvailabilityPanel({
         startsAt: new Date(startsAt).toISOString(),
         endsAt: new Date(endsAt).toISOString(),
         kind,
-        note,
+        note: resolvedNote,
       }).then((result) => {
         if (!result.ok) {
           setError(result.error);
@@ -149,7 +150,7 @@ export function AvailabilityPanel({
         setLiveEntries((current) =>
           [...current, result.data].sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
         );
-        setNote("");
+        if (noteInputRef.current) noteInputRef.current.value = "";
       });
     });
   }
@@ -191,7 +192,8 @@ export function AvailabilityPanel({
         className="grid max-w-3xl gap-3 rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5 md:grid-cols-2"
         onSubmit={(event) => {
           event.preventDefault();
-          createEntry();
+          const formData = new FormData(event.currentTarget);
+          createEntry(String(formData.get("note") ?? ""));
         }}
       >
         <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold md:col-span-2">
@@ -232,11 +234,13 @@ export function AvailabilityPanel({
             <option value="unavailable">unavailable</option>
           </select>
         </label>
-        <label className="block space-y-2 text-sm">
+        <label className="block space-y-2 text-sm" htmlFor="availability-note">
           <span className="font-medium">{labels.note}</span>
           <input
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
+            ref={noteInputRef}
+            id="availability-note"
+            name="note"
+            defaultValue=""
             className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
             disabled={pending || !organizationId}
           />

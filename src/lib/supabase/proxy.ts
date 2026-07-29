@@ -35,16 +35,10 @@ export async function updateSession(request: NextRequest) {
   });
 
   // Validate JWT claims (do not trust getSession() alone for authz).
+  // Unsigned visitors can still use /app in demo mode; live writes stay gated in server actions.
   const { data } = await supabase.auth.getClaims();
   const isAuthenticated = Boolean(data?.claims?.sub);
   const pathname = request.nextUrl.pathname;
-
-  if (pathname.startsWith("/app") && !isAuthenticated) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
 
   if (pathname === "/login" && isAuthenticated) {
     const appUrl = request.nextUrl.clone();
