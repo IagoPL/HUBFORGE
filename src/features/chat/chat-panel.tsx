@@ -36,6 +36,7 @@ function loadDemoStore(): DemoStore {
 }
 
 function saveDemoStore(store: DemoStore) {
+  if (typeof window === "undefined") return;
   window.localStorage.setItem(DEMO_CHAT_KEY, JSON.stringify(store));
 }
 
@@ -82,8 +83,10 @@ export function ChatPanel({
         kind: "project",
         name: "general",
       };
-      store.channels.push(general);
-      saveDemoStore(store);
+      if (typeof window !== "undefined") {
+        store.channels.push(general);
+        saveDemoStore(store);
+      }
       projectChannels = [general];
     }
     return {
