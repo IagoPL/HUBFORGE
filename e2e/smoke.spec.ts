@@ -101,12 +101,21 @@ test.describe("smoke", () => {
   });
 
   test("can link a GitHub repository in demo mode", async ({ page }) => {
+    await page.goto("/app");
+    await expect(page.getByRole("heading").first()).toBeVisible();
     await page.goto("/app/github");
-    await page.getByLabel(/Repository|Repositorio/i).fill("IagoPL/HUBFORGE");
+    await expect(
+      page.getByRole("heading", { name: /GitHub sync|Sincronización GitHub/i }),
+    ).toBeVisible();
+    const repoInput = page.getByLabel(/Repository|Repositorio/i);
+    await expect(repoInput).toBeVisible();
+    await repoInput.fill("IagoPL/HUBFORGE");
     await page
       .getByRole("button", { name: /Link repository|Vincular repositorio/i })
       .click();
-    await expect(page.getByRole("link", { name: "IagoPL/HUBFORGE" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "IagoPL/HUBFORGE" })).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText(/Wire GitHub App webhooks/i)).toBeVisible();
   });
 

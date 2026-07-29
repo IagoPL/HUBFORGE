@@ -77,7 +77,7 @@ export const es = {
       "Límites multi-tenant, mínimo privilegio y acciones auditables forman parte de la base del producto.",
     exploreDemo: "Explorar la demo",
     footerTagline: "HubForge · espacio colaborativo de proyectos",
-    footerStatus: "Fase bootstrap · solo datos demo",
+    footerStatus: "MVP · modo demo sin credenciales",
   },
   login: {
     title: "Iniciar sesión",

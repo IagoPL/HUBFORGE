@@ -79,7 +79,7 @@ export const en = {
       "Multi-tenant boundaries, least privilege, and audit-ready actions are part of the product foundation—not a later patch.",
     exploreDemo: "Explore the demo",
     footerTagline: "HubForge · collaborative project workspace",
-    footerStatus: "Bootstrap phase · demo data only",
+    footerStatus: "MVP · demo mode without credentials",
   },
   login: {
     title: "Sign in",

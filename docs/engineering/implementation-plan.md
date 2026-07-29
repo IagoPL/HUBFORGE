@@ -30,3 +30,16 @@
 7. `feat/chat-realtime` — project channels + Realtime messages (done)
 
 Trunk-based: short feature branches into `main`. No `develop` unless coordination pain appears.
+
+## Phase 3 — Live ops (manual)
+
+- Configure GitHub OAuth in Supabase (`docs/operations/supabase-auth-setup.md`)
+- Create GitHub App + webhook env (`docs/operations/github-app-setup.md`)
+- Optional Vercel deployment with the same env vars
+
+## Phase 4 — Post-MVP (later)
+
+- AI assistant for planning / triage
+- Sprints, roadmap, and workload analytics
+- PWA / push notifications
+- Richer chat (threads, reactions) — still no E2E encryption in near term
