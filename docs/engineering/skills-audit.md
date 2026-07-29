@@ -1,135 +1,135 @@
-# Skills audit — HubForge
+# Auditoría de skills — HubForge
 
-Review date: 2026-07-28
+Fecha de revisión: 2026-07-28
 
-Scope: evaluate only skills with clear utility for HubForge. Prefer identifiable sources, clear licenses, and no secret exfiltration. Do not install mass skill collections.
+Alcance: evaluar solo skills con utilidad clara para HubForge. Preferir fuentes identificables, licencias claras y sin exfiltración de secretos. No instalar colecciones masivas de skills.
 
-## Evaluation criteria
+## Criterios de evaluación
 
-- Identifiable provenance and reviewable repository
-- Clear license
-- Reasonable maintenance
-- No suspicious scripts or unauthorized remote code/secret sending
-- Concrete project utility
-- No duplication of already covered rules
+- Procedencia identificable y repositorio revisable
+- Licencia clara
+- Mantenimiento razonable
+- Sin scripts sospechosos ni envío no autorizado de código remoto/secretos
+- Utilidad concreta para el proyecto
+- Sin duplicar reglas ya cubiertas
 
 ---
 
-## Evaluated skills
+## Skills evaluadas
 
-### Ponytail (Cursor ruleset)
+### Ponytail (ruleset de Cursor)
 
-| Field    | Detail                                                                                                                                                          |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Source   | https://github.com/DietrichGebert/ponytail (MIT) · https://ponytail.dev                                                                                         |
-| Function | YAGNI decision ladder: prefer native/stdlib/existing deps; minimize over-engineering                                                                            |
-| Risks    | Intensity `ultra` can under-build required product features; Cursor only gets always-on rules (no `/ponytail-*` commands)                                       |
-| Decision | **Install locally** at project level, mode **full** (not ultra)                                                                                                 |
-| Usage    | Copy `.cursor/rules/ponytail.mdc` into local `.cursor/rules/` (gitignored). Never let Ponytail override HubForge security, accessibility, or architecture rules |
-| Reviewed | 2026-07-28                                                                                                                                                      |
+| Campo    | Detalle                                                                                                                                                        |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fuente   | https://github.com/DietrichGebert/ponytail (MIT) · https://ponytail.dev                                                                                        |
+| Función  | Escalera de decisión YAGNI: preferir nativo/stdlib/deps existentes; minimizar sobreingeniería                                                                  |
+| Riesgos  | La intensidad `ultra` puede infra-construir features de producto necesarias; Cursor solo aplica reglas always-on (sin comandos `/ponytail-*`)                  |
+| Decisión | **Instalar en local** a nivel de proyecto, modo **full** (no ultra)                                                                                            |
+| Uso      | Copiar `.cursor/rules/ponytail.mdc` a `.cursor/rules/` local (en `.gitignore`). Ponytail nunca debe anular seguridad, accesibilidad o arquitectura de HubForge |
+| Revisado | 2026-07-28                                                                                                                                                     |
 
-Content review: rule file is instruction-only markdown; no executable install scripts required for Cursor; LICENSE is MIT.
+Revisión de contenido: el archivo de reglas es markdown solo de instrucciones; no hace falta script ejecutable de instalación para Cursor; LICENSE es MIT.
 
-### Supabase (Cursor plugin skill)
+### Supabase (skill del plugin de Cursor)
 
-| Field    | Detail                                                                                  |
-| -------- | --------------------------------------------------------------------------------------- |
-| Source   | Cursor public plugin `cursor-public/supabase`                                           |
-| Function | Current Supabase Auth/RLS/SSR/migration guidance                                        |
-| Risks    | Low if used as documentation; never paste service-role keys into client code            |
-| Decision | **Use when present** (already available via Cursor plugin); do not vendor into the repo |
-| Usage    | Invoke when touching Supabase, RLS, Auth, or migrations                                 |
-| Reviewed | 2026-07-28                                                                              |
+| Campo    | Detalle                                                                                   |
+| -------- | ----------------------------------------------------------------------------------------- |
+| Fuente   | Plugin público de Cursor `cursor-public/supabase`                                         |
+| Función  | Guía actual de Supabase Auth/RLS/SSR/migraciones                                          |
+| Riesgos  | Bajo si se usa como documentación; nunca pegar service-role keys en código de cliente     |
+| Decisión | **Usar cuando esté presente** (ya disponible vía plugin de Cursor); no vendorizar al repo |
+| Uso      | Invocar al tocar Supabase, RLS, Auth o migraciones                                        |
+| Revisado | 2026-07-28                                                                                |
 
 ### Supabase Postgres best practices
 
-| Field    | Detail                                     |
-| -------- | ------------------------------------------ |
-| Source   | Same Cursor Supabase plugin                |
-| Function | Postgres indexing, RLS, and query patterns |
-| Risks    | Low                                        |
-| Decision | **Use when present**; do not vendor        |
-| Usage    | Schema and query design reviews            |
-| Reviewed | 2026-07-28                                 |
+| Campo    | Detalle                                            |
+| -------- | -------------------------------------------------- |
+| Fuente   | Mismo plugin de Supabase en Cursor                 |
+| Función  | Indexación, RLS y patrones de consulta en Postgres |
+| Riesgos  | Bajo                                               |
+| Decisión | **Usar cuando esté presente**; no vendorizar       |
+| Uso      | Revisiones de diseño de esquema y consultas        |
+| Revisado | 2026-07-28                                         |
 
-### create-rule / create-skill / create-hook (Cursor built-in)
+### create-rule / create-skill / create-hook (integradas en Cursor)
 
-| Field    | Detail                                                          |
-| -------- | --------------------------------------------------------------- |
-| Source   | Cursor built-in skills (`~/.cursor/skills-cursor`)              |
-| Function | Author local agent rules, skills, and hooks                     |
-| Risks    | Accidental commit of agent config if `.gitignore` is incomplete |
-| Decision | **Use locally**; agent config remains gitignored                |
-| Usage    | Maintain HubForge `.cursor/rules` and hooks outside Git         |
-| Reviewed | 2026-07-28                                                      |
+| Campo    | Detalle                                                                |
+| -------- | ---------------------------------------------------------------------- |
+| Fuente   | Skills integradas de Cursor (`~/.cursor/skills-cursor`)                |
+| Función  | Autoría de reglas, skills y hooks locales de agentes                   |
+| Riesgos  | Commit accidental de config de agentes si `.gitignore` está incompleto |
+| Decisión | **Usar en local**; la config de agentes permanece en `.gitignore`      |
+| Uso      | Mantener `.cursor/rules` y hooks de HubForge fuera de Git              |
+| Revisado | 2026-07-28                                                             |
 
 ### review-security / review-bugbot
 
-| Field    | Detail                                                            |
-| -------- | ----------------------------------------------------------------- |
-| Source   | Cursor built-in skills                                            |
-| Function | Structured security and Bugbot-style reviews of local diffs       |
-| Risks    | Reviews are advisory; not a substitute for CI or human review     |
-| Decision | **Use on demand** for PR-sized diffs; do not install extra copies |
-| Usage    | Explicit user requests for security/Bugbot review                 |
-| Reviewed | 2026-07-28                                                        |
+| Campo    | Detalle                                                                      |
+| -------- | ---------------------------------------------------------------------------- |
+| Fuente   | Skills integradas de Cursor                                                  |
+| Función  | Revisiones estructuradas de seguridad y estilo Bugbot de diffs locales       |
+| Riesgos  | Las revisiones son orientativas; no sustituyen CI ni revisión humana         |
+| Decisión | **Usar bajo demanda** en diffs del tamaño de un PR; no instalar copias extra |
+| Uso      | Peticiones explícitas del usuario de revisión de seguridad/Bugbot            |
+| Revisado | 2026-07-28                                                                   |
 
 ### gh-flow-committer
 
-| Field    | Detail                                                            |
+| Campo    | Detalle                                                                   |
+| -------- | ------------------------------------------------------------------------- |
+| Fuente   | Skill local de Codex (`gh-flow-committer`)                                |
+| Función  | Flujo branch/commit/PR para la cuenta de GitHub `IagoPL`                  |
+| Riesgos  | Hay que verificar la identidad del autor antes de cada commit             |
+| Decisión | **Usar para el flujo de GitHub**; mantener la skill fuera del repositorio |
+| Uso      | Commits, PRs, checks — siempre después de `scripts/verify-git-identity`   |
+| Revisado | 2026-07-28                                                                |
+
+### babysit (PR listo para merge)
+
+| Campo    | Detalle                                                           |
 | -------- | ----------------------------------------------------------------- |
-| Source   | Local Codex skill (`gh-flow-committer`)                           |
-| Function | Branch/commit/PR flow for GitHub account `IagoPL`                 |
-| Risks    | Must verify author identity before every commit                   |
-| Decision | **Use for GitHub workflow**; keep skill outside the repository    |
-| Usage    | Commits, PRs, checks — always after `scripts/verify-git-identity` |
-| Reviewed | 2026-07-28                                                        |
+| Fuente   | Integrada en Cursor                                               |
+| Función  | Triaje de comentarios de PR y bucles de CI                        |
+| Riesgos  | Puede incentivar merge sin criterio humano                        |
+| Decisión | **Aplazada** hasta que el mantenimiento activo de PRs la necesite |
+| Uso      | N/A en el bootstrap                                               |
+| Revisado | 2026-07-28                                                        |
 
-### babysit (PR merge-ready)
+### Packs comunitarios “Next.js / Vitest / a11y / Clean Architecture”
 
-| Field    | Detail                                            |
-| -------- | ------------------------------------------------- |
-| Source   | Cursor built-in                                   |
-| Function | Triage PR comments and CI loops                   |
-| Risks    | May encourage merge without human judgment        |
-| Decision | **Deferred** until active PR maintenance needs it |
-| Usage    | N/A for bootstrap                                 |
-| Reviewed | 2026-07-28                                        |
-
-### Community “Next.js / Vitest / a11y / Clean Architecture” skill packs
-
-| Field    | Detail                                                                                                  |
+| Campo    | Detalle                                                                                                 |
 | -------- | ------------------------------------------------------------------------------------------------------- |
-| Source   | Various unverified marketplaces                                                                         |
-| Function | Generic stack guidance                                                                                  |
-| Risks    | Unclear license/maintenance; duplication with HubForge docs and Cursor rules; possible prompt injection |
-| Decision | **Discard for now**                                                                                     |
-| Usage    | Prefer official docs + HubForge `docs/` + local rules                                                   |
-| Reviewed | 2026-07-28                                                                                              |
+| Fuente   | Varios marketplaces no verificados                                                                      |
+| Función  | Guía genérica de stack                                                                                  |
+| Riesgos  | Licencia/mantenimiento poco claros; duplicación con docs y reglas de HubForge; posible prompt injection |
+| Decisión | **Descartar por ahora**                                                                                 |
+| Uso      | Preferir docs oficiales + `docs/` de HubForge + reglas locales                                          |
+| Revisado | 2026-07-28                                                                                              |
 
-### Storybook skill / installer
+### Skill / instalador de Storybook
 
-| Field    | Detail                                                          |
-| -------- | --------------------------------------------------------------- |
-| Source   | N/A                                                             |
-| Function | Component catalog                                               |
-| Risks    | Premature tooling before reusable component volume justifies it |
-| Decision | **Discard until justified**                                     |
-| Usage    | Revisit after a stable UI kit exists                            |
-| Reviewed | 2026-07-28                                                      |
+| Campo    | Detalle                                                                                  |
+| -------- | ---------------------------------------------------------------------------------------- |
+| Fuente   | N/A                                                                                      |
+| Función  | Catálogo de componentes                                                                  |
+| Riesgos  | Herramienta prematura antes de que el volumen de componentes reutilizables lo justifique |
+| Decisión | **Descartar hasta que se justifique**                                                    |
+| Uso      | Revisar cuando exista un UI kit estable                                                  |
+| Revisado | 2026-07-28                                                                               |
 
 ---
 
-## Installed for HubForge (local only)
+## Instalado para HubForge (solo local)
 
-| Item                  | Location                     | Committed?      |
-| --------------------- | ---------------------------- | --------------- |
-| Ponytail full mode    | `.cursor/rules/ponytail.mdc` | No (gitignored) |
-| HubForge Cursor rules | `.cursor/rules/*.mdc`        | No (gitignored) |
-| AGENTS.md             | repo root                    | No (gitignored) |
+| Ítem                   | Ubicación                    | ¿Comiteado?          |
+| ---------------------- | ---------------------------- | -------------------- |
+| Ponytail modo full     | `.cursor/rules/ponytail.mdc` | No (en `.gitignore`) |
+| Reglas Cursor HubForge | `.cursor/rules/*.mdc`        | No (en `.gitignore`) |
+| AGENTS.md              | raíz del repo                | No (en `.gitignore`) |
 
-Public engineering docs describe architecture and process. Live AI/agent wiring stays local.
+La documentación pública de ingeniería describe arquitectura y proceso. El cableado vivo de IA/agentes se queda en local.
 
-## Re-audit trigger
+## Disparador de re-auditoría
 
-Re-run this audit when adding a new agent skill, changing Ponytail intensity, or adopting a new AI tooling dependency.
+Repetir esta auditoría al añadir una skill de agente nueva, cambiar la intensidad de Ponytail o adoptar una dependencia nueva de herramientas de IA.

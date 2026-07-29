@@ -1,25 +1,25 @@
-# Security Policy
+# Política de seguridad
 
-## Supported versions
+## Versiones soportadas
 
-HubForge is in early development. Security fixes target the `main` branch.
+HubForge está en desarrollo temprano. Las correcciones de seguridad se aplican en la rama `main`.
 
-## Reporting a vulnerability
+## Cómo reportar una vulnerabilidad
 
-Do not open a public issue for security vulnerabilities.
+No abras un issue público para vulnerabilidades de seguridad.
 
-Email the maintainer via GitHub (`@IagoPL`) using a private vulnerability report when available, or contact through GitHub Security Advisories for this repository.
+Contacta al mantenedor por GitHub (`@IagoPL`) con un reporte privado de vulnerabilidad cuando esté disponible, o usa GitHub Security Advisories de este repositorio.
 
-Include:
+Incluye:
 
-- Description of the issue
-- Steps to reproduce
-- Impact assessment
-- Any suggested fix
+- Descripción del problema
+- Pasos para reproducirlo
+- Evaluación del impacto
+- Cualquier corrección sugerida
 
-Please allow reasonable time for triage before public disclosure.
+Concede un tiempo razonable para el triaje antes de una divulgación pública.
 
-## Non-goals for reports
+## Fuera del alcance de los reportes
 
-- Missing features that are explicitly listed as planned
-- Demo/mock data limitations in the bootstrap UI
+- Funcionalidades pendientes que ya figuran como planificadas
+- Limitaciones de datos demo/mock en la UI de bootstrap

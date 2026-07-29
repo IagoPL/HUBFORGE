@@ -1,18 +1,18 @@
-# ADR 0002 — Supabase as data platform
+# ADR 0002 — Supabase como plataforma de datos
 
-- Status: Accepted
-- Date: 2026-07-28
+- Estado: Aceptado
+- Fecha: 2026-07-28
 
-## Context
+## Contexto
 
-HubForge needs auth, Postgres, RLS, realtime, and storage without operating a custom backend fleet.
+HubForge necesita auth, Postgres, RLS, realtime y storage sin operar una flota de backends propios.
 
-## Decision
+## Decisión
 
-Use Supabase (Auth, Postgres, Realtime, Storage) with versioned SQL migrations and RLS on exposed tables. Bootstrap UI may run on typed demo data until credentials exist.
+Usar Supabase (Auth, Postgres, Realtime, Storage) con migraciones SQL versionadas y RLS en las tablas expuestas. La UI de bootstrap puede funcionar con datos demo tipados hasta que existan credenciales.
 
-## Consequences
+## Consecuencias
 
-- Fast path to secure multi-tenant data
-- Must never expose service role keys to the browser
-- Authorization must be enforced in DB policies and server actions, not only UI
+- Camino rápido hacia datos multi-tenant seguros
+- Nunca exponer service role keys al navegador
+- La autorización debe aplicarse en políticas de BD y server actions, no solo en la UI

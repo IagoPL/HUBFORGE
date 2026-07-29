@@ -1,16 +1,16 @@
-# Contributing to HubForge
+# Contribuir a HubForge
 
-Thanks for helping build HubForge.
+Gracias por ayudar a construir HubForge.
 
-## Ground rules
+## Normas básicas
 
-1. Do not commit secrets (`.env`, keys, tokens).
-2. Do not develop directly on `main`.
-3. Use short-lived branches and Pull Requests.
-4. Keep AI/agent config local — `.cursor/`, `AGENTS.md`, and similar paths are gitignored.
-5. Verify Git identity before committing (`pnpm verify:git-identity`).
+1. No subas secretos (`.env`, claves, tokens).
+2. No desarrolles directamente en `main`.
+3. Usa ramas de corta duración y Pull Requests.
+4. Mantén la configuración de IA/agentes en local: `.cursor/`, `AGENTS.md` y rutas similares están en `.gitignore`.
+5. Verifica la identidad de Git antes de hacer commit (`pnpm verify:git-identity`).
 
-## Branch naming
+## Nombres de rama
 
 ```text
 feat/<slug>
@@ -21,9 +21,9 @@ test/<slug>
 chore/<slug>
 ```
 
-## Commit messages
+## Mensajes de commit
 
-Use Conventional Commits:
+Usa Conventional Commits:
 
 ```text
 feat(auth): add GitHub OAuth login
@@ -31,14 +31,14 @@ fix(webhooks): prevent duplicate issue events
 docs(architecture): document module boundaries
 ```
 
-## Local setup
+## Configuración local
 
-1. Install Node.js 20+ and pnpm 11+.
-2. Copy `.env.example` to `.env.local` and fill values when integrating Supabase.
+1. Instala Node.js 20+ y pnpm 11+.
+2. Copia `.env.example` a `.env.local` y completa los valores al integrar Supabase.
 3. `pnpm install`
 4. `pnpm dev`
 
-## Checks before PR
+## Comprobaciones antes del PR
 
 ```bash
 pnpm lint
@@ -48,16 +48,16 @@ pnpm test
 pnpm build
 ```
 
-Optional smoke:
+Smoke opcional:
 
 ```bash
 pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-## PR expectations
+## Expectativas del PR
 
-- Small, reviewable scope
-- Updated docs when behavior or architecture changes
-- No speculative empty modules
-- Accessibility considered for UI changes
+- Alcance pequeño y revisable
+- Documentación actualizada cuando cambie el comportamiento o la arquitectura
+- Sin módulos vacíos especulativos
+- Accesibilidad considerada en cambios de UI

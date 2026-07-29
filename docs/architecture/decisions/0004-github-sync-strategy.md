@@ -1,21 +1,21 @@
-# ADR 0004 — GitHub synchronization strategy
+# ADR 0004 — Estrategia de sincronización con GitHub
 
-- Status: Accepted
-- Date: 2026-07-28
+- Estado: Aceptado
+- Fecha: 2026-07-28
 
-## Context
+## Contexto
 
-Issues/PRs originate on GitHub; HubForge owns availability, chat, functional roles, and internal planning fields.
+Issues/PRs nacen en GitHub; HubForge posee disponibilidad, chat, roles funcionales y campos de planificación interna.
 
-## Decision
+## Decisión
 
-- GitHub is source of truth for GitHub-originated objects
-- HubForge is source of truth for internal collaboration data
-- Persist external IDs; process webhooks idempotently; reconcile periodically
-- Never delete local records on ambiguous webhook payloads
-- Avoid sync loops with clear origin markers
+- GitHub es la fuente de verdad de los objetos originados en GitHub
+- HubForge es la fuente de verdad de los datos de colaboración interna
+- Persistir IDs externos; procesar webhooks de forma idempotente; reconciliar periódicamente
+- Nunca borrar registros locales ante payloads de webhook ambiguos
+- Evitar bucles de sincronización con marcadores claros de origen
 
-## Consequences
+## Consecuencias
 
-- Explicit field ownership in UI
-- More engineering for reconciliation, fewer silent data-loss bugs
+- Propiedad explícita de campos en la UI
+- Más ingeniería de reconciliación, menos bugs silenciosos de pérdida de datos

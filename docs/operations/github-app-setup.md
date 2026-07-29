@@ -1,21 +1,21 @@
-# GitHub App setup (repository sync)
+# Configuración de la GitHub App (sincronización de repositorios)
 
-HubForge syncs issues through a **GitHub App** (not personal access tokens). Auth login remains Supabase GitHub OAuth and is separate.
+HubForge sincroniza issues mediante una **GitHub App** (no personal access tokens). El login sigue siendo Supabase GitHub OAuth y es independiente.
 
-## 1. Create the GitHub App
+## 1. Crear la GitHub App
 
-1. Open https://github.com/settings/apps/new
-2. Homepage URL: your app URL (`http://localhost:3000` locally)
+1. Abre https://github.com/settings/apps/new
+2. Homepage URL: la URL de tu app (`http://localhost:3000` en local)
 3. Webhook URL: `https://<public-host>/api/github/webhooks`
-4. Webhook secret: generate a long random string
+4. Webhook secret: genera una cadena larga aleatoria
 5. Permissions (Repository):
    - Issues: Read & write
    - Metadata: Read-only
-   - Pull requests: Read-only (activity later)
+   - Pull requests: Read-only (actividad más adelante)
 6. Subscribe to events: `Issues`, `Installation`, `Installation repositories`
-7. Create the app and note App ID, Client ID, Client secret, and generate a private key
+7. Crea la app y anota App ID, Client ID, Client secret, y genera una private key
 
-## 2. Environment
+## 2. Entorno
 
 ```bash
 GITHUB_APP_ID=
@@ -27,17 +27,17 @@ GITHUB_APP_SLUG=your-app-slug
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` is required for webhook idempotency writes. Never expose it with `NEXT_PUBLIC_`.
+`SUPABASE_SERVICE_ROLE_KEY` es necesaria para escrituras de idempotencia de webhooks. Nunca la expongas con `NEXT_PUBLIC_`.
 
-## 3. Database
+## 3. Base de datos
 
-Apply `supabase/migrations/20260728240000_github_app_sync.sql` after the earlier HubForge migrations.
+Aplica `supabase/migrations/20260728240000_github_app_sync.sql` después de las migraciones anteriores de HubForge.
 
-## 4. Link a repository
+## 4. Vincular un repositorio
 
-1. Install the app on the org/user that owns the repo
-2. Open HubForge → GitHub
-3. Link `owner/repo` to the active project (optionally store the installation id)
-4. Open/close an issue on GitHub; HubForge upserts `github_synced_issues` and mirrors a HubForge task marked with GitHub origin
+1. Instala la app en la org/usuario que posee el repo
+2. Abre HubForge → GitHub
+3. Vincula `owner/repo` al proyecto activo (opcionalmente guarda el installation id)
+4. Abre/cierra un issue en GitHub; HubForge hace upsert de `github_synced_issues` y refleja una tarea de HubForge marcada con origen GitHub
 
-Without App credentials, the GitHub page still works in demo mode using localStorage.
+Sin credenciales de la App, la página de GitHub sigue funcionando en modo demo con localStorage.

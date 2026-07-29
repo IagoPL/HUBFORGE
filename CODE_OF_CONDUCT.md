@@ -1,28 +1,28 @@
-# Code of Conduct
+# Código de conducta
 
-## Our pledge
+## Nuestro compromiso
 
-We pledge to make participation in HubForge a harassment-free experience for everyone.
+Nos comprometemos a que participar en HubForge sea una experiencia libre de acoso para todo el mundo.
 
-## Our standards
+## Nuestros estándares
 
-Examples of behavior that contributes to a positive environment:
+Ejemplos de comportamiento que favorecen un entorno positivo:
 
-- Respectful, constructive feedback
-- Focusing on what is best for the community and the product
-- Accepting responsibility and apologizing when mistakes happen
+- Feedback respetuoso y constructivo
+- Priorizar lo mejor para la comunidad y el producto
+- Asumir responsabilidad y pedir disculpas cuando haya errores
 
-Unacceptable behavior includes:
+Comportamientos inaceptables:
 
-- Harassment, insults, or discriminatory jokes
-- Publishing others’ private information
-- Sexualized language or imagery in project spaces
+- Acoso, insultos o bromas discriminatorias
+- Publicar información privada de otras personas
+- Lenguaje o imágenes sexualizadas en espacios del proyecto
 
-## Enforcement
+## Aplicación
 
-Instances of abusive behavior may be reported to the project maintainer (`@IagoPL`).
-The maintainer will review and take action they deem appropriate, including warnings or temporary/permanent bans from project spaces.
+Los casos de comportamiento abusivo pueden reportarse al mantenedor del proyecto (`@IagoPL`).
+El mantenedor revisará y tomará las medidas que considere oportunas, incluidas advertencias o expulsiones temporales/permanentes de los espacios del proyecto.
 
-## Scope
+## Alcance
 
-This Code of Conduct applies within project spaces and in public spaces when an individual is representing the project.
+Este Código de conducta aplica en los espacios del proyecto y en espacios públicos cuando alguien representa al proyecto.

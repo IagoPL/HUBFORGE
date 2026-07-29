@@ -1,6 +1,6 @@
-# Architecture overview
+# Visión general de la arquitectura
 
-HubForge is a **modular monolith**: one Next.js application with managed Supabase services.
+HubForge es un **monolito modular**: una aplicación Next.js con servicios gestionados de Supabase.
 
 ```text
 src/
@@ -11,18 +11,18 @@ src/
   server/              # reserved for privileged server modules (auth, github, security)
 ```
 
-## Boundaries
+## Límites
 
-| Concern      | Rule                                                          |
-| ------------ | ------------------------------------------------------------- |
-| Presentation | No direct privileged Supabase access from visual components   |
-| Domain types | Zod schemas in `lib/domain`                                   |
-| Demo data    | Behind `getDemoWorkspace()`                                   |
-| Secrets      | Env only; never logged                                        |
-| Multi-tenant | Every project entity must resolve to org + project; RLS later |
+| Ámbito       | Regla                                                                 |
+| ------------ | --------------------------------------------------------------------- |
+| Presentation | Sin acceso privilegiado directo a Supabase desde componentes visuales |
+| Domain types | Esquemas Zod en `lib/domain`                                          |
+| Demo data    | Detrás de `getDemoWorkspace()`                                        |
+| Secrets      | Solo en env; nunca en logs                                            |
+| Multi-tenant | Toda entidad de proyecto debe resolver a org + project; RLS después   |
 
-## Near-term domains
+## Dominios a corto plazo
 
 Authentication → Organizations → Projects → Members/Roles → Tasks → Availability → Notifications → GitHub integration → Chat
 
-Only create feature folders when they contain real code.
+Solo crea carpetas de feature cuando contengan código real.

@@ -1,24 +1,24 @@
-## Summary
+## Resumen
 
-<!-- What changed and why -->
+<!-- Qué cambió y por qué -->
 
-## Decisions
+## Decisiones
 
-<!-- Notable trade-offs -->
+<!-- Compromisos o trade-offs relevantes -->
 
-## Checks
+## Comprobaciones
 
 - [ ] `pnpm lint`
 - [ ] `pnpm format:check`
 - [ ] `pnpm typecheck`
 - [ ] `pnpm test`
 - [ ] `pnpm build`
-- [ ] Visual review (desktop + mobile)
+- [ ] Revisión visual (escritorio + móvil)
 
-## Risk / follow-up
+## Riesgo / seguimiento
 
-<!-- Known gaps -->
+<!-- Huecos conocidos -->
 
-## Screenshots
+## Capturas
 
-<!-- Optional -->
+<!-- Opcional -->

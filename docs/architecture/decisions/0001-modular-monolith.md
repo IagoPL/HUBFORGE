@@ -1,18 +1,18 @@
-# ADR 0001 — Modular monolith
+# ADR 0001 — Monolito modular
 
-- Status: Accepted
-- Date: 2026-07-28
+- Estado: Aceptado
+- Fecha: 2026-07-28
 
-## Context
+## Contexto
 
-HubForge needs a maintainable foundation that can grow into auth, multi-tenant data, GitHub sync, and realtime chat without premature distributed complexity.
+HubForge necesita una base mantenible que pueda crecer hacia auth, datos multi-tenant, sincronización con GitHub y chat en tiempo real, sin complejidad distribuida prematura.
 
-## Decision
+## Decisión
 
-Ship a single Next.js application (modular monolith) with Supabase managed services. Organize by domain as modules gain real code.
+Entregar una única aplicación Next.js (monolito modular) con servicios gestionados de Supabase. Organizar por dominio a medida que los módulos tengan código real.
 
-## Consequences
+## Consecuencias
 
-- Simple deploy (Vercel + Supabase)
-- Clear module boundaries still required
-- Microservices/Kafka/Redis deferred until a proven need exists
+- Despliegue simple (Vercel + Supabase)
+- Siguen haciendo falta límites claros entre módulos
+- Microservicios/Kafka/Redis aplazados hasta que exista una necesidad demostrada

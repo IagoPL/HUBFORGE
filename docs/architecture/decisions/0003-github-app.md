@@ -1,18 +1,18 @@
-# ADR 0003 — GitHub App over personal tokens
+# ADR 0003 — GitHub App frente a tokens personales
 
-- Status: Accepted
-- Date: 2026-07-28
+- Estado: Aceptado
+- Fecha: 2026-07-28
 
-## Context
+## Contexto
 
-Repository sync requires durable, least-privilege access across installations.
+La sincronización de repositorios exige acceso durable y de mínimo privilegio entre instalaciones.
 
-## Decision
+## Decisión
 
-Integrate via a GitHub App (installations, webhooks, Octokit). Personal access tokens are not the permanent architecture.
+Integrar mediante una GitHub App (instalaciones, webhooks, Octokit). Los personal access tokens no son la arquitectura permanente.
 
-## Consequences
+## Consecuencias
 
-- Better permission scoping and customer installs
-- Requires webhook signature verification and idempotency
-- Implementation starts after org/project/task vertical slice stabilizes
+- Mejor acotación de permisos e instalaciones por cliente
+- Exige verificación de firma de webhooks e idempotencia
+- La implementación empieza cuando se estabilice el vertical org/project/task

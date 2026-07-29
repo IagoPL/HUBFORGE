@@ -1,21 +1,21 @@
-name: Feature request
-description: Propose a product improvement
+name: Solicitud de funcionalidad
+description: Proponer una mejora de producto
 labels: ["enhancement"]
 body:
   - type: textarea
     id: problem
     attributes:
-      label: Problem
-      description: What user problem does this solve?
+      label: Problema
+      description: ¿Qué problema de usuario resuelve esto?
     validations:
       required: true
   - type: textarea
     id: proposal
     attributes:
-      label: Proposal
+      label: Propuesta
     validations:
       required: true
   - type: textarea
     id: scope
     attributes:
-      label: Out of scope
+      label: Fuera de alcance

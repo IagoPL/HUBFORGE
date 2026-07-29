@@ -1,44 +1,44 @@
-# MVP definition
+# Definición del MVP
 
-## Target users
+## Usuarios objetivo
 
-- Small technical teams and startups
-- Creative studios and indie projects
-- Academic and open-source project groups
+- Equipos técnicos pequeños y startups
+- Estudios creativos y proyectos indie
+- Grupos académicos y de proyectos open-source
 
-## Problems
+## Problemas
 
-- Planning, availability, ownership, and GitHub activity live in different tools
-- Unclear who can take the next task
-- Communication loses project context
+- Planificación, disponibilidad, ownership y actividad de GitHub viven en herramientas distintas
+- No está claro quién puede asumir la siguiente tarea
+- La comunicación pierde el contexto del proyecto
 
-## In scope (MVP)
+## En alcance (MVP)
 
-1. Sign up / sign in
-2. Create organization and project
-3. Invite members; define access + functional roles
-4. Create/assign tasks; list + Kanban
-5. Mark availability; team calendar view
-6. Internal notifications
-7. Project channels and messaging (plain text first)
-8. Connect GitHub repository; sync issues; basic PR/commit activity
+1. Registro / inicio de sesión
+2. Crear organización y proyecto
+3. Invitar miembros; definir acceso + roles funcionales
+4. Crear/asignar tareas; lista + Kanban
+5. Marcar disponibilidad; vista de calendario del equipo
+6. Notificaciones internas
+7. Canales de proyecto y mensajería (texto plano primero)
+8. Conectar repositorio de GitHub; sincronizar issues; actividad básica de PR/commit
 
-## Out of scope (post-MVP)
+## Fuera de alcance (post-MVP)
 
-- AI assistant
-- Sprints/roadmap/workload analytics (beyond basics)
-- PWA / push notifications
-- Calls/voice/video
-- End-to-end encryption for chat
+- Asistente de IA
+- Sprints/roadmap/analítica de carga (más allá de lo básico)
+- PWA / notificaciones push
+- Llamadas/voz/vídeo
+- Cifrado de extremo a extremo para el chat
 
-## Primary success flow (first vertical slice)
+## Flujo de éxito principal (primer vertical slice)
 
 Landing → sign in → create org → create project → dashboard → add member → set role → create/assign task → board update → notification → mark unavailability → calendar update
 
-## Success criteria
+## Criterios de éxito
 
-- Flow works end-to-end with authorization on server + RLS
-- Responsive and keyboard accessible
-- Covered by critical automated tests
-- Visual polish consistent with the design system
-- No secrets in the repository
+- El flujo funciona de extremo a extremo con autorización en servidor + RLS
+- Responsive y accesible por teclado
+- Cubierto por tests automatizados críticos
+- Acabado visual coherente con el design system
+- Sin secretos en el repositorio

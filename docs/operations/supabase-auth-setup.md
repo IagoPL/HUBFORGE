@@ -1,19 +1,19 @@
-# Supabase Auth setup (GitHub OAuth)
+# Configuración de Supabase Auth (GitHub OAuth)
 
-HubForge uses Supabase Auth with GitHub as the first provider and Next.js `proxy.ts` for session refresh.
+HubForge usa Supabase Auth con GitHub como primer proveedor y el `proxy.ts` de Next.js para refrescar la sesión.
 
-## 1. Create a Supabase project
+## 1. Crear un proyecto de Supabase
 
-1. Create a project at https://supabase.com/dashboard
-2. Copy Project URL and publishable (or anon) key
+1. Crea un proyecto en https://supabase.com/dashboard
+2. Copia la Project URL y la clave publishable (o anon)
 
-## 2. Local environment
+## 2. Entorno local
 
 ```bash
 cp .env.example .env.local
 ```
 
-Set:
+Configura:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
@@ -21,26 +21,26 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable-or-anon-key>
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` is still accepted as a fallback.
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` sigue aceptándose como fallback.
 
-Never put the service role key in `NEXT_PUBLIC_*` variables.
+Nunca pongas la service role key en variables `NEXT_PUBLIC_*`.
 
-## 3. GitHub OAuth App
+## 3. OAuth App de GitHub
 
-1. Create an OAuth App at https://github.com/settings/developers
-2. Homepage URL: `http://localhost:3000` (and later your production URL)
+1. Crea una OAuth App en https://github.com/settings/developers
+2. Homepage URL: `http://localhost:3000` (y después tu URL de producción)
 3. Authorization callback URL: `https://<project-ref>.supabase.co/auth/v1/callback`
-4. Copy Client ID and generate a Client Secret
+4. Copia el Client ID y genera un Client Secret
 
-## 4. Enable GitHub in Supabase
+## 4. Activar GitHub en Supabase
 
 Dashboard → Authentication → Providers → GitHub:
 
-- Enable provider
-- Paste Client ID / Secret
-- Save
+- Activa el proveedor
+- Pega Client ID / Secret
+- Guarda
 
-## 5. Redirect allow list
+## 5. Lista de redirects permitidos
 
 Dashboard → Authentication → URL Configuration:
 
@@ -49,14 +49,14 @@ Dashboard → Authentication → URL Configuration:
   - `http://localhost:3000/auth/callback`
   - `https://<your-production-domain>/auth/callback`
 
-## 6. Apply migrations
+## 6. Aplicar migraciones
 
 ```bash
 # After linking the project with Supabase CLI
 npx supabase db push
 ```
 
-Or paste these files in the SQL editor, in order:
+O pega estos archivos en el SQL editor, en orden:
 
 1. `supabase/migrations/20260728190000_profiles.sql`
 2. `supabase/migrations/20260728210000_organizations_projects.sql`
@@ -65,14 +65,14 @@ Or paste these files in the SQL editor, in order:
 5. `supabase/migrations/20260728240000_github_app_sync.sql`
 6. `supabase/migrations/20260728250000_chat_realtime.sql`
 
-See also `docs/operations/github-app-setup.md` for GitHub App wiring.
+Consulta también `docs/operations/github-app-setup.md` para cablear la GitHub App.
 
-## 7. Verify
+## 7. Verificar
 
 1. `pnpm dev`
-2. Open `/login`
-3. Continue with GitHub
-4. Land on `/app` with your name in the header
-5. Sign out
+2. Abre `/login`
+3. Continúa con GitHub
+4. Llega a `/app` con tu nombre en el header
+5. Cierra sesión
 
-Without env vars, HubForge stays in demo mode and `/app` remains reachable with mock data.
+Sin variables de entorno, HubForge permanece en modo demo y `/app` sigue accesible con datos mock.

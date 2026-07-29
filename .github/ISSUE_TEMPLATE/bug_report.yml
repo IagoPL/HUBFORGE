@@ -1,23 +1,23 @@
-name: Bug report
-description: Report a defect in HubForge
+name: Informe de error
+description: Reportar un defecto en HubForge
 labels: ["bug"]
 body:
   - type: textarea
     id: summary
     attributes:
-      label: Summary
-      description: What went wrong?
+      label: Resumen
+      description: ¿Qué ha fallado?
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
-      label: Steps to reproduce
+      label: Pasos para reproducir
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Expected behavior
+      label: Comportamiento esperado
     validations:
       required: true

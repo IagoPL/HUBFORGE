@@ -1,45 +1,45 @@
-# Implementation plan
+# Plan de implementación
 
-## Phase 0 — Audit (this iteration)
+## Fase 0 — Auditoría (esta iteración)
 
-- Environment, GitHub auth (`IagoPL`), empty repo bootstrap
-- Skills audit + Ponytail local install policy
-- ADRs + Cursor rules (local/gitignored)
-- Git identity verification script + local hook
+- Entorno, autenticación de GitHub (`IagoPL`), bootstrap de repositorio vacío
+- Auditoría de skills + política de instalación local de Ponytail
+- ADRs + reglas de Cursor (locales/en `.gitignore`)
+- Script de verificación de identidad Git + hook local
 
-## Phase 1 — Bootstrap tooling
+## Fase 1 — Herramientas de bootstrap
 
-- Next.js app, strict TS, lint/format, Tailwind tokens
-- Supabase clients without secrets
+- App Next.js, TS estricto, lint/format, tokens de Tailwind
+- Clientes de Supabase sin secretos
 - Vitest + Playwright smoke + CI
 
-## Phase 2 — Visual experience
+## Fase 2 — Experiencia visual
 
-- Landing, login preview, app shell
+- Landing, preview de login, app shell
 - Demo overview / projects / team / tasks / calendar
-- Light/dark + responsive + reduced motion
+- Claro/oscuro + responsive + reduced motion
 
-## Planned PR sequence
+## Secuencia planificada de PRs
 
-1. `chore/bootstrap-hubforge` — foundation (this PR)
+1. `chore/bootstrap-hubforge` — fundación (este PR)
 2. `feat/authentication` — Supabase GitHub OAuth
-3. `feat/organizations-projects` — Postgres CRUD + RLS
-4. `feat/members-roles-tasks` — invitations, roles, tasks board
-5. `feat/availability-notifications` — calendar + internal alerts
-6. `feat/github-app-sync` — GitHub App link + signed webhooks (done)
-7. `feat/chat-realtime` — project channels + Realtime messages (done)
+3. `feat/organizations-projects` — CRUD en Postgres + RLS
+4. `feat/members-roles-tasks` — invitaciones, roles, tablero de tareas
+5. `feat/availability-notifications` — calendario + alertas internas
+6. `feat/github-app-sync` — enlace GitHub App + webhooks firmados (hecho)
+7. `feat/chat-realtime` — canales de proyecto + mensajes Realtime (hecho)
 
-Trunk-based: short feature branches into `main`. No `develop` unless coordination pain appears.
+Trunk-based: ramas de feature cortas hacia `main`. Sin `develop` salvo que aparezca dolor de coordinación.
 
-## Phase 3 — Live ops (manual)
+## Fase 3 — Ops en vivo (manual)
 
-- Configure GitHub OAuth in Supabase (`docs/operations/supabase-auth-setup.md`)
-- Create GitHub App + webhook env (`docs/operations/github-app-setup.md`)
-- Optional Vercel deployment with the same env vars
+- Configurar GitHub OAuth en Supabase (`docs/operations/supabase-auth-setup.md`)
+- Crear GitHub App + env de webhook (`docs/operations/github-app-setup.md`)
+- Despliegue opcional en Vercel con las mismas variables de entorno
 
-## Phase 4 — Post-MVP (later)
+## Fase 4 — Post-MVP (más adelante)
 
-- AI assistant for planning / triage
-- Sprints, roadmap, and workload analytics
-- PWA / push notifications
-- Richer chat (threads, reactions) — still no E2E encryption in near term
+- Asistente de IA para planificación / triaje
+- Sprints, roadmap y analítica de carga
+- PWA / notificaciones push
+- Chat más rico (hilos, reacciones) — sin cifrado E2E a corto plazo

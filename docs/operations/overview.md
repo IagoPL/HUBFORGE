@@ -1,17 +1,17 @@
-# Operations notes
+# Notas de operaciones
 
-## Environments
+## Entornos
 
-| Environment | Purpose                            |
-| ----------- | ---------------------------------- |
-| Local       | `pnpm dev` + optional `.env.local` |
-| Preview     | Vercel PR previews (to configure)  |
-| Production  | Vercel + Supabase (later)          |
+| Entorno    | Propósito                                 |
+| ---------- | ----------------------------------------- |
+| Local      | `pnpm dev` + `.env.local` opcional        |
+| Preview    | Previews de PR en Vercel (por configurar) |
+| Production | Vercel + Supabase (más adelante)          |
 
-## Secrets
+## Secretos
 
-Store only in environment providers (Vercel/Supabase/GitHub Actions). Never in Git.
+Guardarlos solo en proveedores de entorno (Vercel/Supabase/GitHub Actions). Nunca en Git.
 
-## Observability (later)
+## Observabilidad (más adelante)
 
-Add structured server logs without private message content or tokens.
+Añadir logs estructurados en servidor sin contenido privado de mensajes ni tokens.

@@ -1,23 +1,23 @@
-# ADR 0005 — Multi-tenant permissions
+# ADR 0005 — Permisos multi-tenant
 
-- Status: Accepted
-- Date: 2026-07-28
+- Estado: Aceptado
+- Fecha: 2026-07-28
 
-## Context
+## Contexto
 
-HubForge hosts multiple organizations. Cross-tenant reads/writes are unacceptable.
+HubForge aloja múltiples organizaciones. Las lecturas/escrituras entre tenants son inaceptables.
 
-## Decision
+## Decisión
 
-Model `organization → project → resources`. Enforce authorization in:
+Modelar `organization → project → resources`. Aplicar autorización en:
 
 1. Server actions / route handlers
-2. Postgres RLS policies
-3. Realtime channel authorization
+2. Políticas RLS de Postgres
+3. Autorización de canales Realtime
 
-Separate **access roles** (Owner, Admin, Project Manager, Lead, Member, Guest) from **functional roles** (job titles/responsibilities).
+Separar **roles de acceso** (Owner, Admin, Project Manager, Lead, Member, Guest) de **roles funcionales** (puestos/responsabilidades).
 
-## Consequences
+## Consecuencias
 
-- Slightly more complex membership model
-- Clearer product language and safer defaults
+- Modelo de membresía un poco más complejo
+- Lenguaje de producto más claro y valores por defecto más seguros

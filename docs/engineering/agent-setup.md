@@ -1,32 +1,32 @@
-# Local AI / agent setup
+# Configuración local de IA / agentes
 
-HubForge keeps AI and agent configuration **out of Git**.
+HubForge mantiene la configuración de IA y agentes **fuera de Git**.
 
-Ignored paths include:
+Las rutas ignoradas incluyen:
 
 - `AGENTS.md`
 - `.cursor/`
-- `.claude/`, `.codex/`, `.windsurf/`, `.mcp.json`, and related agent folders
+- `.claude/`, `.codex/`, `.windsurf/`, `.mcp.json` y carpetas de agentes relacionadas
 
-## Required local setup
+## Configuración local requerida
 
-1. Create `.cursor/rules/` in the repo root (untracked).
-2. Install Ponytail **full** mode by copying:
+1. Crea `.cursor/rules/` en la raíz del repo (sin seguimiento).
+2. Instala Ponytail en modo **full** copiando:
 
    https://raw.githubusercontent.com/DietrichGebert/ponytail/main/.cursor/rules/ponytail.mdc
 
-   into `.cursor/rules/ponytail.mdc`
+   a `.cursor/rules/ponytail.mdc`
 
-3. Add HubForge rules (architecture, git workflow, frontend, UI, a11y, security, database, testing, documentation) as sibling `.mdc` files. A generator script may create them locally; they must remain untracked.
-4. Optional: create a root `AGENTS.md` summarizing project constraints for agents that read it.
+3. Añade las reglas de HubForge (arquitectura, flujo Git, frontend, UI, a11y, seguridad, base de datos, testing, documentación) como archivos `.mdc` hermanos. Un script generador puede crearlas en local; deben permanecer sin seguimiento.
+4. Opcional: crea un `AGENTS.md` en la raíz resumiendo las restricciones del proyecto para agentes que lo lean.
 
-## Non-negotiable overrides
+## Overrides no negociables
 
-Ponytail must not override:
+Ponytail no debe anular:
 
-- Security / RLS / secret handling
-- Accessibility requirements
-- Multi-tenant authorization
-- Git identity and PR workflow rules
+- Seguridad / RLS / manejo de secretos
+- Requisitos de accesibilidad
+- Autorización multi-tenant
+- Reglas de identidad Git y flujo de PR
 
-See `docs/engineering/skills-audit.md` for evaluation records.
+Consulta `docs/engineering/skills-audit.md` para el registro de evaluaciones.
