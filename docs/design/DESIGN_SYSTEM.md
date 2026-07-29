@@ -34,17 +34,17 @@ Los roles semánticos y la rampa oscura están especificados en `DESIGN.md`. Las
 
 Los cortes y su trabajo están definidos en `DESIGN.md`: Archivo (display), IBM Plex Sans (cuerpo), IBM Plex Mono (datos de máquina).
 
-| Token | Tamaño / interlínea | Corte | Uso |
-| --- | --- | --- | --- |
-| `--text-display-lg` | 32 / 38 | Archivo | Titular del briefing |
-| `--text-display` | 24 / 30 | Archivo | Título de superficie, primario del cuadro de rotulación |
-| `--text-display-sm` | 18 / 24 | Archivo | Identidad de sección |
-| `--text-body-lg` | 16 / 24 | Plex Sans | Prosa del briefing, lectura larga |
-| `--text-body` | 14 / 20 | Plex Sans | Texto de interfaz por defecto |
-| `--text-body-sm` | 13 / 18 | Plex Sans | Texto secundario |
-| `--text-label` | 11 / 16, tracking, versalitas | Plex Sans | Etiquetas del cuadro de rotulación, cabeceras de columna |
-| `--text-mono` | 13 / 20 | Plex Mono | Datos de máquina en línea |
-| `--text-mono-sm` | 12 / 18 | Plex Mono | Columnas mono densas |
+| Token               | Tamaño / interlínea           | Corte     | Uso                                                      |
+| ------------------- | ----------------------------- | --------- | -------------------------------------------------------- |
+| `--text-display-lg` | 32 / 38                       | Archivo   | Titular del briefing                                     |
+| `--text-display`    | 24 / 30                       | Archivo   | Título de superficie, primario del cuadro de rotulación  |
+| `--text-display-sm` | 18 / 24                       | Archivo   | Identidad de sección                                     |
+| `--text-body-lg`    | 16 / 24                       | Plex Sans | Prosa del briefing, lectura larga                        |
+| `--text-body`       | 14 / 20                       | Plex Sans | Texto de interfaz por defecto                            |
+| `--text-body-sm`    | 13 / 18                       | Plex Sans | Texto secundario                                         |
+| `--text-label`      | 11 / 16, tracking, versalitas | Plex Sans | Etiquetas del cuadro de rotulación, cabeceras de columna |
+| `--text-mono`       | 13 / 20                       | Plex Mono | Datos de máquina en línea                                |
+| `--text-mono-sm`    | 12 / 18                       | Plex Mono | Columnas mono densas                                     |
 
 El tamaño mínimo de cuerpo es 13px, y ningún texto de interfaz baja de 11px. Las cifras tabulares se activan siempre que los números se alineen en columnas.
 
@@ -64,11 +64,11 @@ Contenido, porque este mundo se construye con filetes y no con cajas redondeadas
 
 La estructura la sostienen los filetes, no bordes dibujados alrededor de cada elemento.
 
-| Peso | Token | Uso |
-| --- | --- | --- |
-| Tenue | `--hf-rule-faint` | Separadores de fila en listas densas |
-| Por defecto | `--hf-rule` | Límites de región, bordes de panel |
-| Fuerte | `--hf-rule-strong` | Cuadro de rotulación, divisiones estructurales primarias |
+| Peso        | Token              | Uso                                                      |
+| ----------- | ------------------ | -------------------------------------------------------- |
+| Tenue       | `--hf-rule-faint`  | Separadores de fila en listas densas                     |
+| Por defecto | `--hf-rule`        | Límites de región, bordes de panel                       |
+| Fuerte      | `--hf-rule-strong` | Cuadro de rotulación, divisiones estructurales primarias |
 
 Todos los filetes son de 1px a cualquier densidad. No engordan para señalar importancia: la jerarquía viene de los tokens de peso, no del tamaño.
 
@@ -76,11 +76,11 @@ Todos los filetes son de 1px a cualquier densidad. No engordan para señalar imp
 
 La densidad es una propiedad del trabajo de la superficie, no un valor global de padding. Tres registros, asignados por superficie.
 
-| Registro | Asignado a | Carácter |
-| --- | --- | --- |
-| **Baja — orientación** | Briefing operativo, onboarding, estados vacíos, vistas generales de proyecto | Calmada, muy jerarquizada, escala de lectura en prosa, aire generoso |
-| **Media — exploración** | Actividad, documentación, detalle de proyecto, paneles de contexto | Equilibrada; la agrupación y la alineación hacen el trabajo |
-| **Alta — ejecución** | Backlog, tablas, gestión de tareas, repositorios, historial, revisiones | Máxima información legible por pantalla |
+| Registro                | Asignado a                                                                   | Carácter                                                             |
+| ----------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **Baja — orientación**  | Briefing operativo, onboarding, estados vacíos, vistas generales de proyecto | Calmada, muy jerarquizada, escala de lectura en prosa, aire generoso |
+| **Media — exploración** | Actividad, documentación, detalle de proyecto, paneles de contexto           | Equilibrada; la agrupación y la alineación hacen el trabajo          |
+| **Alta — ejecución**    | Backlog, tablas, gestión de tareas, repositorios, historial, revisiones      | Máxima información legible por pantalla                              |
 
 La densidad se controla mediante jerarquía tipográfica, agrupación, alineación, contraste, revelado progresivo, paneles secundarios, filtros persistentes y detalles bajo demanda, **no** mediante el espaciado por sí solo. No se encierra cada dato en una tarjeta.
 

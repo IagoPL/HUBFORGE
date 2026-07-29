@@ -193,7 +193,9 @@ export function WorkSurface({
     setLive((current) => (current ? { ...current, tasks: next } : current));
     startTransition(() => {
       void Promise.all(
-        changed.map((task) => updateTaskStatusAction({ taskId: task.id, status: task.status })),
+        changed.map((task) =>
+          updateTaskStatusAction({ taskId: task.id, status: task.status }),
+        ),
       ).then((results) => {
         const failed = results.find((result) => !result.ok);
         if (failed && !failed.ok) setError(failed.error);
@@ -262,20 +264,24 @@ export function WorkSurface({
     }
 
     startTransition(() => {
-      void createTaskAction({ projectId, title, description, priority, assigneeIds }).then(
-        (result) => {
-          if (!result.ok) {
-            setError(result.error);
-            return;
-          }
-          setLive((current) =>
-            current ? { ...current, tasks: [...current.tasks, result.data] } : current,
-          );
-          setTitle("");
-          setDescription("");
-          setAssigneeId("");
-        },
-      );
+      void createTaskAction({
+        projectId,
+        title,
+        description,
+        priority,
+        assigneeIds,
+      }).then((result) => {
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        setLive((current) =>
+          current ? { ...current, tasks: [...current.tasks, result.data] } : current,
+        );
+        setTitle("");
+        setDescription("");
+        setAssigneeId("");
+      });
     });
   }
 
@@ -339,7 +345,9 @@ export function WorkSurface({
                 </span>
                 <select
                   value={priority}
-                  onChange={(event) => setPriority(event.target.value as Task["priority"])}
+                  onChange={(event) =>
+                    setPriority(event.target.value as Task["priority"])
+                  }
                   className="input"
                   disabled={pending}
                 >

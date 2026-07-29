@@ -9,12 +9,7 @@ import type { Member, TaskStatus } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 import { Avatar } from "./briefing";
 import { DependencyMove } from "./dependency-move";
-import {
-  plural,
-  statusLabel,
-  type OperationsLabels,
-  type WorkLabels,
-} from "./labels";
+import { plural, statusLabel, type OperationsLabels, type WorkLabels } from "./labels";
 import { RevisionMark } from "./revision-mark";
 
 export type ListState = "ready" | "loading" | "empty" | "error";
@@ -85,7 +80,9 @@ export function WorkList({
             const selected = task.id === selectedId;
             const towed = towedIds.includes(task.id);
             const assignee = memberById(members, task.assigneeIds[0] ?? null);
-            const dependents = tasks.filter((candidate) => task.blocks.includes(candidate.id));
+            const dependents = tasks.filter((candidate) =>
+              task.blocks.includes(candidate.id),
+            );
 
             return (
               <motion.li

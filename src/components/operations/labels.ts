@@ -34,8 +34,10 @@ export function changeSummary(
   labels: OperationsLabels,
 ) {
   const facts = [
-    counts.merged > 0 && plural(counts.merged, labels.factMergedOne, labels.factMergedOther),
-    counts.blocked > 0 && plural(counts.blocked, labels.factBlockedOne, labels.factBlockedOther),
+    counts.merged > 0 &&
+      plural(counts.merged, labels.factMergedOne, labels.factMergedOther),
+    counts.blocked > 0 &&
+      plural(counts.blocked, labels.factBlockedOne, labels.factBlockedOther),
     counts.needsReview > 0 &&
       plural(counts.needsReview, labels.factReviewOne, labels.factReviewOther),
   ].filter((fact): fact is string => typeof fact === "string");

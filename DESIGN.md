@@ -27,15 +27,15 @@ Ordenados por resonancia con la audiencia: 1. consola de observabilidad · 2. di
 
 ### Por qué este mundo sostiene el producto
 
-| Requisito de producto | Recurso nativo de este mundo |
-| --- | --- |
-| «¿Qué ha cambiado desde mi última visita?» | Marcas de revisión y tabla de revisiones: un registro formal y fechado de lo que cambió en la hoja |
-| «Contexto siempre visible» | El cuadro de rotulación, que nunca se va |
-| «Información conectada» | Líneas de guía que atan la anotación a su sujeto |
-| «Densidad adaptativa» | Capas de dibujo, que se activan y desactivan sin salir de la hoja |
-| «Qué está bloqueado / dependencias» | Líneas de cota y dependencia; el arrastre con peso |
-| «Los neutros dominan, el color solo comunica» | El dibujo técnico es tinta monocroma por naturaleza |
-| «Motion preciso, mecánico, contenido» | Movimiento de delineación: las líneas se extienden, las guías encajan, las capas se atenúan |
+| Requisito de producto                         | Recurso nativo de este mundo                                                                       |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| «¿Qué ha cambiado desde mi última visita?»    | Marcas de revisión y tabla de revisiones: un registro formal y fechado de lo que cambió en la hoja |
+| «Contexto siempre visible»                    | El cuadro de rotulación, que nunca se va                                                           |
+| «Información conectada»                       | Líneas de guía que atan la anotación a su sujeto                                                   |
+| «Densidad adaptativa»                         | Capas de dibujo, que se activan y desactivan sin salir de la hoja                                  |
+| «Qué está bloqueado / dependencias»           | Líneas de cota y dependencia; el arrastre con peso                                                 |
+| «Los neutros dominan, el color solo comunica» | El dibujo técnico es tinta monocroma por naturaleza                                                |
+| «Motion preciso, mecánico, contenido»         | Movimiento de delineación: las líneas se extienden, las guías encajan, las capas se atenúan        |
 
 ## Colors
 
@@ -55,12 +55,12 @@ No se usa como color genérico repartido por toda la interfaz. Debe seguir predo
 
 `danger` debe distinguirse claramente del vermilion en **cuatro** ejes simultáneos, nunca solo en tono:
 
-| Eje | Vermilion (revisión / atención) | Danger (error / destructivo) |
-| --- | --- | --- |
-| Tono | Naranja cálido, `#FF5C38` | Rojo carmesí desplazado hacia magenta, `#E2434F` en oscuro |
-| Luminosidad | Brillante, sobre fondo transparente o tenue | Más oscuro y saturado, con relleno más denso |
-| Iconografía | Marca de revisión, punto de pulso, línea de guía | Triángulo de alerta, círculo de error |
-| Lenguaje | «cambiado», «nuevo», «requiere revisión» | «error», «ha fallado», «se eliminará» |
+| Eje         | Vermilion (revisión / atención)                  | Danger (error / destructivo)                               |
+| ----------- | ------------------------------------------------ | ---------------------------------------------------------- |
+| Tono        | Naranja cálido, `#FF5C38`                        | Rojo carmesí desplazado hacia magenta, `#E2434F` en oscuro |
+| Luminosidad | Brillante, sobre fondo transparente o tenue      | Más oscuro y saturado, con relleno más denso               |
+| Iconografía | Marca de revisión, punto de pulso, línea de guía | Triángulo de alerta, círculo de error                      |
+| Lenguaje    | «cambiado», «nuevo», «requiere revisión»         | «error», «ha fallado», «se eliminará»                      |
 
 Nunca debe depender únicamente del color la distinción entre revisión, advertencia y error. Cada uno lleva su propio icono y su propia palabra.
 
@@ -125,20 +125,20 @@ Resumen normativo. Los contratos completos, los estados requeridos y la polític
 
 La estructura la sostienen filetes, alineación y agrupación. Una tarjeta solo se justifica cuando el objeto es realmente levantable, reordenable o accionable de forma independiente; las tarjetas anidadas dentro de tarjetas están prohibidas. Ningún componente estándar sin estilar se publica dentro de una superficie comprometida.
 
-| Componente | Trabajo |
-| --- | --- |
-| Cuadro de rotulación | Declaración permanente de espacio de trabajo, proyecto, contexto activo y estado de revisión; nunca desaparece al hacer scroll |
-| Rail global | Navegación global compacta y estable en el borde izquierdo; nunca se ensancha hasta convertirse en una barra lateral etiquetada |
-| Panel contextual | Navegación secundaria solo del contexto actual; colapsable |
-| Inspector | Superficie de detalle a la derecha; seleccionar revela el detalle aquí en lugar de navegar fuera |
-| Command palette | Búsqueda y acción transversal sobre todo el espacio de trabajo, primero teclado |
-| Briefing | Superficie operativa de entrada: resumen en prosa y después lista priorizada de acciones. Densidad baja |
-| Elemento de atención | Una fila priorizada que declara qué ocurrió, por qué importa, quién está implicado y qué acción hay |
-| Marca de revisión | Señala lo cambiado desde la última visita; rol semántico propio, nunca estilado como advertencia |
-| Línea de guía | Ata una anotación a su sujeto |
-| Fila anotada | Primitiva de lista densa: columnas alineadas, mono para datos de máquina, separadores de filete, sin envoltorio de tarjeta |
-| Conmutador de capa | Sube o baja la densidad de información en el sitio, sin navegar |
-| Pulso | Indicador honesto de actividad real; nunca se anima para insinuar actividad que no ocurrió |
+| Componente           | Trabajo                                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Cuadro de rotulación | Declaración permanente de espacio de trabajo, proyecto, contexto activo y estado de revisión; nunca desaparece al hacer scroll  |
+| Rail global          | Navegación global compacta y estable en el borde izquierdo; nunca se ensancha hasta convertirse en una barra lateral etiquetada |
+| Panel contextual     | Navegación secundaria solo del contexto actual; colapsable                                                                      |
+| Inspector            | Superficie de detalle a la derecha; seleccionar revela el detalle aquí en lugar de navegar fuera                                |
+| Command palette      | Búsqueda y acción transversal sobre todo el espacio de trabajo, primero teclado                                                 |
+| Briefing             | Superficie operativa de entrada: resumen en prosa y después lista priorizada de acciones. Densidad baja                         |
+| Elemento de atención | Una fila priorizada que declara qué ocurrió, por qué importa, quién está implicado y qué acción hay                             |
+| Marca de revisión    | Señala lo cambiado desde la última visita; rol semántico propio, nunca estilado como advertencia                                |
+| Línea de guía        | Ata una anotación a su sujeto                                                                                                   |
+| Fila anotada         | Primitiva de lista densa: columnas alineadas, mono para datos de máquina, separadores de filete, sin envoltorio de tarjeta      |
+| Conmutador de capa   | Sube o baja la densidad de información en el sitio, sin navegar                                                                 |
+| Pulso                | Indicador honesto de actividad real; nunca se anima para insinuar actividad que no ocurrió                                      |
 
 Todo control interactivo implementa los estados default, hover, focus-visible, active, disabled, loading y error/success. Toda superficie de datos implementa los estados vacío, sin datos, cargando, parcial, error y no autorizado. Los botones llevan una única acción primaria por región de superficie, y el acento le pertenece a ella.
 

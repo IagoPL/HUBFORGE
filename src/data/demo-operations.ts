@@ -72,11 +72,19 @@ const CHANGES: Record<
 > = {
   task_1: {
     updatedAt: "2026-07-27T10:15:00.000Z",
-    revision: { kind: "changed", at: "2026-07-27T10:15:00.000Z", note: "Merged and closed" },
+    revision: {
+      kind: "changed",
+      at: "2026-07-27T10:15:00.000Z",
+      note: "Merged and closed",
+    },
   },
   task_2: {
     updatedAt: "2026-07-29T16:40:00.000Z",
-    revision: { kind: "changed", at: "2026-07-29T16:40:00.000Z", note: "Moved to in progress" },
+    revision: {
+      kind: "changed",
+      at: "2026-07-29T16:40:00.000Z",
+      note: "Moved to in progress",
+    },
   },
   task_3: {
     updatedAt: "2026-07-29T09:05:00.000Z",

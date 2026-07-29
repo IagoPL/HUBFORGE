@@ -195,9 +195,13 @@ export function AvailabilityPanel({
           createEntry(String(formData.get("note") ?? ""));
         }}
       >
-        <h2 className="t-display-sm text-[var(--hf-ink)] md:col-span-2">{labels.create}</h2>
+        <h2 className="t-display-sm text-[var(--hf-ink)] md:col-span-2">
+          {labels.create}
+        </h2>
         <label className="grid gap-1.5">
-          <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.startsAt}</span>
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.startsAt}
+          </span>
           <input
             type="datetime-local"
             value={startsAt}
@@ -208,7 +212,9 @@ export function AvailabilityPanel({
           />
         </label>
         <label className="grid gap-1.5">
-          <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.endsAt}</span>
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.endsAt}
+          </span>
           <input
             type="datetime-local"
             value={endsAt}
@@ -219,7 +225,9 @@ export function AvailabilityPanel({
           />
         </label>
         <label className="grid gap-1.5">
-          <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.kind}</span>
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.kind}
+          </span>
           <select
             value={kind}
             onChange={(event) => setKind(event.target.value as AvailabilityEntry["kind"])}
@@ -232,7 +240,9 @@ export function AvailabilityPanel({
           </select>
         </label>
         <label className="grid gap-1.5" htmlFor="availability-note">
-          <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.note}</span>
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.note}
+          </span>
           <input
             ref={noteInputRef}
             id="availability-note"
@@ -263,7 +273,10 @@ export function AvailabilityPanel({
                 : null);
 
             return (
-              <li key={entry.id} className="panel flex flex-wrap items-center gap-x-4 gap-y-2 p-3">
+              <li
+                key={entry.id}
+                className="panel flex flex-wrap items-center gap-x-4 gap-y-2 p-3"
+              >
                 <p className="t-body font-medium text-[var(--hf-ink)]">
                   {member?.name ?? "Team member"}
                 </p>
@@ -284,9 +297,13 @@ export function AvailabilityPanel({
                     {new Date(entry.startsAt).toLocaleString()}
                   </time>
                   {" → "}
-                  <time dateTime={entry.endsAt}>{new Date(entry.endsAt).toLocaleString()}</time>
+                  <time dateTime={entry.endsAt}>
+                    {new Date(entry.endsAt).toLocaleString()}
+                  </time>
                 </p>
-                <p className="t-body-sm min-w-0 flex-1 text-[var(--hf-ink-muted)]">{entry.note}</p>
+                <p className="t-body-sm min-w-0 flex-1 text-[var(--hf-ink-muted)]">
+                  {entry.note}
+                </p>
                 <Button
                   type="button"
                   variant="ghost"

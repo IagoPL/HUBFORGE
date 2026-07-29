@@ -17,7 +17,10 @@ export function UserMenu({
   // offers the way out of the demo rather than repeating the label.
   if (!user) {
     return (
-      <Link href="/login" className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}>
+      <Link
+        href="/login"
+        className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+      >
         {signInLabel}
       </Link>
     );
@@ -34,7 +37,10 @@ export function UserMenu({
         ) : null}
       </div>
       <form action={signOut}>
-        <button type="submit" className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}>
+        <button
+          type="submit"
+          className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+        >
           {signOutLabel}
         </button>
       </form>

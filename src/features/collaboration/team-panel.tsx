@@ -208,9 +208,13 @@ export function TeamPanel({
           invite();
         }}
       >
-        <h2 className="t-display-sm text-[var(--hf-ink)] md:col-span-2">{labels.invite}</h2>
+        <h2 className="t-display-sm text-[var(--hf-ink)] md:col-span-2">
+          {labels.invite}
+        </h2>
         <label className="grid gap-1.5">
-          <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.email}</span>
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.email}
+          </span>
           <input
             type="email"
             value={email}
@@ -221,7 +225,9 @@ export function TeamPanel({
           />
         </label>
         <label className="grid gap-1.5">
-          <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.accessRole}</span>
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.accessRole}
+          </span>
           <select
             value={accessRole}
             onChange={(event) => setAccessRole(event.target.value as AccessRole)}
@@ -262,7 +268,9 @@ export function TeamPanel({
             {invitations.map((invitation) => (
               /* Dashed rule: drawn but not yet built. */
               <li key={invitation.id} className="panel border-dashed p-4">
-                <p className="t-body font-medium text-[var(--hf-ink)]">{invitation.email}</p>
+                <p className="t-body font-medium text-[var(--hf-ink)]">
+                  {invitation.email}
+                </p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <Badge tone="brand">{accessLabels[invitation.accessRole]}</Badge>
                   <Badge>{invitation.functionalRole || "Contributor"}</Badge>
@@ -290,12 +298,18 @@ export function TeamPanel({
                   {member.avatarInitials}
                 </span>
                 <div className="min-w-0">
-                  <p className="t-body truncate font-medium text-[var(--hf-ink)]">{member.name}</p>
-                  <p className="t-body-sm truncate text-[var(--hf-ink-muted)]">{member.email}</p>
+                  <p className="t-body truncate font-medium text-[var(--hf-ink)]">
+                    {member.name}
+                  </p>
+                  <p className="t-body-sm truncate text-[var(--hf-ink-muted)]">
+                    {member.email}
+                  </p>
                 </div>
               </div>
               <label className="grid gap-1">
-                <span className="t-label text-[var(--hf-ink-faint)]">{labels.accessRole}</span>
+                <span className="t-label text-[var(--hf-ink-faint)]">
+                  {labels.accessRole}
+                </span>
                 <select
                   value={member.accessRole}
                   onChange={(event) =>

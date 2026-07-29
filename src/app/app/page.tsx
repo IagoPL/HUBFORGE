@@ -51,7 +51,9 @@ export default async function AppOverviewPage() {
     }
 
     const project =
-      state.projects.find((item) => item.id === state.activeProjectId) ?? state.projects[0] ?? null;
+      state.projects.find((item) => item.id === state.activeProjectId) ??
+      state.projects[0] ??
+      null;
 
     if (!project) {
       return (
@@ -187,7 +189,10 @@ function Onboarding({
     <div className="grid max-w-xl gap-3 px-4 py-5 sm:px-6">
       <h2 className="t-display text-[var(--hf-ink)]">{title}</h2>
       <p className="lead">{body}</p>
-      <Link href={href} className={cn(buttonVariants({ variant: "primary" }), "justify-self-start")}>
+      <Link
+        href={href}
+        className={cn(buttonVariants({ variant: "primary" }), "justify-self-start")}
+      >
         {action}
       </Link>
     </div>

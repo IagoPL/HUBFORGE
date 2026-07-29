@@ -26,13 +26,13 @@ La navegación es contextual y progresiva. La navegación secundaria aparece ún
 
 ### Chrome de escritorio
 
-| Elemento | Comportamiento |
-| --- | --- |
-| **Rail global** | Compacto, estable, siempre presente en el borde izquierdo. No es una segunda barra lateral ancha llena de iconos y texto. Contiene: Inicio operativo, Proyectos, Trabajo, Actividad, Equipo, Buscar / Command Center. |
-| **Panel contextual** | Se despliega cuando el contexto actual lo necesita y se colapsa cuando no. |
-| **Área principal de trabajo** | La hoja. Donde ocurre la tarea. |
-| **Inspector** | Panel lateral derecho opcional para el detalle del objeto seleccionado. Seleccionar algo lo revela aquí en lugar de navegar fuera. |
-| **Command palette** | La vía rápida transversal a cualquier cosa: proyecto, tarea, persona, rama, canal, acción. |
+| Elemento                      | Comportamiento                                                                                                                                                                                                        |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Rail global**               | Compacto, estable, siempre presente en el borde izquierdo. No es una segunda barra lateral ancha llena de iconos y texto. Contiene: Inicio operativo, Proyectos, Trabajo, Actividad, Equipo, Buscar / Command Center. |
+| **Panel contextual**          | Se despliega cuando el contexto actual lo necesita y se colapsa cuando no.                                                                                                                                            |
+| **Área principal de trabajo** | La hoja. Donde ocurre la tarea.                                                                                                                                                                                       |
+| **Inspector**                 | Panel lateral derecho opcional para el detalle del objeto seleccionado. Seleccionar algo lo revela aquí en lugar de navegar fuera.                                                                                    |
+| **Command palette**           | La vía rápida transversal a cualquier cosa: proyecto, tarea, persona, rama, canal, acción.                                                                                                                            |
 
 Dentro de un proyecto, la navegación contextual pasa a ser: Resumen, Trabajo, Repositorios, Actividad, Documentación, Equipo, Configuración.
 
@@ -59,7 +59,7 @@ Responde en menos de diez segundos: qué ha cambiado, qué necesita mi atención
 5. Próximos pasos
 6. Proyectos activos
 
-La parte superior es un resumen editorial breve en prosa, no una fila de métricas. Por ejemplo: *«Desde tu última visita se han fusionado 3 pull requests, apareció un bloqueo en la API y 2 tareas requieren revisión.»*
+La parte superior es un resumen editorial breve en prosa, no una fila de métricas. Por ejemplo: _«Desde tu última visita se han fusionado 3 pull requests, apareció un bloqueo en la API y 2 tareas requieren revisión.»_
 
 Debajo se sitúa una única lista priorizada de acciones. Cada elemento declara cuatro cosas: **qué ocurrió, por qué importa, quién está implicado y qué acción está disponible.**
 

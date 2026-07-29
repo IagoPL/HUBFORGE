@@ -134,7 +134,11 @@ export function Inspector({
 
           {task.revision ? (
             <RevisionMark
-              signal={{ kind: "revision", revision: task.revision.kind, at: task.revision.at }}
+              signal={{
+                kind: "revision",
+                revision: task.revision.kind,
+                at: task.revision.at,
+              }}
               now={now}
               locale={locale}
               labels={statusLabels}
@@ -168,7 +172,9 @@ export function Inspector({
           {/* Dependency lines are drawn only because these relations exist. */}
           {upstream.length > 0 || downstream.length > 0 ? (
             <section>
-              <h3 className="t-label text-[var(--hf-ink-faint)]">{labels.dependencies}</h3>
+              <h3 className="t-label text-[var(--hf-ink-faint)]">
+                {labels.dependencies}
+              </h3>
 
               <div className="mt-2 border-l border-[var(--hf-rule-strong)] pl-3">
                 <DependencyGroup
@@ -222,7 +228,11 @@ function Field({
     <>
       <dt className="t-label pt-0.5 text-[var(--hf-ink-faint)]">{label}</dt>
       <dd
-        className={cn(mono ? "t-mono-sm" : "t-body-sm", "text-[var(--hf-ink)]", className)}
+        className={cn(
+          mono ? "t-mono-sm" : "t-body-sm",
+          "text-[var(--hf-ink)]",
+          className,
+        )}
         data-tabular={mono ? "" : undefined}
       >
         {children}

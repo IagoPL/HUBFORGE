@@ -25,12 +25,12 @@ HubForge se mueve **preciso, rápido y contenido. Mecánico, pero no rígido.**
 
 ## Tokens de duración
 
-| Token | Rango | Se aplica a |
-| --- | --- | --- |
-| `--motion-feedback` | 80–140 ms | Feedback inmediato: pulsación, conmutación, confirmación de hover |
-| `--motion-micro` | 140–200 ms | Microinteracciones |
-| `--motion-panel` | 180–260 ms | Paneles, menús, cambios de contexto |
-| `--motion-structural` | 240–360 ms | Transiciones estructurales entre estados principales |
+| Token                 | Rango      | Se aplica a                                                       |
+| --------------------- | ---------- | ----------------------------------------------------------------- |
+| `--motion-feedback`   | 80–140 ms  | Feedback inmediato: pulsación, conmutación, confirmación de hover |
+| `--motion-micro`      | 140–200 ms | Microinteracciones                                                |
+| `--motion-panel`      | 180–260 ms | Paneles, menús, cambios de contexto                               |
+| `--motion-structural` | 240–360 ms | Transiciones estructurales entre estados principales              |
 
 Los componentes consumen estos tokens y nunca codifican tiempos a mano.
 

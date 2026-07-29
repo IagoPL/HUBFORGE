@@ -22,10 +22,7 @@ export function SiteHeader({
           {t.common.brand}
         </Link>
 
-        <nav
-          aria-label={t.nav.marketing}
-          className="hidden items-center gap-5 md:flex"
-        >
+        <nav aria-label={t.nav.marketing} className="hidden items-center gap-5 md:flex">
           {(
             [
               ["#problem", t.nav.problem],

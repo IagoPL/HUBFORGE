@@ -42,12 +42,15 @@ export function Briefing({
       <p className="t-body-lg mt-2 max-w-[60ch] text-[var(--hf-ink)]">{summary}</p>
 
       {attention.length === 0 ? (
-        <p className="t-body mt-3 text-[var(--hf-ink-muted)]">{labels.nothingNeedsAttention}</p>
+        <p className="t-body mt-3 text-[var(--hf-ink-muted)]">
+          {labels.nothingNeedsAttention}
+        </p>
       ) : (
         <ol className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
           {attention.map((item) => {
             const actor = memberById(members, item.actorId);
-            const blocked = item.signal.kind === "revision" && item.signal.revision === "blocked";
+            const blocked =
+              item.signal.kind === "revision" && item.signal.revision === "blocked";
 
             return (
               <li key={item.id}>
@@ -67,7 +70,9 @@ export function Briefing({
                     note={item.headline}
                   />
 
-                  <h3 className="t-body font-medium text-[var(--hf-ink)]">{item.headline}</h3>
+                  <h3 className="t-body font-medium text-[var(--hf-ink)]">
+                    {item.headline}
+                  </h3>
                   <p className="t-body-sm text-[var(--hf-ink-muted)]">
                     {consequence(item, labels)}
                   </p>

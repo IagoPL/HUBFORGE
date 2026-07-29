@@ -25,7 +25,8 @@ let hydrated = false;
 function ensureHydrated() {
   if (hydrated || typeof window === "undefined") return;
   hydrated = true;
-  currentDensity = window.localStorage.getItem(KEY) === "compact" ? "compact" : "comfortable";
+  currentDensity =
+    window.localStorage.getItem(KEY) === "compact" ? "compact" : "comfortable";
   document.documentElement.dataset.density = currentDensity;
 }
 

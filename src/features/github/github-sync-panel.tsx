@@ -286,7 +286,9 @@ export function GitHubSyncPanel({
         >
           <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
           <label className="grid gap-1.5">
-            <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.repo}</span>
+            <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+              {labels.repo}
+            </span>
             <input
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
@@ -323,8 +325,14 @@ export function GitHubSyncPanel({
         ) : (
           <ul className="grid gap-2">
             {synced.map((issue) => (
-              <li key={issue.id} className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3">
-                <span className="t-mono-sm shrink-0 text-[var(--hf-ink-faint)]" data-tabular>
+              <li
+                key={issue.id}
+                className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3"
+              >
+                <span
+                  className="t-mono-sm shrink-0 text-[var(--hf-ink-faint)]"
+                  data-tabular
+                >
                   #{issue.number}
                 </span>
                 <a
@@ -335,7 +343,9 @@ export function GitHubSyncPanel({
                 >
                   {issue.title}
                 </a>
-                <Badge tone={issue.state === "open" ? "success" : "neutral"}>{issue.state}</Badge>
+                <Badge tone={issue.state === "open" ? "success" : "neutral"}>
+                  {issue.state}
+                </Badge>
                 <Badge>{issue.origin}</Badge>
               </li>
             ))}

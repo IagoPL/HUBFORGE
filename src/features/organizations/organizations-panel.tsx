@@ -80,7 +80,9 @@ export function OrganizationsPanel({
       >
         <h2 className="t-display-sm text-[var(--hf-ink)]">{labels.create}</h2>
         <label className="grid gap-1.5">
-          <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.name}</span>
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.name}
+          </span>
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}

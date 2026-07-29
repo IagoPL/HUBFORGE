@@ -74,7 +74,9 @@ export default async function LandingPage() {
                   {t.operations.briefing}
                 </p>
                 <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <p className="t-display-sm text-[var(--hf-ink)]">{t.operations.briefing}</p>
+                  <p className="t-display-sm text-[var(--hf-ink)]">
+                    {t.operations.briefing}
+                  </p>
                   <p className="t-mono-sm text-[var(--hf-ink-faint)]" data-tabular>
                     active · 5 tasks · 1 blocked
                   </p>
@@ -82,17 +84,18 @@ export default async function LandingPage() {
               </div>
 
               <div className="grid gap-3 px-4 py-4">
-                <p className="t-label text-[var(--hf-ink-faint)]">{t.operations.briefing}</p>
+                <p className="t-label text-[var(--hf-ink-faint)]">
+                  {t.operations.briefing}
+                </p>
                 <p className="t-body text-[var(--hf-ink)]">
-                  {t.operations.sinceLastVisit
-                    .replace(
-                      "{facts}",
-                      [
-                        t.operations.factMergedOne,
-                        t.operations.factBlockedOne,
-                        t.operations.factReviewOne,
-                      ].join(t.operations.factJoin),
-                    )}
+                  {t.operations.sinceLastVisit.replace(
+                    "{facts}",
+                    [
+                      t.operations.factMergedOne,
+                      t.operations.factBlockedOne,
+                      t.operations.factReviewOne,
+                    ].join(t.operations.factJoin),
+                  )}
                 </p>
 
                 <ul className="grid gap-2">
@@ -129,7 +132,10 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <section id="problem" className="border-b border-[var(--hf-rule)] bg-[var(--hf-ground-1)]">
+        <section
+          id="problem"
+          className="border-b border-[var(--hf-rule)] bg-[var(--hf-ground-1)]"
+        >
           <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 md:grid-cols-3">
             {problems.map((item, index) => (
               <article key={item.title} className="grid gap-2">
@@ -147,7 +153,9 @@ export default async function LandingPage() {
           <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
             <div className="mb-10 max-w-2xl grid gap-2">
               <h2 className="t-display text-[var(--hf-ink)]">{t.landing.productTitle}</h2>
-              <p className="t-body-lg text-[var(--hf-ink-muted)]">{t.landing.productSubtitle}</p>
+              <p className="t-body-lg text-[var(--hf-ink-muted)]">
+                {t.landing.productSubtitle}
+              </p>
             </div>
 
             <ol className="grid gap-0 border-t border-[var(--hf-rule)] md:grid-cols-2">
@@ -160,7 +168,9 @@ export default async function LandingPage() {
                     {String(index + 1).padStart(2, "0")}
                   </p>
                   <h3 className="t-display-sm text-[var(--hf-ink)]">{item.title}</h3>
-                  <p className="t-body max-w-[52ch] text-[var(--hf-ink-muted)]">{item.body}</p>
+                  <p className="t-body max-w-[52ch] text-[var(--hf-ink-muted)]">
+                    {item.body}
+                  </p>
                 </li>
               ))}
             </ol>
@@ -173,8 +183,12 @@ export default async function LandingPage() {
         >
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-16 sm:px-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-xl grid gap-2">
-              <h2 className="t-display text-[var(--hf-ink)]">{t.landing.securityTitle}</h2>
-              <p className="t-body-lg text-[var(--hf-ink-muted)]">{t.landing.securityBody}</p>
+              <h2 className="t-display text-[var(--hf-ink)]">
+                {t.landing.securityTitle}
+              </h2>
+              <p className="t-body-lg text-[var(--hf-ink-muted)]">
+                {t.landing.securityBody}
+              </p>
             </div>
             <Link href="/app" className={cn(buttonVariants({ size: "lg" }), "shrink-0")}>
               {t.landing.exploreDemo}
@@ -186,7 +200,9 @@ export default async function LandingPage() {
 
       <footer className="border-t border-[var(--hf-rule)] bg-[var(--hf-ground-0)]">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p className="t-body-sm text-[var(--hf-ink-muted)]">{t.landing.footerTagline}</p>
+          <p className="t-body-sm text-[var(--hf-ink-muted)]">
+            {t.landing.footerTagline}
+          </p>
           <p className="t-mono-sm text-[var(--hf-ink-faint)]">{t.landing.footerStatus}</p>
         </div>
       </footer>

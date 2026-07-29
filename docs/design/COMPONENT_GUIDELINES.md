@@ -45,20 +45,20 @@ Los estados vacíos son contenido redactado, no marcadores de posición. Explica
 
 Superficies nombradas por este mundo. Cada una tiene un trabajo.
 
-| Componente | Trabajo |
-| --- | --- |
+| Componente               | Trabajo                                                                                                                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Cuadro de rotulación** | Declaración permanente de espacio de trabajo, proyecto, contexto activo y estado de revisión. Nunca desaparece al hacer scroll. Usa tipografía display y mono para los datos de máquina. |
-| **Rail global** | Navegación global compacta y estable en el borde izquierdo. Icono más nombre accesible; nunca se ensancha hasta ser una barra lateral etiquetada. |
-| **Panel contextual** | Navegación secundaria y controles solo del contexto actual. Colapsable. |
-| **Inspector** | Superficie de detalle a la derecha para el objeto seleccionado. La selección revela el detalle aquí en lugar de navegar fuera. |
-| **Command palette** | Búsqueda y acción transversal sobre proyectos, tareas, personas, ramas y canales. Primero teclado, completamente operable sin puntero. |
-| **Briefing** | La superficie operativa de entrada. Resumen en prosa y después lista priorizada de acciones. Densidad baja. |
-| **Elemento de atención** | Una fila de la lista priorizada. Declara qué ocurrió, por qué importa, quién está implicado y qué acción está disponible. |
-| **Marca de revisión** | Señala lo que ha cambiado desde la última visita. Rol semántico propio, nunca estilado como advertencia. |
-| **Línea de guía** | Ata visualmente una anotación a su sujeto. |
-| **Fila anotada** | La primitiva de lista densa: columnas alineadas, mono para datos de máquina, separadores de filete, sin envoltorio de tarjeta. |
-| **Conmutador de capa** | Sube o baja la densidad de información en el sitio, sin navegar. |
-| **Pulso** | Indicador honesto de actividad real: presencia, sincronización, cambios en vivo. Nunca se anima para insinuar actividad que no ocurrió. |
+| **Rail global**          | Navegación global compacta y estable en el borde izquierdo. Icono más nombre accesible; nunca se ensancha hasta ser una barra lateral etiquetada.                                        |
+| **Panel contextual**     | Navegación secundaria y controles solo del contexto actual. Colapsable.                                                                                                                  |
+| **Inspector**            | Superficie de detalle a la derecha para el objeto seleccionado. La selección revela el detalle aquí en lugar de navegar fuera.                                                           |
+| **Command palette**      | Búsqueda y acción transversal sobre proyectos, tareas, personas, ramas y canales. Primero teclado, completamente operable sin puntero.                                                   |
+| **Briefing**             | La superficie operativa de entrada. Resumen en prosa y después lista priorizada de acciones. Densidad baja.                                                                              |
+| **Elemento de atención** | Una fila de la lista priorizada. Declara qué ocurrió, por qué importa, quién está implicado y qué acción está disponible.                                                                |
+| **Marca de revisión**    | Señala lo que ha cambiado desde la última visita. Rol semántico propio, nunca estilado como advertencia.                                                                                 |
+| **Línea de guía**        | Ata visualmente una anotación a su sujeto.                                                                                                                                               |
+| **Fila anotada**         | La primitiva de lista densa: columnas alineadas, mono para datos de máquina, separadores de filete, sin envoltorio de tarjeta.                                                           |
+| **Conmutador de capa**   | Sube o baja la densidad de información en el sitio, sin navegar.                                                                                                                         |
+| **Pulso**                | Indicador honesto de actividad real: presencia, sincronización, cambios en vivo. Nunca se anima para insinuar actividad que no ocurrió.                                                  |
 
 ## Tipografía en componentes
 

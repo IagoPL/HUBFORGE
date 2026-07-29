@@ -55,7 +55,9 @@ export function ProjectsPanel({
                   )}
                 >
                   <span className="flex flex-wrap items-center gap-2">
-                    <span className="t-display-sm text-[var(--hf-ink)]">{project.name}</span>
+                    <span className="t-display-sm text-[var(--hf-ink)]">
+                      {project.name}
+                    </span>
                     <Badge tone={active ? "brand" : "neutral"}>{project.status}</Badge>
                   </span>
                   <span className="t-body-sm mt-1.5 block text-[var(--hf-ink-muted)]">
@@ -88,7 +90,9 @@ export function ProjectsPanel({
       >
         <h2 className="t-display-sm text-[var(--hf-ink)]">{labels.create}</h2>
         <label className="grid gap-1.5">
-          <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.name}</span>
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.name}
+          </span>
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
@@ -98,7 +102,9 @@ export function ProjectsPanel({
           />
         </label>
         <label className="grid gap-1.5">
-          <span className="t-body-sm font-medium text-[var(--hf-ink)]">{labels.description}</span>
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.description}
+          </span>
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}

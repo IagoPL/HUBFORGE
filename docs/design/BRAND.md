@@ -6,7 +6,7 @@ Identidad de referencia de HubForge. La verdad de producto vive en `PRODUCT.md`;
 
 **HubForge**. Una sola palabra, ambas partes en mayúscula inicial. Nunca «Hub Forge», nunca «HubForce», nunca abreviado a «HF» en texto de cara al usuario.
 
-El nombre significa personas, herramientas y trabajo uniéndose en un mismo lugar. La mitad que sostiene el peso es *hub*. *Forge* es solo metáfora: nunca se convierte en imagen. Ningún yunque, martillo, chispa, metal fundido ni referencia medieval o de herrería en el producto, el marketing o la iconografía.
+El nombre significa personas, herramientas y trabajo uniéndose en un mismo lugar. La mitad que sostiene el peso es _hub_. _Forge_ es solo metáfora: nunca se convierte en imagen. Ningún yunque, martillo, chispa, metal fundido ni referencia medieval o de herrería en el producto, el marketing o la iconografía.
 
 El logotipo se mantiene fuerte en el primer viewport de la superficie de marketing.
 
@@ -32,7 +32,7 @@ Abrir HubForge por la mañana debe producir: **control, claridad, calma, confian
 
 Nunca debe producir: ansiedad, saturación, culpa, teatro de urgencia, ni la sensación de que hay cientos de asuntos pendientes.
 
-En segundos la interfaz responde, sin que nadie lo pida: *¿qué está ocurriendo y qué debería hacer ahora?* Sin buscar, sin abrir diez pantallas, sin cambiar de herramienta.
+En segundos la interfaz responde, sin que nadie lo pida: _¿qué está ocurriendo y qué debería hacer ahora?_ Sin buscar, sin abrir diez pantallas, sin cambiar de herramienta.
 
 ## Voz
 
@@ -55,7 +55,7 @@ El producto es temprano pero realmente funcional, con sincronización real de Su
 
 ## La accesibilidad como marca
 
-La accesibilidad es un atributo de marca declarado, no una tarea de cumplimiento. El producto debe sentirse premium *porque* cualquiera puede usarlo con comodidad: operación completa por teclado, contraste de texto cercano a AAA, estados de foco honestos y ningún significado transmitido solo por color. Los requisitos vinculantes están enumerados en `PRODUCT.md` y se implementan a través de `UX_PRINCIPLES.md` y `COMPONENT_GUIDELINES.md`.
+La accesibilidad es un atributo de marca declarado, no una tarea de cumplimiento. El producto debe sentirse premium _porque_ cualquiera puede usarlo con comodidad: operación completa por teclado, contraste de texto cercano a AAA, estados de foco honestos y ningún significado transmitido solo por color. Los requisitos vinculantes están enumerados en `PRODUCT.md` y se implementan a través de `UX_PRINCIPLES.md` y `COMPONENT_GUIDELINES.md`.
 
 ## Referencia de oficio
 

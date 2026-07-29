@@ -81,7 +81,12 @@ export function AppShell({
     { href: "/app/tasks", label: labels.tasks, icon: ListTodo, onPhone: true },
     { href: "/app/team", label: labels.team, icon: Users, onPhone: true },
     { href: "/app/chat", label: labels.chat, icon: MessageSquare, onPhone: true },
-    { href: "/app/organizations", label: labels.organizations, icon: Building2, onPhone: false },
+    {
+      href: "/app/organizations",
+      label: labels.organizations,
+      icon: Building2,
+      onPhone: false,
+    },
     { href: "/app/projects", label: labels.projects, icon: FolderKanban, onPhone: false },
     { href: "/app/calendar", label: labels.calendar, icon: CalendarDays, onPhone: false },
     { href: "/app/github", label: labels.github, icon: FolderGit, onPhone: false },
@@ -161,7 +166,9 @@ export function AppShell({
           )}
         >
           <Ellipsis className="size-[1.125rem] shrink-0" aria-hidden />
-          <span className="t-label text-[0.5625rem] tracking-[0.06em]">{labels.more}</span>
+          <span className="t-label text-[0.5625rem] tracking-[0.06em]">
+            {labels.more}
+          </span>
         </button>
       </nav>
 
@@ -196,7 +203,9 @@ export function AppShell({
                       aria-hidden
                     />
                   ) : null}
-                  <span className="t-body-sm truncate text-[var(--hf-ink-faint)]">{crumb}</span>
+                  <span className="t-body-sm truncate text-[var(--hf-ink-faint)]">
+                    {crumb}
+                  </span>
                 </li>
               ))}
             </ol>
@@ -218,7 +227,9 @@ export function AppShell({
         </div>
 
         <div className="mt-1.5 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <h1 className="t-display text-[var(--hf-ink)]">{current?.label ?? labels.brand}</h1>
+          <h1 className="t-display text-[var(--hf-ink)]">
+            {current?.label ?? labels.brand}
+          </h1>
           <p className="t-mono-sm text-[var(--hf-ink-faint)]" data-tabular>
             {mode === "demo" ? labels.demoWorkspace : labels.liveWorkspace}
           </p>
@@ -270,7 +281,9 @@ function RailLink({
         )}
       />
       <Icon className="size-[1.125rem] shrink-0" aria-hidden />
-      <span className="t-label text-[0.5625rem] tracking-[0.06em] lg:sr-only">{label}</span>
+      <span className="t-label text-[0.5625rem] tracking-[0.06em] lg:sr-only">
+        {label}
+      </span>
 
       <span
         role="tooltip"

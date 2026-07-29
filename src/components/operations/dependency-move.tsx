@@ -6,12 +6,7 @@ import type { OperationsTask } from "@/data/demo-operations";
 import { STATUS_ORDER } from "@/data/demo-operations";
 import type { TaskStatus } from "@/lib/domain/types";
 import { cn, fill } from "@/lib/utils";
-import {
-  plural,
-  statusLabel,
-  type OperationsLabels,
-  type WorkLabels,
-} from "./labels";
+import { plural, statusLabel, type OperationsLabels, type WorkLabels } from "./labels";
 
 /**
  * The signature interaction: work does not move alone.
@@ -131,7 +126,9 @@ export function DependencyMove({
                 />
                 {statusLabel(value, statusLabels)}
                 {value === task.status ? (
-                  <span className="t-mono-sm text-[var(--hf-ink-faint)]">{labels.current}</span>
+                  <span className="t-mono-sm text-[var(--hf-ink-faint)]">
+                    {labels.current}
+                  </span>
                 ) : null}
               </label>
             ))}
@@ -141,7 +138,11 @@ export function DependencyMove({
           {hasDependents ? (
             <div className="panel p-3">
               <p className="t-body-sm text-[var(--hf-ink)]">
-                {plural(dependents.length, statusLabels.waitsOne, statusLabels.waitsOther)}
+                {plural(
+                  dependents.length,
+                  statusLabels.waitsOne,
+                  statusLabels.waitsOther,
+                )}
               </p>
               <ul className="mt-2 grid gap-1">
                 {dependents.map((dependent) => (

@@ -271,7 +271,9 @@ export function ChatPanel({
 
       <div className="grid gap-3 lg:grid-cols-[13rem_1fr]">
         <nav aria-label={labels.channels} className="panel p-2">
-          <p className="t-label px-2 py-1 text-[var(--hf-ink-faint)]">{labels.channels}</p>
+          <p className="t-label px-2 py-1 text-[var(--hf-ink-faint)]">
+            {labels.channels}
+          </p>
           <ul className="grid gap-0.5">
             {visibleChannels.map((channel) => {
               const active = channel.id === currentChannelId;
@@ -298,9 +300,14 @@ export function ChatPanel({
           </ul>
         </nav>
 
-        <section aria-label={currentChannelName} className="panel flex min-h-[28rem] flex-col">
+        <section
+          aria-label={currentChannelName}
+          className="panel flex min-h-[28rem] flex-col"
+        >
           <div className="flex items-baseline gap-3 border-b border-[var(--hf-rule)] px-4 py-2.5">
-            <p className="t-mono font-medium text-[var(--hf-ink)]">#{currentChannelName}</p>
+            <p className="t-mono font-medium text-[var(--hf-ink)]">
+              #{currentChannelName}
+            </p>
             <p className="t-body-sm text-[var(--hf-ink-faint)]">{labels.messages}</p>
           </div>
 
