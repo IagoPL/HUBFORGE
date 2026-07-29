@@ -191,4 +191,15 @@ export const es = {
     demoHint: "En modo demo los mensajes se guardan en este navegador.",
     liveHint: "Con sesión iniciada, el chat usa Supabase Realtime para mensajes nuevos.",
   },
+  errors: {
+    authRequired: "Inicia sesión para continuar.",
+    notConfigured: "Supabase aún no está configurado.",
+    nameRequired: "El nombre es obligatorio.",
+    permissionDenied: "No tienes permiso para hacer eso.",
+    slugTaken: "Ese slug ya está en uso. Prueba con otro nombre.",
+    createFailed: "No se pudo crear la organización.",
+    projectCreateFailed: "No se pudo crear el proyecto.",
+    pickOrganization: "Elige una organización primero.",
+    generic: "Algo salió mal. Inténtalo de nuevo.",
+  },
 } as const satisfies Dictionary;

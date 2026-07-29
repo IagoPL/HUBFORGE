@@ -12,6 +12,7 @@ import {
 } from "@/features/organizations/workspace-mapping";
 import { slugify } from "@/features/organizations/workspace-state";
 import type { Organization, Project } from "@/lib/domain/types";
+import { mapProviderError, translatedError } from "@/lib/errors/user-facing";
 
 export type WorkspaceActionResult<T> =
   { ok: true; data: T } | { ok: false; error: string };
@@ -19,12 +20,12 @@ export type WorkspaceActionResult<T> =
 async function requireLiveClient() {
   const user = await getCurrentUser();
   if (!user) {
-    return { ok: false as const, error: "Sign in to manage organizations." };
+    return { ok: false as const, error: await translatedError("authRequired") };
   }
 
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
-    return { ok: false as const, error: "Supabase is not configured." };
+    return { ok: false as const, error: await translatedError("notConfigured") };
   }
 
   return { ok: true as const, user, supabase };
@@ -37,7 +38,7 @@ export async function createOrganizationAction(
   if (!gate.ok) return { ok: false, error: gate.error };
 
   const name = nameInput.trim();
-  if (!name) return { ok: false, error: "Organization name is required." };
+  if (!name) return { ok: false, error: await translatedError("nameRequired") };
 
   const baseSlug = slugify(name) || `org-${Date.now()}`;
   const { data: existing } = await gate.supabase.from("organizations").select("slug");
@@ -46,18 +47,17 @@ export async function createOrganizationAction(
     (existing ?? []).map((row: { slug: string }) => row.slug),
   );
 
-  const { data, error } = await gate.supabase
-    .from("organizations")
-    .insert({
-      name,
-      slug,
-      created_by: gate.user.id,
-    })
-    .select("id, name, slug")
-    .single();
+  const { data, error } = await gate.supabase.rpc("create_organization", {
+    org_name: name,
+    org_slug: slug,
+  });
 
   if (error || !data) {
-    return { ok: false, error: error?.message ?? "Could not create organization." };
+    const key = mapProviderError(error?.message);
+    return {
+      ok: false,
+      error: await translatedError(key === "generic" ? "createFailed" : key),
+    };
   }
 
   revalidatePath("/app", "layout");
@@ -74,8 +74,10 @@ export async function createProjectAction(input: {
 
   const name = input.name.trim();
   const organizationId = input.organizationId.trim();
-  if (!name) return { ok: false, error: "Project name is required." };
-  if (!organizationId) return { ok: false, error: "Pick an organization first." };
+  if (!name) return { ok: false, error: await translatedError("nameRequired") };
+  if (!organizationId) {
+    return { ok: false, error: await translatedError("pickOrganization") };
+  }
 
   const baseSlug = slugify(name) || `project-${Date.now()}`;
   const { data: existing } = await gate.supabase
@@ -101,7 +103,11 @@ export async function createProjectAction(input: {
     .single();
 
   if (error || !data) {
-    return { ok: false, error: error?.message ?? "Could not create project." };
+    const key = mapProviderError(error?.message);
+    return {
+      ok: false,
+      error: await translatedError(key === "generic" ? "projectCreateFailed" : key),
+    };
   }
 
   revalidatePath("/app", "layout");

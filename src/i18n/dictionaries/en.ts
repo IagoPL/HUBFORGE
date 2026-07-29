@@ -193,6 +193,17 @@ export const en = {
     demoHint: "Demo mode stores chat messages in this browser.",
     liveHint: "Signed-in chat uses Supabase Realtime for new messages.",
   },
+  errors: {
+    authRequired: "Sign in to continue.",
+    notConfigured: "Supabase is not configured yet.",
+    nameRequired: "Name is required.",
+    permissionDenied: "You do not have permission to do that.",
+    slugTaken: "That slug is already taken. Try another name.",
+    createFailed: "Could not create the organization.",
+    projectCreateFailed: "Could not create the project.",
+    pickOrganization: "Pick an organization first.",
+    generic: "Something went wrong. Please try again.",
+  },
 } as const satisfies MessageTree;
 
 export type Dictionary = {
