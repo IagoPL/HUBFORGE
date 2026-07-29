@@ -4,6 +4,16 @@ import { safeRedirectPath } from "@/features/authentication/safe-redirect";
 import { getPublicSupabaseConfig } from "@/lib/supabase/config";
 
 function appOrigin(request: NextRequest) {
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const host = forwardedHost ?? request.headers.get("host") ?? request.nextUrl.host;
+  const proto =
+    request.headers.get("x-forwarded-proto") ??
+    (request.nextUrl.protocol.replace(":", "") || "https");
+
+  if (host && !host.includes("localhost") && !host.startsWith("127.0.0.1")) {
+    return `${proto}://${host}`.replace(/\/$/, "");
+  }
+
   return (
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
     request.nextUrl.origin.replace(/\/$/, "")
