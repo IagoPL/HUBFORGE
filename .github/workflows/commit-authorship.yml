@@ -1,0 +1,96 @@
+name: Commit authorship
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: authorship-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  authorship:
+    name: Commit authorship
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Verify commit authorship
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          EXPECTED_NAME='Iago Prieto Lamas'
+          EXPECTED_EMAIL='50492345+IagoPL@users.noreply.github.com'
+          DEPENDABOT_NAME='dependabot[bot]'
+          DEPENDABOT_EMAIL='49699333+dependabot[bot]@users.noreply.github.com'
+
+          if [ -z "${BASE_SHA}" ] || [ "${BASE_SHA}" = "0000000000000000000000000000000000000000" ]; then
+            RANGE="${HEAD_SHA}"
+          else
+            RANGE="${BASE_SHA}..${HEAD_SHA}"
+          fi
+
+          echo "Checking commits in range: ${RANGE}"
+
+          while IFS= read -r sha; do
+            [ -z "${sha}" ] && continue
+            author_name="$(git log -1 --format='%an' "${sha}")"
+            author_email="$(git log -1 --format='%ae' "${sha}")"
+            committer_name="$(git log -1 --format='%cn' "${sha}")"
+            committer_email="$(git log -1 --format='%ce' "${sha}")"
+            message="$(git log -1 --format='%B' "${sha}")"
+
+            echo "Inspect ${sha}: ${author_name} <${author_email}> / ${committer_name}"
+
+            if echo "${author_name}" | grep -Eiq 'cursor|cursoragent'; then
+              echo "::error::Forbidden author identity on ${sha}: ${author_name}"
+              exit 1
+            fi
+            if echo "${committer_name}" | grep -Eiq 'cursor|cursoragent'; then
+              echo "::error::Forbidden committer identity on ${sha}: ${committer_name}"
+              exit 1
+            fi
+            if echo "${author_email}" | grep -Eiq 'cursoragent@|@cursor\.com'; then
+              echo "::error::Forbidden author email on ${sha}: ${author_email}"
+              exit 1
+            fi
+            if echo "${committer_email}" | grep -Eiq 'cursoragent@|@cursor\.com'; then
+              echo "::error::Forbidden committer email on ${sha}: ${committer_email}"
+              exit 1
+            fi
+            if echo "${message}" | grep -Eiq 'Co-authored-by:[[:space:]]*(Cursor( Agent)?|cursoragent|Claude|OpenAI|Copilot)'; then
+              echo "::error::Forbidden AI co-author trailer on ${sha}"
+              exit 1
+            fi
+            if echo "${message}" | grep -Eiq '^Generated-by:'; then
+              echo "::error::Forbidden Generated-by trailer on ${sha}"
+              exit 1
+            fi
+
+            if [ "${author_name}" = "${DEPENDABOT_NAME}" ] && [ "${author_email}" = "${DEPENDABOT_EMAIL}" ]; then
+              continue
+            fi
+
+            if [ "${author_name}" = "${EXPECTED_NAME}" ] && [ "${author_email}" = "${EXPECTED_EMAIL}" ]; then
+              continue
+            fi
+
+            # Allow other human collaborators (non-bot) without hard-coding every identity.
+            if echo "${author_email}" | grep -Eiq '\[bot\]@users\.noreply\.github\.com|noreply@github\.com'; then
+              if [ "${author_name}" != "GitHub" ]; then
+                echo "::error::Unauthorized bot author on ${sha}: ${author_name} <${author_email}>"
+                exit 1
+              fi
+              continue
+            fi
+
+            echo "Accepted human collaborator on ${sha}: ${author_name} <${author_email}>"
+          done < <(git rev-list --no-merges "${RANGE}")
