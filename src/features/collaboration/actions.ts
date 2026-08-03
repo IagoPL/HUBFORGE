@@ -732,7 +732,8 @@ export async function setTaskAssigneesAction(input: {
   });
 
   if (added.length > 0 && project?.organization_id) {
-    const { createNotificationForUsers } = await import("@/features/availability/actions");
+    const { createNotificationForUsers } =
+      await import("@/features/availability/actions");
     await createNotificationForUsers({
       organizationId: project.organization_id,
       userIds: added,
@@ -752,7 +753,9 @@ export async function setTaskDependenciesAction(input: {
   const gate = await requireLive();
   if (!gate.ok) return gate;
 
-  const uniqueDeps = [...new Set(input.dependsOnTaskIds.filter((id) => id !== input.taskId))];
+  const uniqueDeps = [
+    ...new Set(input.dependsOnTaskIds.filter((id) => id !== input.taskId)),
+  ];
 
   const { data: existing } = await gate.supabase
     .from("task_dependencies")

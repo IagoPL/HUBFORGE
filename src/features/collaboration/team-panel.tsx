@@ -210,11 +210,15 @@ export function TeamPanel({
           {labels.invite}
         </Button>
         {inviteNotice ? (
-          <p className="t-body-sm text-[var(--hf-ink-muted)] md:col-span-2">{inviteNotice}</p>
+          <p className="t-body-sm text-[var(--hf-ink-muted)] md:col-span-2">
+            {inviteNotice}
+          </p>
         ) : null}
         {inviteUrl ? (
           <div className="grid gap-2 md:col-span-2">
-            <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.inviteLinkHint}</p>
+            <p className="t-body-sm text-[var(--hf-ink-muted)]">
+              {labels.inviteLinkHint}
+            </p>
             <div className="flex flex-wrap items-center gap-2">
               <code className="t-mono-sm break-all rounded bg-[var(--hf-ground-3)] px-2 py-1">
                 {inviteUrl}

@@ -69,7 +69,9 @@ export function WorkSurface({
   const [pending, startTransition] = useTransition();
 
   const [towedIds, setTowedIds] = useState<string[]>([]);
-  const [undo, setUndo] = useState<{ tasks: OperationsTask[]; message: string } | null>(null);
+  const [undo, setUndo] = useState<{ tasks: OperationsTask[]; message: string } | null>(
+    null,
+  );
   const [announcement, setAnnouncement] = useState("");
 
   const [title, setTitle] = useState("");
@@ -139,7 +141,10 @@ export function WorkSurface({
         ? "empty"
         : "ready";
 
-  function persist(next: OperationsTask[], changed: { id: string; status: TaskStatus }[]) {
+  function persist(
+    next: OperationsTask[],
+    changed: { id: string; status: TaskStatus }[],
+  ) {
     setLive((current) => (current ? { ...current, tasks: next } : current));
     startTransition(() => {
       void Promise.all(

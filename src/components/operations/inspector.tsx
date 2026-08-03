@@ -144,7 +144,10 @@ export function Inspector({
                 />
               </label>
             ) : (
-              <h2 id="inspector-heading" className="t-display-sm mt-1 text-[var(--hf-ink)]">
+              <h2
+                id="inspector-heading"
+                className="t-display-sm mt-1 text-[var(--hf-ink)]"
+              >
                 {task.title}
               </h2>
             )}
@@ -169,7 +172,9 @@ export function Inspector({
             <Field label={labels.status}>{statusLabel(task.status, statusLabels)}</Field>
             {editable ? (
               <>
-                <dt className="t-label pt-0.5 text-[var(--hf-ink-faint)]">{labels.priority}</dt>
+                <dt className="t-label pt-0.5 text-[var(--hf-ink-faint)]">
+                  {labels.priority}
+                </dt>
                 <dd>
                   <select
                     value={priority}
@@ -186,7 +191,9 @@ export function Inspector({
                 </dd>
               </>
             ) : (
-              <Field label={labels.priority}>{priorityLabel(task.priority, labels)}</Field>
+              <Field label={labels.priority}>
+                {priorityLabel(task.priority, labels)}
+              </Field>
             )}
             {task.updatedAt ? (
               <Field label={labels.updated} mono>
@@ -266,7 +273,9 @@ export function Inspector({
 
           {editable ? (
             <label className="grid gap-1.5">
-              <span className="t-label text-[var(--hf-ink-faint)]">{labels.dependsOn}</span>
+              <span className="t-label text-[var(--hf-ink-faint)]">
+                {labels.dependsOn}
+              </span>
               <select
                 value={dependsOnTaskId}
                 onChange={(event) => setDependsOnTaskId(event.target.value)}

@@ -15,10 +15,7 @@ export async function GET(request: Request) {
 
   if (!user) {
     const login = new URL("/login", url.origin);
-    login.searchParams.set(
-      "next",
-      `/api/github/setup?${url.searchParams.toString()}`,
-    );
+    login.searchParams.set("next", `/api/github/setup?${url.searchParams.toString()}`);
     return NextResponse.redirect(login);
   }
 

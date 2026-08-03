@@ -80,7 +80,11 @@ export async function processGitHubWebhook(input: {
     await upsertIssueFromWebhook(admin, input.payload);
   }
 
-  if (input.event === "pull_request" && input.payload.pull_request && input.payload.repository) {
+  if (
+    input.event === "pull_request" &&
+    input.payload.pull_request &&
+    input.payload.repository
+  ) {
     await upsertPullRequestFromWebhook(admin, input.payload);
   }
 

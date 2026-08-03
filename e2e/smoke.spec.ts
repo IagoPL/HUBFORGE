@@ -7,7 +7,9 @@ test.describe("smoke", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "Build together without losing context",
     );
-    await expect(page.getByRole("link", { name: /Sign in|Iniciar sesión/i })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /Sign in|Iniciar sesión/i }),
+    ).toBeVisible();
   });
 
   test("login offers GitHub OAuth CTA", async ({ page }) => {

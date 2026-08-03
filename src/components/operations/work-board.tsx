@@ -125,11 +125,7 @@ export function WorkBoard({
                           value={task.status}
                           disabled={pending}
                           onChange={(event) =>
-                            onApplyMove(
-                              task.id,
-                              event.target.value as TaskStatus,
-                              [],
-                            )
+                            onApplyMove(task.id, event.target.value as TaskStatus, [])
                           }
                           className="input t-mono-sm max-w-[7.5rem] py-1"
                         >

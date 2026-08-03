@@ -204,7 +204,8 @@ export const en = {
   },
   invite: {
     invalidTitle: "Invalid invitation",
-    invalidBody: "This invite link is missing a token. Ask your teammate to send a new one.",
+    invalidBody:
+      "This invite link is missing a token. Ask your teammate to send a new one.",
     failedTitle: "Could not accept invitation",
     goToApp: "Go to workspace",
     emailSubject: "Join {org} on HubForge",

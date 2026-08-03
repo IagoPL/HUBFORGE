@@ -184,7 +184,10 @@ export default async function LandingPage() {
                 {t.landing.securityBody}
               </p>
             </div>
-            <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "shrink-0")}>
+            <Link
+              href="/login"
+              className={cn(buttonVariants({ size: "lg" }), "shrink-0")}
+            >
               {t.common.signIn}
               <ArrowRight className="size-4" aria-hidden />
             </Link>
@@ -210,7 +213,9 @@ export default async function LandingPage() {
             >
               {t.legal.termsTitle}
             </Link>
-            <p className="t-mono-sm text-[var(--hf-ink-faint)]">{t.landing.footerStatus}</p>
+            <p className="t-mono-sm text-[var(--hf-ink-faint)]">
+              {t.landing.footerStatus}
+            </p>
           </div>
         </div>
       </footer>

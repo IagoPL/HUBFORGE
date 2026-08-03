@@ -70,10 +70,7 @@ export default async function AppOverviewPage() {
     getProjectLastVisitAction(project.id),
   ]);
   const lastVisitAt = visitResult.ok ? visitResult.data : null;
-  const opsResult = await listOperationsTasksAction(
-    project.id,
-    lastVisitAt ?? undefined,
-  );
+  const opsResult = await listOperationsTasksAction(project.id, lastVisitAt ?? undefined);
   void touchProjectVisitAction(project.id);
   const members = membersResult.ok ? membersResult.data : [];
   const opsTasks = opsResult.ok ? opsResult.data : [];

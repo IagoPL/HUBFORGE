@@ -11,13 +11,11 @@ export type SendEmailInput = {
 };
 
 export type SendEmailResult =
-  | { ok: true; delivered: boolean }
-  | { ok: false; error: string };
+  { ok: true; delivered: boolean } | { ok: false; error: string };
 
 export function getAppBaseUrl() {
   return (
-    process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "") ||
-    "http://localhost:3000"
+    process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "") || "http://localhost:3000"
   );
 }
 
