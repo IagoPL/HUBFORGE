@@ -18,6 +18,8 @@ export default async function OrganizationsPage() {
         name: t.organizations.name,
         current: t.organizations.current,
         liveHint: t.organizations.liveHint,
+        limitReached: t.organizations.limitReached,
+        packaging: t.packaging,
       }}
     />
   );

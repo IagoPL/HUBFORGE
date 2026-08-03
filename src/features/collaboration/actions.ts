@@ -24,6 +24,7 @@ import {
   type Task,
   type TaskStatus,
 } from "@/lib/domain/types";
+import { getPackagingLimits } from "@/lib/packaging/limits";
 
 export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -165,6 +166,30 @@ export async function inviteMemberAction(input: {
 
   if (!email.includes("@")) {
     return { ok: false, error: "Enter a valid email." };
+  }
+
+  const limits = getPackagingLimits();
+  const [memberCount, inviteCount] = await Promise.all([
+    gate.supabase
+      .from("organization_members")
+      .select("user_id", { count: "exact", head: true })
+      .eq("organization_id", input.organizationId),
+    gate.supabase
+      .from("organization_invitations")
+      .select("id", { count: "exact", head: true })
+      .eq("organization_id", input.organizationId)
+      .eq("status", "pending"),
+  ]);
+
+  if (memberCount.error) return { ok: false, error: memberCount.error.message };
+  if (inviteCount.error) return { ok: false, error: inviteCount.error.message };
+
+  const seats = (memberCount.count ?? 0) + (inviteCount.count ?? 0);
+  if (seats >= limits.membersPerOrganization) {
+    return {
+      ok: false,
+      error: `Member limit reached (${limits.membersPerOrganization}).`,
+    };
   }
 
   const { data: invitation, error } = await gate.supabase
