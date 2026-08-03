@@ -2,15 +2,21 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 test.describe("smoke", () => {
-  test("landing renders brand and CTA", async ({ page }) => {
+  test("landing renders brand and CTAs", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      "Build together without losing context",
+      /holding your project|frenando vuestro proyecto/i,
     );
     await expect(
       page
         .getByRole("main")
-        .getByRole("link", { name: /Sign in|Iniciar sesión/i })
+        .getByRole("link", { name: /Connect GitHub|Conectar GitHub/i })
+        .first(),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("main")
+        .getByRole("link", { name: /Open demonstration|Abrir demostración/i })
         .first(),
     ).toBeVisible();
   });
@@ -30,7 +36,7 @@ test.describe("smoke", () => {
     await expect(page.getByRole("group", { name: /Language|Idioma/i })).toBeVisible();
     await page.getByRole("button", { name: /Spanish|Español/i }).click();
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      "Construid juntos sin perder el contexto",
+      "frenando vuestro proyecto",
     );
   });
 
@@ -41,6 +47,40 @@ test.describe("smoke", () => {
       ["serious", "critical"].includes(v.impact ?? ""),
     );
     expect(serious).toEqual([]);
+  });
+
+  test("demo mode is navigable without auth", async ({ page }) => {
+    await page.goto("/demo");
+    await expect(page.getByText(/Demonstration mode|Modo demostración/i)).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /Connect my repository|Conectar mi repositorio/i }),
+    ).toBeVisible();
+    await page
+      .getByRole("navigation", { name: /App/i })
+      .getByRole("link", { name: /Attention|Atención/i })
+      .click();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      /Attention|Atención/i,
+    );
+    await page.goto("/demo/dependencies");
+    await expect(
+      page.getByText(/Character turnaround asset|blocks|bloque/i).first(),
+    ).toBeVisible();
+  });
+
+  test("demo has no serious accessibility violations", async ({ page }) => {
+    await page.goto("/demo");
+    const results = await new AxeBuilder({ page }).analyze();
+    const serious = results.violations.filter((v) =>
+      ["serious", "critical"].includes(v.impact ?? ""),
+    );
+    expect(serious).toEqual([]);
+  });
+
+  test("chat route soft-retires to briefing", async ({ page }) => {
+    await page.context().clearCookies();
+    await page.goto("/app/chat");
+    await expect(page).toHaveURL(/\/login/);
   });
 
   test("privacy and terms pages render", async ({ page }) => {
@@ -65,5 +105,7 @@ test.describe("smoke", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: /Briefing/i }),
     ).toBeVisible();
+    await page.goto("/app/chat");
+    await expect(page).toHaveURL(/\/app(\?notice=chat-retired)?$/);
   });
 });
