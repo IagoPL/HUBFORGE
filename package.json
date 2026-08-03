@@ -50,7 +50,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "eslint-config-prettier": "^10.1.8",
-    "jsdom": "^30.0.0",
+    "jsdom": "^30.0.1",
     "prettier": "^3.9.6",
     "tailwindcss": "^4",
     "typescript": "^5",
