@@ -1,6 +1,9 @@
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { isGitHubAppConfigured, verifyGitHubWebhookSignature } from "@/features/github/config";
+import {
+  isGitHubAppConfigured,
+  verifyGitHubWebhookSignature,
+} from "@/features/github/config";
 import { isValidRepoFullName, normalizeRepoFullName } from "@/features/github/repo-utils";
 
 describe("github helpers", () => {

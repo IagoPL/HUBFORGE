@@ -1,6 +1,9 @@
 import { generateKeyPairSync, createVerify } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createGitHubAppJwt, createInstallationAccessToken } from "@/features/github/app-auth";
+import {
+  createGitHubAppJwt,
+  createInstallationAccessToken,
+} from "@/features/github/app-auth";
 
 function ephemeralPrivateKey() {
   return generateKeyPairSync("rsa", {

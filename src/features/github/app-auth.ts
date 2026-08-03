@@ -62,7 +62,10 @@ export async function createInstallationAccessToken(installationId: number) {
 
   const json = (await response.json()) as { token?: string };
   if (!json.token) {
-    return { ok: false as const, error: "GitHub installation token missing in response." };
+    return {
+      ok: false as const,
+      error: "GitHub installation token missing in response.",
+    };
   }
 
   return { ok: true as const, token: json.token };

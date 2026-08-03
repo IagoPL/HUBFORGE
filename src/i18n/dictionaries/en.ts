@@ -323,7 +323,8 @@ export const en = {
     repoFormat: "Use the owner/repo format.",
     syncNow: "Sync now",
     syncSuccess: "Synced from GitHub.",
-    emptyActivity: "No synced activity yet. Link a repo with an installation id and sync.",
+    emptyActivity:
+      "No synced activity yet. Link a repo with an installation id and sync.",
   },
   chat: {
     title: "Chat",

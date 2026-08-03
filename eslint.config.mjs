@@ -17,6 +17,10 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Vendored agent tooling, not project source.
     ".cursor/**",
+    // Local one-off history rebuild helpers (untracked / gitignored).
+    "scripts/rebuild-*.mjs",
+    ".audit-*.mjs",
+    ".git-bundles/**",
   ]),
   {
     rules: {

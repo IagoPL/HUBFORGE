@@ -2,11 +2,11 @@
 
 ## Environments
 
-| Environment | Purpose                                              |
-| ----------- | ---------------------------------------------------- |
-| Local       | `pnpm dev` + `.env.local`                            |
-| Preview     | Vercel PR previews (project `hubforge`)              |
-| Production  | `https://hubforge-six.vercel.app` + Supabase         |
+| Environment | Purpose                                      |
+| ----------- | -------------------------------------------- |
+| Local       | `pnpm dev` + `.env.local`                    |
+| Preview     | Vercel PR previews (project `hubforge`)      |
+| Production  | `https://hubforge-six.vercel.app` + Supabase |
 
 Production readiness: [production-checklist.md](./production-checklist.md). Probe: `GET /api/ready`.
 

@@ -66,16 +66,16 @@ Production checklist: `docs/operations/production-checklist.md` (domain `hubforg
 
 ### Scripts
 
-| Script                              | Purpose            |
-| ----------------------------------- | ------------------ |
-| `pnpm dev`                          | Local development  |
-| `pnpm lint`                         | ESLint             |
-| `pnpm format` / `pnpm format:check` | Prettier           |
-| `pnpm typecheck`                    | TypeScript         |
-| `pnpm test`                         | Unit tests         |
-| `pnpm test:e2e`                     | Playwright smoke   |
-| `pnpm build`                        | Production build   |
-| `pnpm verify:git-identity`          | Commit author gate |
+| Script                              | Purpose             |
+| ----------------------------------- | ------------------- |
+| `pnpm dev`                          | Local development   |
+| `pnpm lint`                         | ESLint              |
+| `pnpm format` / `pnpm format:check` | Prettier            |
+| `pnpm typecheck`                    | TypeScript          |
+| `pnpm test`                         | Unit tests          |
+| `pnpm test:e2e`                     | Playwright smoke    |
+| `pnpm build`                        | Production build    |
+| `pnpm verify:git-identity`          | Commit author gate  |
 | `pnpm verify:env`                   | Env readiness flags |
 
 ## Testing

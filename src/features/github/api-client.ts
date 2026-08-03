@@ -42,7 +42,9 @@ async function githubGet<T>(token: string, path: string): Promise<T> {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`GitHub API ${path} failed (${response.status}): ${body.slice(0, 200)}`);
+    throw new Error(
+      `GitHub API ${path} failed (${response.status}): ${body.slice(0, 200)}`,
+    );
   }
 
   return (await response.json()) as T;

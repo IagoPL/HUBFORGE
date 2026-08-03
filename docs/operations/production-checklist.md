@@ -5,14 +5,14 @@ Supabase project: `pnpkgfhpwvdkhbncfwqz` (eu-west-1) — schema/migrations alrea
 
 ## Current status (local snapshot)
 
-| Piece | Status |
-| --- | --- |
-| Supabase Postgres + RLS tables | Done |
-| Local `NEXT_PUBLIC_SUPABASE_*` + `NEXT_PUBLIC_APP_URL` | Present in `.env.local` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Missing locally |
-| GitHub App env (`GITHUB_APP_*`, webhook secret) | Missing locally |
-| Vercel project `hubforge` | Linked; production domain live |
-| Resend / Sentry | Optional |
+| Piece                                                  | Status                         |
+| ------------------------------------------------------ | ------------------------------ |
+| Supabase Postgres + RLS tables                         | Done                           |
+| Local `NEXT_PUBLIC_SUPABASE_*` + `NEXT_PUBLIC_APP_URL` | Present in `.env.local`        |
+| `SUPABASE_SERVICE_ROLE_KEY`                            | Missing locally                |
+| GitHub App env (`GITHUB_APP_*`, webhook secret)        | Missing locally                |
+| Vercel project `hubforge`                              | Linked; production domain live |
+| Resend / Sentry                                        | Optional                       |
 
 Run locally:
 
