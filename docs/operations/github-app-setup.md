@@ -10,9 +10,9 @@ Sync paths:
 ## 1. Create the GitHub App
 
 1. Open https://github.com/settings/apps/new
-2. Homepage URL: your app URL (`http://localhost:3000` locally)
-3. Setup URL: `https://<public-host>/api/github/setup` (stores `installation_id`; pass `state=<organizationId>` from HubForge)
-4. Webhook URL: `https://<public-host>/api/github/webhooks`
+2. Homepage URL: production app URL (`https://hubforge-six.vercel.app`) or `http://localhost:3000` while testing
+3. Setup URL: `https://hubforge-six.vercel.app/api/github/setup` (stores `installation_id`; pass `state=<organizationId>` from HubForge)
+4. Webhook URL: `https://hubforge-six.vercel.app/api/github/webhooks`
 5. Webhook secret: generate a long random string
 6. Permissions (Repository):
    - Issues: Read & write

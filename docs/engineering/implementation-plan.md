@@ -32,17 +32,16 @@
 
 Trunk-based: short feature branches into `main`. No `develop` unless coordination pain appears.
 
-## Phase 3 — Live ops (manual; remaining)
+## Phase 3 — Live ops
 
-Checklist when standing up a real environment:
+Infra already exists (Supabase project + Vercel `hubforge` + domain `hubforge-six.vercel.app`).
+Remaining work is **secrets + provider config** — see `docs/operations/production-checklist.md`.
 
-1. Create Supabase project; apply migrations under `supabase/migrations/`
-2. Configure GitHub OAuth in Supabase (`docs/operations/supabase-auth-setup.md`)
-3. Set `NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_APP_URL` in `.env.local` / host
-4. Create GitHub App + webhook + private key (`docs/operations/github-app-setup.md`)
-5. Optional: invite email via Resend (`docs/operations/email-setup.md`); otherwise copyable invite links
-6. Optional: Vercel Preview/Production with the same env vars
-7. Optional: Sentry DSN for error tracking
+1. Confirm GitHub OAuth in Supabase + redirect allow list for prod/local
+2. Set `NEXT_PUBLIC_SUPABASE_*`, `NEXT_PUBLIC_APP_URL` in `.env.local` / Vercel (auth core)
+3. Add `SUPABASE_SERVICE_ROLE_KEY` + GitHub App env for sync (`docs/operations/github-app-setup.md`)
+4. Optional: Resend (`docs/operations/email-setup.md`), Sentry (`docs/operations/error-tracking.md`)
+5. Verify with `pnpm verify:env` and `GET /api/ready`
 
 ## Phase 4 — Post-MVP (later)
 

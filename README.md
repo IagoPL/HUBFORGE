@@ -53,6 +53,12 @@ pnpm dev
 
 Copy `.env.example` to `.env.local` and fill Supabase (and optional GitHub App) values. Without Supabase configured, `/app` redirects to login — there is no offline demo workspace.
 
+```bash
+pnpm verify:env   # reports missing env flags (no secret values)
+```
+
+Production checklist: `docs/operations/production-checklist.md` (domain `hubforge-six.vercel.app`).
+
 - Auth: `docs/operations/supabase-auth-setup.md`
 - GitHub App sync: `docs/operations/github-app-setup.md`
 - Invite email (optional): `docs/operations/email-setup.md`
@@ -70,6 +76,7 @@ Copy `.env.example` to `.env.local` and fill Supabase (and optional GitHub App) 
 | `pnpm test:e2e`                     | Playwright smoke   |
 | `pnpm build`                        | Production build   |
 | `pnpm verify:git-identity`          | Commit author gate |
+| `pnpm verify:env`                   | Env readiness flags |
 
 ## Testing
 
