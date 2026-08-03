@@ -15,8 +15,8 @@
 
 ## Phase 2 — Visual experience
 
-- Landing, login preview, app shell
-- Demo overview / projects / team / tasks / calendar
+- Landing, login, app shell
+- Live overview / projects / team / tasks / calendar (Supabase-backed)
 - Light/dark + responsive + reduced motion
 
 ## Planned PR sequence
@@ -28,14 +28,21 @@
 5. `feat/availability-notifications` — calendar + internal alerts
 6. `feat/github-app-sync` — GitHub App link + signed webhooks (done)
 7. `feat/chat-realtime` — project channels + Realtime messages (done)
+8. `feat/github-api-backfill` — App JWT, installation token, Sync now / link backfill (done)
 
 Trunk-based: short feature branches into `main`. No `develop` unless coordination pain appears.
 
-## Phase 3 — Live ops (manual)
+## Phase 3 — Live ops (manual; remaining)
 
-- Configure GitHub OAuth in Supabase (`docs/operations/supabase-auth-setup.md`)
-- Create GitHub App + webhook env (`docs/operations/github-app-setup.md`)
-- Optional Vercel deployment with the same env vars
+Checklist when standing up a real environment:
+
+1. Create Supabase project; apply migrations under `supabase/migrations/`
+2. Configure GitHub OAuth in Supabase (`docs/operations/supabase-auth-setup.md`)
+3. Set `NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_APP_URL` in `.env.local` / host
+4. Create GitHub App + webhook + private key (`docs/operations/github-app-setup.md`)
+5. Optional: `RESEND_*` for invite emails; otherwise copyable invite links
+6. Optional: Vercel Preview/Production with the same env vars
+7. Optional: Sentry DSN for error tracking
 
 ## Phase 4 — Post-MVP (later)
 
@@ -43,3 +50,4 @@ Trunk-based: short feature branches into `main`. No `develop` unless coordinatio
 - Sprints, roadmap, and workload analytics
 - PWA / push notifications
 - Richer chat (threads, reactions) — still no E2E encryption in near term
+- Billing stays deferred while the product remains free

@@ -1,6 +1,6 @@
 # Packaging limits
 
-Soft free-tier caps until paid plans / Stripe are defined in `PRODUCT.md`.
+HubForge is **free for now** (no Stripe / paid plans). Soft caps exist only as abuse guards and can be raised via env.
 
 | Resource                                   | Env override                | Default |
 | ------------------------------------------ | --------------------------- | ------- |

@@ -1,9 +1,13 @@
 import { createHmac } from "node:crypto";
-import { describe, expect, it } from "vitest";
-import { verifyGitHubWebhookSignature } from "@/features/github/config";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { isGitHubAppConfigured, verifyGitHubWebhookSignature } from "@/features/github/config";
 import { isValidRepoFullName, normalizeRepoFullName } from "@/features/github/repo-utils";
 
 describe("github helpers", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("normalizes and validates repository names", () => {
     expect(normalizeRepoFullName("https://github.com/IagoPL/HUBFORGE.git")).toBe(
       "IagoPL/HUBFORGE",
@@ -30,5 +34,11 @@ describe("github helpers", () => {
         secret,
       }),
     ).toBe(false);
+  });
+
+  it("reports when the GitHub App env is incomplete", () => {
+    vi.stubEnv("GITHUB_APP_ID", "1");
+    vi.stubEnv("GITHUB_APP_CLIENT_ID", "");
+    expect(isGitHubAppConfigured()).toBe(false);
   });
 });

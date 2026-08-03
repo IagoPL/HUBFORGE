@@ -310,9 +310,12 @@ export const en = {
     syncedCommits: "Synced commits",
     recentActivity: "Recent activity",
     setupHint:
-      "Configure the GitHub App env vars and point webhooks to /api/github/webhooks.",
+      "Configure the GitHub App env vars and point webhooks to /api/github/webhooks. After linking with an installation id, HubForge can backfill recent issues, PRs, and commits.",
     install: "Install GitHub App",
     repoFormat: "Use the owner/repo format.",
+    syncNow: "Sync now",
+    syncSuccess: "Synced from GitHub.",
+    emptyActivity: "No synced activity yet. Link a repo with an installation id and sync.",
   },
   chat: {
     title: "Chat",

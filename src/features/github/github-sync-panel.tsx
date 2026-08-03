@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  backfillRepositorySyncAction,
   linkRepositoryAction,
   listLinkedRepositoryAction,
   listSyncedCommitsAction,
@@ -39,6 +40,9 @@ export function GitHubSyncPanel({
     setupHint: string;
     install: string;
     repoFormat: string;
+    syncNow: string;
+    syncSuccess: string;
+    emptyActivity: string;
   };
   appConfigured: boolean;
   installUrl: string | null;
@@ -53,6 +57,7 @@ export function GitHubSyncPanel({
   const [fullName, setFullName] = useState("");
   const [installationId, setInstallationId] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const installHref =
@@ -60,22 +65,27 @@ export function GitHubSyncPanel({
       ? `${installUrl}${installUrl.includes("?") ? "&" : "?"}state=${encodeURIComponent(organizationId)}`
       : installUrl;
 
+  function refreshLists(activeProjectId: string) {
+    return Promise.all([
+      listLinkedRepositoryAction(activeProjectId),
+      listSyncedIssuesAction(activeProjectId),
+      listSyncedPullRequestsAction(activeProjectId),
+      listSyncedCommitsAction(activeProjectId),
+    ]).then(([repoResult, issuesResult, prsResult, commitsResult]) => {
+      if (repoResult.ok) setRepo(repoResult.data);
+      else setError(repoResult.error);
+      if (issuesResult.ok) setIssues(issuesResult.data);
+      if (prsResult.ok) setPullRequests(prsResult.data);
+      if (commitsResult.ok) setCommits(commitsResult.data);
+    });
+  }
+
   useEffect(() => {
     if (!projectId) return;
     let cancelled = false;
     startTransition(() => {
-      void Promise.all([
-        listLinkedRepositoryAction(projectId),
-        listSyncedIssuesAction(projectId),
-        listSyncedPullRequestsAction(projectId),
-        listSyncedCommitsAction(projectId),
-      ]).then(([repoResult, issuesResult, prsResult, commitsResult]) => {
+      void refreshLists(projectId).then(() => {
         if (cancelled) return;
-        if (repoResult.ok) setRepo(repoResult.data);
-        else setError(repoResult.error);
-        if (issuesResult.ok) setIssues(issuesResult.data);
-        if (prsResult.ok) setPullRequests(prsResult.data);
-        if (commitsResult.ok) setCommits(commitsResult.data);
       });
     });
     return () => {
@@ -86,6 +96,7 @@ export function GitHubSyncPanel({
   function linkRepo() {
     if (!projectId || !organizationId) return;
     setError(null);
+    setStatus(null);
     const normalized = normalizeRepoFullName(fullName);
     if (!isValidRepoFullName(normalized)) {
       setError(labels.repoFormat);
@@ -105,6 +116,7 @@ export function GitHubSyncPanel({
         }
         setRepo(result.data);
         setFullName("");
+        void refreshLists(projectId);
       });
     });
   }
@@ -112,6 +124,7 @@ export function GitHubSyncPanel({
   function unlinkRepo() {
     if (!projectId) return;
     setError(null);
+    setStatus(null);
     startTransition(() => {
       void unlinkRepositoryAction(projectId).then((result) => {
         if (!result.ok) {
@@ -122,6 +135,24 @@ export function GitHubSyncPanel({
         setIssues([]);
         setPullRequests([]);
         setCommits([]);
+      });
+    });
+  }
+
+  function syncNow() {
+    if (!projectId) return;
+    setError(null);
+    setStatus(null);
+    startTransition(() => {
+      void backfillRepositorySyncAction(projectId).then((result) => {
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        setStatus(
+          `${labels.syncSuccess} ${result.data.issues} issues · ${result.data.pullRequests} PRs · ${result.data.commits} commits`,
+        );
+        void refreshLists(projectId);
       });
     });
   }
@@ -144,6 +175,12 @@ export function GitHubSyncPanel({
       {error ? (
         <p role="alert" className="t-body-sm text-[var(--hf-error)]">
           {error}
+        </p>
+      ) : null}
+
+      {status ? (
+        <p role="status" className="t-body-sm text-[var(--hf-ink-muted)]">
+          {status}
         </p>
       ) : null}
 
@@ -174,6 +211,15 @@ export function GitHubSyncPanel({
             {repo.fullName}
           </a>
           <Badge tone="brand">linked</Badge>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={pending || !appConfigured || repo.installationId == null}
+            onClick={syncNow}
+          >
+            {labels.syncNow}
+          </Button>
           <Button
             type="button"
             variant="ghost"
@@ -233,7 +279,7 @@ export function GitHubSyncPanel({
         <div className="grid gap-2">
           <h3 className="t-label text-[var(--hf-ink-faint)]">{labels.syncedIssues}</h3>
           {issues.length === 0 ? (
-            <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
+            <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyActivity}</p>
           ) : (
             <ul className="grid gap-2">
               {issues.map((issue) => (
@@ -270,7 +316,7 @@ export function GitHubSyncPanel({
             {labels.syncedPullRequests}
           </h3>
           {pullRequests.length === 0 ? (
-            <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
+            <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.emptyActivity}</p>
           ) : (
             <ul className="grid gap-2">
               {pullRequests.map((pr) => (
@@ -301,7 +347,7 @@ export function GitHubSyncPanel({
         <div className="grid gap-2">
           <h3 className="t-label text-[var(--hf-ink-faint)]">{labels.syncedCommits}</h3>
           {commits.length === 0 ? (
-            <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
+            <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.emptyActivity}</p>
           ) : (
             <ul className="grid gap-2">
               {commits.map((commit) => (

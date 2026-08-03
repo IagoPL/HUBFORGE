@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/features/authentication/get-current-user";
+import { backfillLinkedRepository, type BackfillCounts } from "@/features/github/backfill";
+import { isGitHubAppConfigured } from "@/features/github/config";
 import { isValidRepoFullName, normalizeRepoFullName } from "@/features/github/repo-utils";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -144,6 +146,18 @@ export async function linkRepositoryAction(input: {
     return { ok: false, error: error?.message ?? "Could not link repository." };
   }
 
+  if (data.installation_id != null && isGitHubAppConfigured()) {
+    await backfillLinkedRepository({
+      fullName: data.full_name,
+      installationId: data.installation_id,
+      linked: {
+        id: data.id,
+        project_id: data.project_id,
+        organization_id: data.organization_id,
+      },
+    });
+  }
+
   revalidatePath("/app", "layout");
   return {
     ok: true,
@@ -156,6 +170,47 @@ export async function linkRepositoryAction(input: {
       installationId: data.installation_id,
     },
   };
+}
+
+export async function backfillRepositorySyncAction(
+  projectId: string,
+): Promise<ActionResult<BackfillCounts>> {
+  const gate = await requireLive();
+  if (!gate.ok) return gate;
+
+  if (!isGitHubAppConfigured()) {
+    return { ok: false, error: "GitHub App is not configured." };
+  }
+
+  const { data, error } = await gate.supabase
+    .from("project_repositories")
+    .select("id, project_id, organization_id, full_name, installation_id")
+    .eq("project_id", projectId)
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+  if (!data) return { ok: false, error: "Link a repository before syncing." };
+  if (data.installation_id == null) {
+    return {
+      ok: false,
+      error: "Installation id is required to sync from the GitHub API.",
+    };
+  }
+
+  const result = await backfillLinkedRepository({
+    fullName: data.full_name,
+    installationId: data.installation_id,
+    linked: {
+      id: data.id,
+      project_id: data.project_id,
+      organization_id: data.organization_id,
+    },
+  });
+
+  if (!result.ok) return result;
+
+  revalidatePath("/app", "layout");
+  return { ok: true, data: result.counts };
 }
 
 export async function unlinkRepositoryAction(
