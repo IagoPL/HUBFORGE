@@ -13,7 +13,9 @@ test.describe("smoke", () => {
   test("demo workspace overview is reachable", async ({ page }) => {
     await page.goto("/app");
     // Surface title lives in the shell title block; project context is a crumb.
-    await expect(page.getByRole("heading", { name: /Briefing|Resumen/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Briefing/i }),
+    ).toBeVisible();
     await expect(page.getByText("Aurora Launch").first()).toBeVisible();
   });
 
@@ -93,7 +95,7 @@ test.describe("smoke", () => {
         name: /Add availability window|Añadir ventana de disponibilidad/i,
       })
       .click();
-    await expect(page.getByText("Deep work block")).toBeVisible();
+    await expect(page.getByText("Deep work block").first()).toBeVisible();
 
     await page.goto("/app");
     await expect(
