@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: "%s · HubForge",
   },
   description:
-    "Collaborative project workspace with GitHub synchronization, team availability, roles, planning, communication and real-time notifications.",
+    "HubForge turns GitHub activity, dependencies, and team capacity into an operational briefing for indie multidisciplinary teams.",
 };
 
 export default async function RootLayout({
