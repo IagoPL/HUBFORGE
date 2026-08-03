@@ -40,7 +40,7 @@ Checklist when standing up a real environment:
 2. Configure GitHub OAuth in Supabase (`docs/operations/supabase-auth-setup.md`)
 3. Set `NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_APP_URL` in `.env.local` / host
 4. Create GitHub App + webhook + private key (`docs/operations/github-app-setup.md`)
-5. Optional: `RESEND_*` for invite emails; otherwise copyable invite links
+5. Optional: invite email via Resend (`docs/operations/email-setup.md`); otherwise copyable invite links
 6. Optional: Vercel Preview/Production with the same env vars
 7. Optional: Sentry DSN for error tracking
 

@@ -55,6 +55,7 @@ Copy `.env.example` to `.env.local` and fill Supabase (and optional GitHub App) 
 
 - Auth: `docs/operations/supabase-auth-setup.md`
 - GitHub App sync: `docs/operations/github-app-setup.md`
+- Invite email (optional): `docs/operations/email-setup.md`
 - Soft limits: `docs/operations/packaging-limits.md`
 
 ### Scripts

@@ -38,6 +38,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           chat: t.nav.chat,
           more: t.nav.more,
           skipToContent: t.nav.skipToContent,
+          commandPalette: t.nav.commandPalette,
+          commandPlaceholder: t.nav.commandPlaceholder,
+          commandNavigate: t.nav.commandNavigate,
+          commandPreferences: t.nav.commandPreferences,
+          densityComfortable: t.nav.densityComfortable,
+          densityCompact: t.nav.densityCompact,
+          commandEmpty: t.nav.commandEmpty,
+          commandOpenHint: t.nav.commandOpenHint,
         }}
         userSlot={
           <UserMenu

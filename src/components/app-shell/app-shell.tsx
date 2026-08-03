@@ -10,12 +10,14 @@ import {
   LayoutDashboard,
   ListTodo,
   MessageSquare,
+  Search,
   Users,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
+import { CommandPalette } from "@/components/app-shell/command-palette";
 import { DensityToggle } from "@/components/operations/density-toggle";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
@@ -41,6 +43,14 @@ type ShellLabels = {
   chat: string;
   more: string;
   skipToContent: string;
+  commandPalette: string;
+  commandPlaceholder: string;
+  commandNavigate: string;
+  commandPreferences: string;
+  densityComfortable: string;
+  densityCompact: string;
+  commandEmpty: string;
+  commandOpenHint: string;
 };
 
 type Destination = {
@@ -72,6 +82,28 @@ export function AppShell({
   const pathname = usePathname();
   const { activeOrganization, activeProject } = useWorkspace();
   const moreRef = useRef<HTMLDialogElement>(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [paletteKey, setPaletteKey] = useState(0);
+
+  function openPalette() {
+    setPaletteKey((key) => key + 1);
+    setPaletteOpen(true);
+  }
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setPaletteOpen((open) => {
+          if (open) return false;
+          setPaletteKey((key) => key + 1);
+          return true;
+        });
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   const destinations: Destination[] = [
     { href: "/app", label: labels.overview, icon: LayoutDashboard, onPhone: true },
@@ -209,6 +241,21 @@ export function AppShell({
           </nav>
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <button
+              type="button"
+              onClick={openPalette}
+              className={cn(
+                "hidden min-h-9 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--hf-rule)]",
+                "px-2.5 text-[var(--hf-ink-muted)] transition-colors duration-[var(--motion-feedback)]",
+                "hover:bg-[var(--hf-ground-3)] hover:text-[var(--hf-ink)] sm:inline-flex",
+                "focus-visible:outline-2 focus-visible:outline-offset-2",
+                "focus-visible:outline-[var(--hf-accent)]",
+              )}
+              aria-label={labels.commandPalette}
+            >
+              <Search className="size-3.5 shrink-0" aria-hidden />
+              <span className="t-mono-sm text-[var(--hf-ink-faint)]">⌘K</span>
+            </button>
             <DensityToggle />
             <LanguageSwitcher
               locale={locale}
@@ -233,6 +280,30 @@ export function AppShell({
       <main id="app-content" className="flex min-w-0 flex-1 flex-col pb-20 lg:pb-0">
         {children}
       </main>
+
+      <CommandPalette
+        key={paletteKey}
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        labels={{
+          title: labels.commandPalette,
+          placeholder: labels.commandPlaceholder,
+          navigate: labels.commandNavigate,
+          preferences: labels.commandPreferences,
+          densityComfortable: labels.densityComfortable,
+          densityCompact: labels.densityCompact,
+          empty: labels.commandEmpty,
+          openHint: labels.commandOpenHint,
+          overview: labels.overview,
+          projects: labels.projects,
+          tasks: labels.tasks,
+          team: labels.team,
+          calendar: labels.calendar,
+          organizations: labels.organizations,
+          github: labels.github,
+          chat: labels.chat,
+        }}
+      />
     </div>
   );
 }
