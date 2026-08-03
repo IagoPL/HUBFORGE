@@ -128,7 +128,7 @@ export function changeCountsFromTasks(tasks: OperationsTask[], lastVisitAt: stri
   const changed = tasks.filter((task) => Date.parse(task.updatedAt ?? "") > since);
 
   return {
-    merged: changed.filter((task) => task.status === "done").length,
+    completed: changed.filter((task) => task.status === "done").length,
     blocked: changed.filter((task) => task.revision?.kind === "blocked").length,
     needsReview: changed.filter((task) => task.status === "review").length,
   };
