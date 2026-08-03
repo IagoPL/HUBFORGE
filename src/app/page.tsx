@@ -43,7 +43,7 @@ export default async function LandingPage() {
                 {t.landing.subtitle}
               </p>
               <div className="flex flex-wrap items-center gap-3">
-                <Link href="/app" className={cn(buttonVariants({ size: "lg" }))}>
+                <Link href="/demo" className={cn(buttonVariants({ size: "lg" }))}>
                   {t.landing.enterDemo}
                   <ArrowRight className="size-4" aria-hidden />
                 </Link>
@@ -190,7 +190,7 @@ export default async function LandingPage() {
                 {t.landing.securityBody}
               </p>
             </div>
-            <Link href="/app" className={cn(buttonVariants({ size: "lg" }), "shrink-0")}>
+            <Link href="/demo" className={cn(buttonVariants({ size: "lg" }), "shrink-0")}>
               {t.landing.exploreDemo}
               <ArrowRight className="size-4" aria-hidden />
             </Link>
@@ -199,11 +199,25 @@ export default async function LandingPage() {
       </main>
 
       <footer className="border-t border-[var(--hf-rule)] bg-[var(--hf-ground-0)]">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="t-body-sm text-[var(--hf-ink-muted)]">
             {t.landing.footerTagline}
           </p>
-          <p className="t-mono-sm text-[var(--hf-ink-faint)]">{t.landing.footerStatus}</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link
+              href="/privacy"
+              className="t-body-sm text-[var(--hf-ink-muted)] underline-offset-2 hover:underline"
+            >
+              {t.legal.privacyTitle}
+            </Link>
+            <Link
+              href="/terms"
+              className="t-body-sm text-[var(--hf-ink-muted)] underline-offset-2 hover:underline"
+            >
+              {t.legal.termsTitle}
+            </Link>
+            <p className="t-mono-sm text-[var(--hf-ink-faint)]">{t.landing.footerStatus}</p>
+          </div>
         </div>
       </footer>
     </>

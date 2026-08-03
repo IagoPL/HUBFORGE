@@ -61,6 +61,10 @@ export function TeamPanel({
     pending: string;
     saveRoles: string;
     empty: string;
+    copyLink: string;
+    inviteSent: string;
+    inviteLinkHint: string;
+    emailNotDelivered: string;
   };
 }) {
   const { mode, activeOrganization } = useWorkspace();
@@ -68,6 +72,8 @@ export function TeamPanel({
   const [demoTick, setDemoTick] = useState(0);
   const [draftMembers, setDraftMembers] = useState<Member[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [inviteNotice, setInviteNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
@@ -109,6 +115,8 @@ export function TeamPanel({
   function invite() {
     if (!organizationId || !email.trim()) return;
     setError(null);
+    setInviteUrl(null);
+    setInviteNotice(null);
 
     if (mode === "demo") {
       const name = email.split("@")[0] || "Member";
@@ -144,6 +152,10 @@ export function TeamPanel({
           setDraftMembers((current) => [...current, result.data.member!]);
         } else {
           setInvitations((current) => [result.data.invitation, ...current]);
+          setInviteUrl(result.data.inviteUrl);
+          setInviteNotice(
+            result.data.emailDelivered ? labels.inviteSent : labels.emailNotDelivered,
+          );
         }
         setEmail("");
         setFunctionalRole("");
@@ -259,6 +271,27 @@ export function TeamPanel({
         >
           {labels.invite}
         </Button>
+        {inviteNotice ? (
+          <p className="t-body-sm text-[var(--hf-ink-muted)] md:col-span-2">{inviteNotice}</p>
+        ) : null}
+        {inviteUrl ? (
+          <div className="grid gap-2 md:col-span-2">
+            <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.inviteLinkHint}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <code className="t-mono-sm break-all rounded bg-[var(--hf-ground-3)] px-2 py-1">
+                {inviteUrl}
+              </code>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => void navigator.clipboard.writeText(inviteUrl)}
+              >
+                {labels.copyLink}
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </form>
 
       {invitations.length > 0 ? (

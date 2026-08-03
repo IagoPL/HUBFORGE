@@ -71,7 +71,7 @@ export default async function LoginPage({
 
         {!configured ? (
           <Link
-            href="/app"
+            href="/demo"
             className={cn(buttonVariants({ variant: "outline" }), "flex w-full")}
           >
             {t.login.enterDemo}

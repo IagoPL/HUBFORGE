@@ -21,6 +21,10 @@ export default async function TeamPage() {
         pending: t.team.pending,
         saveRoles: t.team.saveRoles,
         empty: t.team.empty,
+        copyLink: t.team.copyLink,
+        inviteSent: t.team.inviteSent,
+        inviteLinkHint: t.team.inviteLinkHint,
+        emailNotDelivered: t.team.emailNotDelivered,
       }}
     />
   );

@@ -6,14 +6,16 @@ HubForge syncs issues through a **GitHub App** (not personal access tokens). Aut
 
 1. Open https://github.com/settings/apps/new
 2. Homepage URL: your app URL (`http://localhost:3000` locally)
-3. Webhook URL: `https://<public-host>/api/github/webhooks`
-4. Webhook secret: generate a long random string
-5. Permissions (Repository):
+3. Setup URL: `https://<public-host>/api/github/setup` (stores `installation_id`; pass `state=<organizationId>` from HubForge)
+4. Webhook URL: `https://<public-host>/api/github/webhooks`
+5. Webhook secret: generate a long random string
+6. Permissions (Repository):
    - Issues: Read & write
    - Metadata: Read-only
-   - Pull requests: Read-only (activity later)
-6. Subscribe to events: `Issues`, `Installation`, `Installation repositories`
-7. Create the app and note App ID, Client ID, Client secret, and generate a private key
+   - Pull requests: Read-only
+   - Contents: Read-only (push commit metadata)
+7. Subscribe to events: `Issues`, `Pull request`, `Push`, `Installation`, `Installation repositories`
+8. Create the app and note App ID, Client ID, Client secret, and generate a private key
 
 ## 2. Environment
 
@@ -31,7 +33,9 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 ## 3. Database
 
-Apply `supabase/migrations/20260728240000_github_app_sync.sql` after the earlier HubForge migrations.
+Apply `supabase/migrations/20260728240000_github_app_sync.sql` and
+`supabase/migrations/20260803200000_operations_history_deps_github_activity.sql`
+after the earlier HubForge migrations.
 
 ## 4. Link a repository
 
@@ -39,5 +43,7 @@ Apply `supabase/migrations/20260728240000_github_app_sync.sql` after the earlier
 2. Open HubForge → GitHub
 3. Link `owner/repo` to the active project (optionally store the installation id)
 4. Open/close an issue on GitHub; HubForge upserts `github_synced_issues` and mirrors a HubForge task marked with GitHub origin
+5. Open or update a pull request; HubForge upserts `github_synced_pull_requests`
+6. Push commits; HubForge upserts rows in `github_synced_commits` from the webhook payload
 
 Without App credentials, the GitHub page still works in demo mode using localStorage.

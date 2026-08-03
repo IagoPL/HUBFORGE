@@ -208,6 +208,24 @@ export const es = {
     stepOrg: "1. Organización",
     stepProject: "2. Proyecto",
   },
+  invite: {
+    invalidTitle: "Invitación no válida",
+    invalidBody:
+      "Este enlace no incluye un token. Pide a tu compañero que envíe una invitación nueva.",
+    failedTitle: "No se pudo aceptar la invitación",
+    goToApp: "Ir al espacio",
+    emailSubject: "Únete a {org} en HubForge",
+    emailBody:
+      "Te han invitado a unirte a {org} en HubForge.\n\nAcepta la invitación:\n{url}",
+  },
+  legal: {
+    privacyTitle: "Política de privacidad",
+    privacyBody:
+      "HubForge almacena datos de cuenta, contenido del espacio y actividad necesaria para operar espacios colaborativos.\n\nUsamos Supabase para autenticación y almacenamiento. Los datos de GitHub sincronizados mediante la GitHub App se limitan a lo que vincule tu organización.\n\nContacta con el administrador de tu organización o con el operador de HubForge para solicitudes de acceso, corrección o eliminación.",
+    termsTitle: "Términos del servicio",
+    termsBody:
+      "HubForge se ofrece como espacio colaborativo para equipos. Eres responsable del contenido que creas y de invitar a personas de confianza.\n\nNo abuses del servicio, no intentes accesos no autorizados ni subas material ilegal. La disponibilidad y las funciones pueden cambiar en versiones tempranas.\n\nEl uso continuado implica aceptar estos términos para el espacio de tu organización.",
+  },
   team: {
     title: "Equipo",
     subtitle:
@@ -219,6 +237,10 @@ export const es = {
     pending: "Invitaciones pendientes",
     saveRoles: "Guardar roles",
     empty: "Invita a compañeros a esta organización.",
+    copyLink: "Copiar enlace de invitación",
+    inviteSent: "Invitación enviada.",
+    inviteLinkHint: "Comparte este enlace si el correo no se entrega.",
+    emailNotDelivered: "No se entregó el correo. Copia el enlace de invitación.",
   },
   tasks: {
     title: "Tareas",
@@ -231,6 +253,11 @@ export const es = {
     assignee: "Asignado",
     emptyProject: "Selecciona o crea un proyecto antes de gestionar tareas.",
     unassigned: "Sin asignar",
+    listView: "Lista",
+    boardView: "Tablero",
+    saveTask: "Guardar tarea",
+    dependsOn: "Depende de",
+    editTask: "Editar tarea",
   },
   calendar: {
     title: "Disponibilidad",
@@ -259,6 +286,9 @@ export const es = {
     emptyProject: "Selecciona o crea un proyecto antes de vincular GitHub.",
     emptyRepo: "Todavía no hay repositorio vinculado.",
     syncedIssues: "Issues sincronizados",
+    syncedPullRequests: "Pull requests sincronizados",
+    syncedCommits: "Commits sincronizados",
+    recentActivity: "Actividad reciente",
     setupHint:
       "Configura las variables de la GitHub App y apunta los webhooks a /api/github/webhooks.",
     demoHint: "En modo demo el repositorio vinculado se guarda en este navegador.",

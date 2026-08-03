@@ -22,6 +22,14 @@ export type OperationsTask = Task & {
   revision: { kind: RevisionKind; at: string; note: string } | null;
 };
 
+export type TaskEventRow = {
+  kind: string;
+  summary: string;
+  created_at: string;
+  from_value?: string | null;
+  to_value?: string | null;
+};
+
 /**
  * Why an item is on the attention list.
  *
@@ -104,13 +112,44 @@ const CHANGES: Record<
   },
 };
 
+export function revisionFromEvent(
+  event: TaskEventRow | null | undefined,
+  taskStatus: TaskStatus,
+): OperationsTask["revision"] {
+  if (!event) return null;
+  const at = event.created_at;
+  const note = event.summary || event.kind;
+  switch (event.kind) {
+    case "created":
+      return { kind: "new", at, note };
+    case "status_changed":
+      return { kind: "changed", at, note };
+    case "dependency_added":
+    case "dependency_removed":
+      if (taskStatus !== "done") {
+        return { kind: "blocked", at, note };
+      }
+      return { kind: "changed", at, note };
+    default:
+      return { kind: "changed", at, note };
+  }
+}
+
+function buildBlocksMap(dependsOn: Map<string, string[]>) {
+  const blocks = new Map<string, string[]>();
+  for (const [taskId, deps] of dependsOn) {
+    for (const dep of deps) {
+      blocks.set(dep, [...(blocks.get(dep) ?? []), taskId]);
+    }
+  }
+  return blocks;
+}
+
 /**
  * Layers the operations fields onto a plain task list.
  *
  * `declared` is true only for the demo workspace, which is the one place where
- * dependencies and change history are authored. A live workspace has no such
- * columns yet, so it gets empty relations and no timestamps rather than
- * invented ones.
+ * dependencies and change history are authored.
  */
 export function toOperationsTasks(tasks: Task[], declared: boolean): OperationsTask[] {
   if (!declared) {
@@ -123,19 +162,38 @@ export function toOperationsTasks(tasks: Task[], declared: boolean): OperationsT
     }));
   }
 
-  const blocks = new Map<string, string[]>();
-  for (const [taskId, deps] of Object.entries(DEPENDS_ON)) {
-    for (const dep of deps) {
-      blocks.set(dep, [...(blocks.get(dep) ?? []), taskId]);
-    }
-  }
+  const dependsOn = new Map(Object.entries(DEPENDS_ON));
+  const blocks = buildBlocksMap(dependsOn);
 
   return tasks.map((task) => ({
     ...task,
-    dependsOn: DEPENDS_ON[task.id] ?? [],
+    dependsOn: dependsOn.get(task.id) ?? [],
     blocks: blocks.get(task.id) ?? [],
     updatedAt: CHANGES[task.id]?.updatedAt ?? LAST_VISIT_AT,
     revision: CHANGES[task.id]?.revision ?? null,
+  }));
+}
+
+export function operationsTasksFromLive(
+  tasks: Task[],
+  dependencyRows: { task_id: string; depends_on_task_id: string }[],
+  latestEvents: Record<string, TaskEventRow | undefined>,
+  updatedAtById: Record<string, string | null>,
+): OperationsTask[] {
+  const dependsOn = new Map<string, string[]>();
+  for (const row of dependencyRows) {
+    const list = dependsOn.get(row.task_id) ?? [];
+    list.push(row.depends_on_task_id);
+    dependsOn.set(row.task_id, list);
+  }
+  const blocks = buildBlocksMap(dependsOn);
+
+  return tasks.map((task) => ({
+    ...task,
+    dependsOn: dependsOn.get(task.id) ?? [],
+    blocks: blocks.get(task.id) ?? [],
+    updatedAt: updatedAtById[task.id] ?? null,
+    revision: revisionFromEvent(latestEvents[task.id], task.status),
   }));
 }
 
@@ -144,8 +202,11 @@ export const DEMO_NOW_AT = NOW_AT;
 
 const REVISION_WEIGHT = { blocked: 0, new: 1, changed: 2 } as const;
 
-function buildAttention(tasks: OperationsTask[]): AttentionItem[] {
-  const since = Date.parse(LAST_VISIT_AT);
+export function buildAttentionFromTasks(
+  tasks: OperationsTask[],
+  lastVisitAt: string,
+): AttentionItem[] {
+  const since = Date.parse(lastVisitAt);
 
   return tasks
     .filter((task) => task.revision && Date.parse(task.revision.at) > since)
@@ -175,52 +236,80 @@ function buildAttention(tasks: OperationsTask[]): AttentionItem[] {
     });
 }
 
+export function changeCountsFromTasks(tasks: OperationsTask[], lastVisitAt: string) {
+  const since = Date.parse(lastVisitAt);
+  const changed = tasks.filter((task) => Date.parse(task.updatedAt ?? "") > since);
+
+  return {
+    merged: changed.filter((task) => task.status === "done").length,
+    blocked: changed.filter((task) => task.revision?.kind === "blocked").length,
+    needsReview: changed.filter((task) => task.status === "review").length,
+  };
+}
+
 /**
- * Attention list for a workspace with no recorded task history.
- *
- * Raises open work by standing priority, which is a fact the schema already
- * holds. Dependency counts stay `null` rather than claiming there are none.
+ * Attention list for live workspaces: revision when recorded, else priority.
  */
-export function buildLiveAttention(tasks: Task[]): AttentionItem[] {
-  const weight = { high: 0, medium: 1, low: 2 } as const;
+export function buildLiveAttention(tasks: OperationsTask[]): AttentionItem[] {
+  const priorityWeight = { high: 0, medium: 1, low: 2 } as const;
 
   return tasks
-    .filter((task) => task.status !== "done" && task.priority !== "low")
-    .sort((a, b) => weight[a.priority] - weight[b.priority])
-    .slice(0, 6)
-    .map(
-      (task) =>
-        ({
+    .filter((task) => task.status !== "done")
+    .filter((task) => task.revision || task.priority !== "low")
+    .map((task) => {
+      if (task.revision) {
+        return {
           id: `att_${task.id}`,
-          headline: task.title,
+          headline: `${task.title} — ${task.revision.note.toLowerCase()}`,
           status: task.status,
-          dependentCount: null,
+          dependentCount: task.blocks.length,
           actorId: task.assigneeIds[0] ?? null,
           taskId: task.id,
-          signal: { kind: "priority", priority: task.priority },
-        }) satisfies AttentionItem,
-    );
+          signal: {
+            kind: "revision" as const,
+            revision: task.revision.kind,
+            at: task.revision.at,
+          },
+        } satisfies AttentionItem;
+      }
+
+      return {
+        id: `att_${task.id}`,
+        headline: task.title,
+        status: task.status,
+        dependentCount: task.blocks.length,
+        actorId: task.assigneeIds[0] ?? null,
+        taskId: task.id,
+        signal: { kind: "priority" as const, priority: task.priority },
+      } satisfies AttentionItem;
+    })
+    .sort((a, b) => {
+      if (a.signal.kind === "revision" && b.signal.kind === "revision") {
+        return (
+          REVISION_WEIGHT[a.signal.revision] - REVISION_WEIGHT[b.signal.revision] ||
+          Date.parse(b.signal.at) - Date.parse(a.signal.at)
+        );
+      }
+      if (a.signal.kind === "revision") return -1;
+      if (b.signal.kind === "revision") return 1;
+      return (
+        priorityWeight[a.signal.priority] - priorityWeight[b.signal.priority]
+      );
+    })
+    .slice(0, 6);
 }
 
 export function getDemoOperations(): OperationsSnapshot {
   const snapshot = getDemoWorkspace();
   const tasks = toOperationsTasks(snapshot.tasks, true);
-  const since = Date.parse(LAST_VISIT_AT);
-  const changed = tasks.filter((task) => Date.parse(task.updatedAt ?? "") > since);
-
-  const changeCounts = {
-    merged: changed.filter((task) => task.status === "done").length,
-    blocked: changed.filter((task) => task.revision?.kind === "blocked").length,
-    needsReview: changed.filter((task) => task.status === "review").length,
-  };
 
   return {
     ...snapshot,
     tasks,
     lastVisitAt: LAST_VISIT_AT,
     nowAt: NOW_AT,
-    attention: buildAttention(tasks),
-    changeCounts,
+    attention: buildAttentionFromTasks(tasks, LAST_VISIT_AT),
+    changeCounts: changeCountsFromTasks(tasks, LAST_VISIT_AT),
   };
 }
 

@@ -5,9 +5,18 @@ import { BriefingSurface } from "@/components/operations/briefing-surface";
 import { changeSummary, openWorkSummary } from "@/components/operations/labels";
 import { NotificationsPanel } from "@/features/availability/notifications-panel";
 import { getCurrentUser } from "@/features/authentication/get-current-user";
-import { listMembersAction, listTasksAction } from "@/features/collaboration/actions";
+import {
+  getProjectLastVisitAction,
+  listMembersAction,
+  listOperationsTasksAction,
+  touchProjectVisitAction,
+} from "@/features/collaboration/actions";
 import { getWorkspaceSnapshot } from "@/features/organizations/get-workspace";
-import { buildLiveAttention, getDemoOperations } from "@/data/demo-operations";
+import {
+  buildLiveAttention,
+  changeCountsFromTasks,
+  getDemoOperations,
+} from "@/data/demo-operations";
 import { getDictionary, getLocale } from "@/i18n/get-dictionary";
 import type { Member } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
@@ -66,21 +75,29 @@ export default async function AppOverviewPage() {
       );
     }
 
-    const [membersResult, tasksResult] = await Promise.all([
+    const [membersResult, visitResult] = await Promise.all([
       listMembersAction(organization.id),
-      listTasksAction(project.id),
+      getProjectLastVisitAction(project.id),
     ]);
+    const lastVisitAt = visitResult.ok ? visitResult.data : null;
+    const opsResult = await listOperationsTasksAction(
+      project.id,
+      lastVisitAt ?? undefined,
+    );
+    void touchProjectVisitAction(project.id);
     const members = membersResult.ok ? membersResult.data : [];
-    const tasks = tasksResult.ok ? tasksResult.data : [];
-    const open = tasks.filter((task) => task.status !== "done").length;
+    const opsTasks = opsResult.ok ? opsResult.data : [];
+    const open = opsTasks.filter((task) => task.status !== "done").length;
+
+    const summary = lastVisitAt
+      ? changeSummary(changeCountsFromTasks(opsTasks, lastVisitAt), t.operations)
+      : openWorkSummary(open, opsTasks.length, t.operations);
 
     return (
       <>
-        {/* No task history exists yet, so the briefing states the present
-            instead of claiming to know what changed. */}
         <BriefingSurface
-          summary={openWorkSummary(open, tasks.length, t.operations)}
-          attention={buildLiveAttention(tasks)}
+          summary={summary}
+          attention={buildLiveAttention(opsTasks)}
           members={members}
           now={new Date().toISOString()}
           locale={locale}

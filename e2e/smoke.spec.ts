@@ -1,6 +1,13 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+async function openDemo(page: import("@playwright/test").Page, path = "/app") {
+  await page.goto("/demo");
+  if (path !== "/app") {
+    await page.goto(path);
+  }
+}
+
 test.describe("smoke", () => {
   test("landing renders brand and CTA", async ({ page }) => {
     await page.goto("/");
@@ -11,8 +18,7 @@ test.describe("smoke", () => {
   });
 
   test("demo workspace overview is reachable", async ({ page }) => {
-    await page.goto("/app");
-    // Surface title lives in the shell title block; project context is a crumb.
+    await openDemo(page);
     await expect(
       page.getByRole("heading", { level: 1, name: /Briefing/i }),
     ).toBeVisible();
@@ -47,8 +53,15 @@ test.describe("smoke", () => {
     expect(serious).toEqual([]);
   });
 
+  test("privacy and terms pages render", async ({ page }) => {
+    await page.goto("/privacy");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await page.goto("/terms");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  });
+
   test("can create organization and project in demo mode", async ({ page }) => {
-    await page.goto("/app/organizations");
+    await openDemo(page, "/app/organizations");
     await page
       .getByLabel(/Organization name|Nombre de la organización/i)
       .fill("Forge Studio");
@@ -65,7 +78,7 @@ test.describe("smoke", () => {
   });
 
   test("can invite a member and create a task in demo mode", async ({ page }) => {
-    await page.goto("/app/team");
+    await openDemo(page, "/app/team");
     await page.getByLabel(/Email|Correo/i).fill("casey@example.com");
     await page
       .getByLabel(/Functional role|Rol funcional/i)
@@ -75,7 +88,6 @@ test.describe("smoke", () => {
     await expect(page.getByText("casey@example.com")).toBeVisible();
 
     await page.goto("/app/tasks");
-    // The create form sits inside a collapsed details panel.
     await page
       .locator("details summary")
       .filter({ hasText: /Create task|Crear tarea/i })
@@ -85,8 +97,14 @@ test.describe("smoke", () => {
     await expect(page.getByText("Write acceptance checks").first()).toBeVisible();
   });
 
+  test("task board view is available in demo mode", async ({ page }) => {
+    await openDemo(page, "/app/tasks");
+    await page.getByRole("button", { name: /Board|Tablero/i }).click();
+    await expect(page.getByRole("heading", { name: /Backlog|Pendiente/i })).toBeVisible();
+  });
+
   test("can add availability and mark a notification as read", async ({ page }) => {
-    await page.goto("/app/calendar");
+    await openDemo(page, "/app/calendar");
     const note = page.getByLabel(/Note|Nota/i);
     await note.fill("Deep work block");
     await expect(note).toHaveValue("Deep work block");
@@ -112,10 +130,9 @@ test.describe("smoke", () => {
   });
 
   test("can link a GitHub repository in demo mode", async ({ page }) => {
-    await page.goto("/app");
+    await openDemo(page);
     await expect(page.getByRole("heading").first()).toBeVisible();
     await page.goto("/app/github");
-    // Panel title moved into the shell; assert the surface and the form.
     await expect(page.getByRole("heading", { name: /^GitHub$/i })).toBeVisible();
     const repoInput = page.getByLabel(/Repository|Repositorio/i);
     await expect(repoInput).toBeVisible();
@@ -130,7 +147,7 @@ test.describe("smoke", () => {
   });
 
   test("can send a chat message in demo mode", async ({ page }) => {
-    await page.goto("/app/chat");
+    await openDemo(page, "/app/chat");
     await expect(page.getByRole("heading", { name: /^Chat$/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /#general/i })).toBeVisible();
     await page
@@ -138,5 +155,15 @@ test.describe("smoke", () => {
       .fill("Hello from demo chat");
     await page.getByRole("button", { name: /^Send$|^Enviar$/i }).click();
     await expect(page.getByText("Hello from demo chat")).toBeVisible();
+  });
+
+  test("live auth path is gated without demo cookie", async ({ page }) => {
+    test.skip(
+      !process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      "Supabase not configured in this environment — anonymous /app stays open.",
+    );
+    await page.context().clearCookies();
+    await page.goto("/app");
+    await expect(page).toHaveURL(/\/login/);
   });
 });

@@ -5,20 +5,24 @@ import { Undo2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { Inspector } from "@/components/operations/inspector";
+import { Inspector, type InspectorSaveInput } from "@/components/operations/inspector";
 import {
   plural,
   statusLabel,
   type OperationsLabels,
   type WorkLabels,
 } from "@/components/operations/labels";
+import { WorkBoard } from "@/components/operations/work-board";
 import { WorkList, type ListState } from "@/components/operations/work-list";
-import { DEMO_NOW_AT, toOperationsTasks } from "@/data/demo-operations";
+import { DEMO_NOW_AT, toOperationsTasks, type OperationsTask } from "@/data/demo-operations";
 import { getDemoWorkspace } from "@/data/demo-workspace";
 import {
   createTaskAction,
   listMembersAction,
-  listTasksAction,
+  listOperationsTasksAction,
+  setTaskAssigneesAction,
+  setTaskDependenciesAction,
+  updateTaskAction,
   updateTaskStatusAction,
 } from "@/features/collaboration/actions";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
@@ -26,7 +30,13 @@ import type { Locale } from "@/i18n/config";
 import type { Member, Task, TaskStatus } from "@/lib/domain/types";
 import { cn, fill } from "@/lib/utils";
 
+type ViewMode = "list" | "board";
+
 const DEMO_TASKS_KEY = "hubforge.demo.tasks.v1";
+
+function toPlainTasks(tasks: OperationsTask[]): Task[] {
+  return tasks.map(({ dependsOn: _d, blocks: _b, updatedAt: _u, revision: _r, ...task }) => task);
+}
 
 function loadDemoTasks(projectId: string): Task[] {
   const seed = getDemoWorkspace().tasks.filter((task) => task.projectId === projectId);
@@ -71,6 +81,9 @@ export function WorkSurface({
     assignee: string;
     emptyProject: string;
     unassigned: string;
+    listView: string;
+    boardView: string;
+    saveTask: string;
   };
 }) {
   const { mode, activeProject, activeOrganization } = useWorkspace();
@@ -83,20 +96,21 @@ export function WorkSurface({
   /** Tagged with the project it belongs to, so "loaded" is derived, not tracked. */
   const [live, setLive] = useState<{
     projectId: string;
-    tasks: Task[];
+    tasks: OperationsTask[];
     members: Member[];
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const [towedIds, setTowedIds] = useState<string[]>([]);
-  const [undo, setUndo] = useState<{ tasks: Task[]; message: string } | null>(null);
+  const [undo, setUndo] = useState<{ tasks: OperationsTask[]; message: string } | null>(null);
   const [announcement, setAnnouncement] = useState("");
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<Task["priority"]>("medium");
   const [assigneeId, setAssigneeId] = useState("");
+  const [view, setView] = useState<ViewMode>("list");
 
   const demoTasks = useMemo(() => {
     void reloadKey;
@@ -112,17 +126,14 @@ export function WorkSurface({
   }, [mode, organizationId]);
 
   const loaded = mode === "demo" || !projectId || live?.projectId === projectId;
-  const plainTasks = useMemo(
-    () => (mode === "demo" ? demoTasks : (live?.tasks ?? [])),
+  const tasks = useMemo(
+    () =>
+      mode === "demo"
+        ? toOperationsTasks(demoTasks, true)
+        : (live?.tasks ?? []),
     [mode, demoTasks, live],
   );
   const members = mode === "demo" ? demoMembers : (live?.members ?? []);
-
-  // Dependencies and history are authored for the demo workspace only.
-  const tasks = useMemo(
-    () => toOperationsTasks(plainTasks, mode === "demo"),
-    [plainTasks, mode],
-  );
   const now = mode === "demo" ? DEMO_NOW_AT : new Date().toISOString();
 
   useEffect(() => {
@@ -130,7 +141,7 @@ export function WorkSurface({
 
     let cancelled = false;
     void Promise.all([
-      listTasksAction(projectId),
+      listOperationsTasksAction(projectId),
       organizationId
         ? listMembersAction(organizationId)
         : Promise.resolve({ ok: true as const, data: [] as Member[] }),
@@ -183,9 +194,9 @@ export function WorkSurface({
         ? "empty"
         : "ready";
 
-  function persist(next: Task[], changed: { id: string; status: TaskStatus }[]) {
+  function persist(next: OperationsTask[], changed: { id: string; status: TaskStatus }[]) {
     if (mode === "demo") {
-      saveDemoTasks(next);
+      saveDemoTasks(toPlainTasks(next));
       setReloadKey((value) => value + 1);
       return;
     }
@@ -204,11 +215,11 @@ export function WorkSurface({
   }
 
   function applyMove(taskId: string, status: TaskStatus, carryIds: string[]) {
-    const moved = plainTasks.find((task) => task.id === taskId);
+    const moved = tasks.find((task) => task.id === taskId);
     if (!moved) return;
 
     const movedIds = [taskId, ...carryIds];
-    const next = plainTasks.map((task) =>
+    const next = tasks.map((task) =>
       movedIds.includes(task.id) ? { ...task, status } : task,
     );
 
@@ -222,7 +233,7 @@ export function WorkSurface({
         status: statusLabel(status, operationsLabels),
       }) + carried;
 
-    setUndo({ tasks: plainTasks, message });
+    setUndo({ tasks, message });
     setAnnouncement(message);
     persist(
       next,
@@ -238,6 +249,53 @@ export function WorkSurface({
     );
     setAnnouncement(labels.undone);
     setUndo(null);
+  }
+
+  async function saveTask(input: InspectorSaveInput): Promise<string | null> {
+    if (!selectedId) return "No task selected.";
+
+    if (mode === "demo") {
+      const next = demoTasks.map((task) =>
+        task.id === selectedId
+          ? {
+              ...task,
+              title: input.title.trim(),
+              description: input.description.trim(),
+              priority: input.priority,
+              assigneeIds: input.assigneeIds,
+            }
+          : task,
+      );
+      saveDemoTasks(next);
+      // Demo deps live only in the authored map; keep plain tasks in sync.
+      setReloadKey((value) => value + 1);
+      setAnnouncement(formLabels.saveTask);
+      return null;
+    }
+
+    const update = await updateTaskAction({
+      taskId: selectedId,
+      title: input.title,
+      description: input.description,
+      priority: input.priority,
+    });
+    if (!update.ok) return update.error;
+
+    const assignees = await setTaskAssigneesAction({
+      taskId: selectedId,
+      assigneeIds: input.assigneeIds,
+    });
+    if (!assignees.ok) return assignees.error;
+
+    const deps = await setTaskDependenciesAction({
+      taskId: selectedId,
+      dependsOnTaskIds: input.dependsOnTaskIds,
+    });
+    if (!deps.ok) return deps.error;
+
+    setReloadKey((value) => value + 1);
+    setAnnouncement(formLabels.saveTask);
+    return null;
   }
 
   function createTask() {
@@ -276,7 +334,21 @@ export function WorkSurface({
           return;
         }
         setLive((current) =>
-          current ? { ...current, tasks: [...current.tasks, result.data] } : current,
+          current
+            ? {
+                ...current,
+                tasks: [
+                  ...current.tasks,
+                  {
+                    ...result.data,
+                    dependsOn: [],
+                    blocks: [],
+                    updatedAt: null,
+                    revision: null,
+                  },
+                ],
+              }
+            : current,
         );
         setTitle("");
         setDescription("");
@@ -393,27 +465,80 @@ export function WorkSurface({
               </Button>
             </div>
           ) : null}
+
+          <div
+            role="group"
+            aria-label={formLabels.listView}
+            className="flex gap-1 border-b border-[var(--hf-rule)] pb-2"
+          >
+            <button
+              type="button"
+              aria-pressed={view === "list"}
+              onClick={() => setView("list")}
+              className={cn(
+                "t-body-sm rounded-[var(--radius-md)] px-3 py-1.5",
+                view === "list"
+                  ? "bg-[var(--hf-ground-3)] text-[var(--hf-ink)]"
+                  : "text-[var(--hf-ink-muted)] hover:text-[var(--hf-ink)]",
+              )}
+            >
+              {formLabels.listView}
+            </button>
+            <button
+              type="button"
+              aria-pressed={view === "board"}
+              onClick={() => setView("board")}
+              className={cn(
+                "t-body-sm rounded-[var(--radius-md)] px-3 py-1.5",
+                view === "board"
+                  ? "bg-[var(--hf-ground-3)] text-[var(--hf-ink)]"
+                  : "text-[var(--hf-ink-muted)] hover:text-[var(--hf-ink)]",
+              )}
+            >
+              {formLabels.boardView}
+            </button>
+          </div>
         </div>
 
-        <WorkList
-          tasks={tasks}
-          members={members}
-          now={now}
-          locale={locale}
-          labels={labels}
-          statusLabels={operationsLabels}
-          selectedId={selectedId}
-          towedIds={towedIds}
-          state={listState}
-          pending={pending}
-          onSelect={select}
-          onPreview={setTowedIds}
-          onApplyMove={applyMove}
-          onRetry={() => {
-            setError(null);
-            setReloadKey((value) => value + 1);
-          }}
-        />
+        {view === "list" ? (
+          <WorkList
+            tasks={tasks}
+            members={members}
+            now={now}
+            locale={locale}
+            labels={labels}
+            statusLabels={operationsLabels}
+            selectedId={selectedId}
+            towedIds={towedIds}
+            state={listState}
+            pending={pending}
+            onSelect={select}
+            onPreview={setTowedIds}
+            onApplyMove={applyMove}
+            onRetry={() => {
+              setError(null);
+              setReloadKey((value) => value + 1);
+            }}
+          />
+        ) : (
+          <WorkBoard
+            tasks={tasks}
+            members={members}
+            now={now}
+            locale={locale}
+            labels={labels}
+            statusLabels={operationsLabels}
+            selectedId={selectedId}
+            state={listState}
+            pending={pending}
+            onSelect={select}
+            onApplyMove={applyMove}
+            onRetry={() => {
+              setError(null);
+              setReloadKey((value) => value + 1);
+            }}
+          />
+        )}
       </div>
 
       <AnimatePresence>
@@ -427,8 +552,12 @@ export function WorkSurface({
             locale={locale}
             labels={labels}
             statusLabels={operationsLabels}
+            saveLabel={formLabels.saveTask}
+            unassignedLabel={formLabels.unassigned}
+            editable
             onClose={close}
             onSelect={select}
+            onSave={saveTask}
           />
         ) : null}
       </AnimatePresence>

@@ -6,10 +6,14 @@ import { Button } from "@/components/ui/button";
 import {
   linkRepositoryAction,
   listLinkedRepositoryAction,
+  listSyncedCommitsAction,
   listSyncedIssuesAction,
+  listSyncedPullRequestsAction,
   unlinkRepositoryAction,
   type LinkedRepository,
+  type SyncedCommitSummary,
   type SyncedIssueSummary,
+  type SyncedPullRequestSummary,
 } from "@/features/github/actions";
 import { isValidRepoFullName, normalizeRepoFullName } from "@/features/github/repo-utils";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
@@ -100,6 +104,9 @@ export function GitHubSyncPanel({
     emptyProject: string;
     emptyRepo: string;
     syncedIssues: string;
+    syncedPullRequests: string;
+    syncedCommits: string;
+    recentActivity: string;
     setupHint: string;
     demoHint: string;
     install: string;
@@ -114,10 +121,17 @@ export function GitHubSyncPanel({
   const [demoTick, setDemoTick] = useState(0);
   const [repo, setRepo] = useState<LinkedRepository | null>(null);
   const [issues, setIssues] = useState<SyncedIssueSummary[]>([]);
+  const [pullRequests, setPullRequests] = useState<SyncedPullRequestSummary[]>([]);
+  const [commits, setCommits] = useState<SyncedCommitSummary[]>([]);
   const [fullName, setFullName] = useState("");
   const [installationId, setInstallationId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  const installHref =
+    installUrl && organizationId
+      ? `${installUrl}${installUrl.includes("?") ? "&" : "?"}state=${encodeURIComponent(organizationId)}`
+      : installUrl;
 
   const demoRepo = useMemo(() => {
     void demoTick;
@@ -141,11 +155,15 @@ export function GitHubSyncPanel({
       void Promise.all([
         listLinkedRepositoryAction(projectId),
         listSyncedIssuesAction(projectId),
-      ]).then(([repoResult, issuesResult]) => {
+        listSyncedPullRequestsAction(projectId),
+        listSyncedCommitsAction(projectId),
+      ]).then(([repoResult, issuesResult, prsResult, commitsResult]) => {
         if (cancelled) return;
         if (repoResult.ok) setRepo(repoResult.data);
         else setError(repoResult.error);
         if (issuesResult.ok) setIssues(issuesResult.data);
+        if (prsResult.ok) setPullRequests(prsResult.data);
+        if (commitsResult.ok) setCommits(commitsResult.data);
       });
     });
     return () => {
@@ -211,6 +229,8 @@ export function GitHubSyncPanel({
         }
         setRepo(null);
         setIssues([]);
+        setPullRequests([]);
+        setCommits([]);
       });
     });
   }
@@ -238,10 +258,10 @@ export function GitHubSyncPanel({
         </p>
       ) : null}
 
-      {installUrl && mode === "live" ? (
+      {installHref && mode === "live" ? (
         <p className="t-body">
           <a
-            href={installUrl}
+            href={installHref}
             className="font-medium text-[var(--hf-accent)] underline underline-offset-2"
             target="_blank"
             rel="noreferrer"
@@ -316,41 +336,113 @@ export function GitHubSyncPanel({
         </form>
       )}
 
-      <section aria-labelledby="synced-heading" className="grid gap-2">
-        <h2 id="synced-heading" className="t-display-sm text-[var(--hf-ink)]">
-          {labels.syncedIssues}
+      <section aria-labelledby="activity-heading" className="grid gap-4">
+        <h2 id="activity-heading" className="t-display-sm text-[var(--hf-ink)]">
+          {labels.recentActivity}
         </h2>
-        {synced.length === 0 ? (
-          <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
-        ) : (
-          <ul className="grid gap-2">
-            {synced.map((issue) => (
-              <li
-                key={issue.id}
-                className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3"
-              >
-                <span
-                  className="t-mono-sm shrink-0 text-[var(--hf-ink-faint)]"
-                  data-tabular
+
+        <div className="grid gap-2">
+          <h3 className="t-label text-[var(--hf-ink-faint)]">{labels.syncedIssues}</h3>
+          {synced.length === 0 ? (
+            <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
+          ) : (
+            <ul className="grid gap-2">
+              {synced.map((issue) => (
+                <li
+                  key={issue.id}
+                  className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3"
                 >
-                  #{issue.number}
-                </span>
-                <a
-                  href={issue.htmlUrl}
-                  className="t-body min-w-0 flex-1 font-medium text-[var(--hf-ink)] underline-offset-2 hover:underline"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {issue.title}
-                </a>
-                <Badge tone={issue.state === "open" ? "success" : "neutral"}>
-                  {issue.state}
-                </Badge>
-                <Badge>{issue.origin}</Badge>
-              </li>
-            ))}
-          </ul>
-        )}
+                  <span
+                    className="t-mono-sm shrink-0 text-[var(--hf-ink-faint)]"
+                    data-tabular
+                  >
+                    #{issue.number}
+                  </span>
+                  <a
+                    href={issue.htmlUrl}
+                    className="t-body min-w-0 flex-1 font-medium text-[var(--hf-ink)] underline-offset-2 hover:underline"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {issue.title}
+                  </a>
+                  <Badge tone={issue.state === "open" ? "success" : "neutral"}>
+                    {issue.state}
+                  </Badge>
+                  <Badge>{issue.origin}</Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {mode === "live" ? (
+          <>
+            <div className="grid gap-2">
+              <h3 className="t-label text-[var(--hf-ink-faint)]">
+                {labels.syncedPullRequests}
+              </h3>
+              {pullRequests.length === 0 ? (
+                <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
+              ) : (
+                <ul className="grid gap-2">
+                  {pullRequests.map((pr) => (
+                    <li
+                      key={pr.id}
+                      className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3"
+                    >
+                      <span className="t-mono-sm text-[var(--hf-ink-faint)]" data-tabular>
+                        #{pr.number}
+                      </span>
+                      <a
+                        href={pr.htmlUrl}
+                        className="t-body min-w-0 flex-1 font-medium text-[var(--hf-ink)] underline-offset-2 hover:underline"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {pr.title}
+                      </a>
+                      <Badge tone={pr.merged ? "success" : "neutral"}>
+                        {pr.merged ? "merged" : pr.state}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="grid gap-2">
+              <h3 className="t-label text-[var(--hf-ink-faint)]">{labels.syncedCommits}</h3>
+              {commits.length === 0 ? (
+                <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
+              ) : (
+                <ul className="grid gap-2">
+                  {commits.map((commit) => (
+                    <li
+                      key={commit.id}
+                      className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3"
+                    >
+                      <span className="t-mono-sm text-[var(--hf-ink-faint)]">
+                        {commit.sha.slice(0, 7)}
+                      </span>
+                      <a
+                        href={commit.htmlUrl}
+                        className="t-body min-w-0 flex-1 truncate text-[var(--hf-ink)] underline-offset-2 hover:underline"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {commit.message || commit.sha}
+                      </a>
+                      <span className="t-mono-sm text-[var(--hf-ink-faint)]">
+                        {commit.authorLogin}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        ) : null}
       </section>
     </div>
   );
