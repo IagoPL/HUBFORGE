@@ -1,44 +1,57 @@
-# MVP definition
+# Definición del MVP
 
-## Target users
+## Usuarios objetivo
 
-- Small technical teams and startups
-- Creative studios and indie projects
-- Academic and open-source project groups
+- Equipos indie de 3 a 15 integrantes.
+- Estudios pequeños multidisciplinares que ya usan GitHub.
+- Proyectos con ritmo mixto (tiempo libre + sprints cortos) y roles técnicos y no técnicos.
 
-## Problems
+## Problemas que el MVP resuelve
 
-- Planning, availability, ownership, and GitHub activity live in different tools
-- Unclear who can take the next task
-- Communication loses project context
+- La actividad de GitHub no se lee como contexto operativo.
+- Los bloqueos y dependencias no se ven por impacto.
+- No está claro quién puede asumir el siguiente trabajo.
+- Tras una ausencia, el “qué cambió” queda enterrado en notificaciones.
 
-## In scope (MVP)
+## Dentro del alcance
 
-1. Sign up / sign in
-2. Create organization and project
-3. Invite members; define access + functional roles
-4. Create/assign tasks; list + Kanban
-5. Mark availability; team calendar view
-6. Internal notifications
-7. Project channels and messaging (plain text first)
-8. Connect GitHub repository; sync issues; basic PR/commit activity
+1. Autenticación con GitHub.
+2. Conexión de un repositorio (GitHub App) e importación de issues, pull requests y actividad relevante.
+3. Briefing desde la última visita (qué se completó, qué cambió, qué se bloqueó, qué necesita revisión, qué lleva detenido).
+4. Cola de atención priorizada (bloqueos de alto impacto, PRs en espera, trabajo estancado, críticos sin responsable, dependencias, cambios desde la visita).
+5. Mapa de bloqueos y dependencias con impacto y acción recomendada.
+6. Responsables y roles funcionales (separados del rol de acceso).
+7. Capacidad semanal del equipo (disponibilidad orientada a asignación).
+8. Enlaces al origen en GitHub.
+9. Modo demostración determinista, solo lectura o reiniciable, claramente etiquetado.
+10. Español e inglés en la aplicación.
+11. Accesibilidad por teclado y pruebas de flujos críticos.
 
-## Out of scope (post-MVP)
+## Fuera del alcance del MVP
 
-- AI assistant
-- Sprints/roadmap/workload analytics (beyond basics)
-- PWA / push notifications
-- Calls/voice/video
-- End-to-end encryption for chat
+Ver [non-goals.md](./non-goals.md). En particular: chat propio, videollamadas, facturación, IA central, app nativa y sustitución de GitHub Projects.
 
-## Primary success flow (first vertical slice)
+## Flujo de éxito
 
-Landing → sign in → create org → create project → dashboard → add member → set role → create/assign task → board update → notification → mark unavailability → calendar update
+1. Iniciar sesión con GitHub.
+2. Crear o seleccionar un espacio.
+3. Instalar la GitHub App y elegir repositorio.
+4. Importar actividad relevante.
+5. Configurar integrantes y roles funcionales.
+6. Indicar disponibilidad semanal.
+7. Abrir el primer briefing y actuar desde la cola de atención.
 
-## Success criteria
+## Criterios de éxito del MVP
 
-- Flow works end-to-end with authorization on server + RLS
-- Responsive and keyboard accessible
-- Covered by critical automated tests
-- Visual polish consistent with the design system
-- No secrets in the repository
+- Una persona entiende la propuesta en menos de 10 segundos (landing).
+- El briefing explica qué cambió y por qué importa, no solo contadores.
+- Los bloqueos se ordenan por impacto.
+- La capacidad influye en recomendaciones de asignación.
+- GitHub aparece como fuente de verdad.
+- El chat no forma parte de la navegación ni de la propuesta comercial.
+- `lint`, formato, tipos, pruebas, build y Playwright se mantienen en verde.
+- RLS, autorización y multi-tenant no se degradan.
+
+## Estado de implementación
+
+El código de autenticación, sincronización GitHub (webhooks + backfill), visitas, eventos, dependencias y superficies de briefing existe en distinto grado de madurez. El MVP de producto se considera **en desarrollo**: falta unificar señales, reestructurar navegación/copy, modo demo indie y retirar el chat de las superficies visibles. No se afirma “MVP completo” ni “listo para producción” mientras OAuth, GitHub App o secretos de entorno requieran configuración manual.

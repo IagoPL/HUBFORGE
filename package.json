@@ -2,7 +2,7 @@
   "name": "hubforge",
   "version": "0.1.0",
   "private": true,
-  "description": "Collaborative project workspace with GitHub synchronization, team availability, roles, planning, communication and real-time notifications.",
+  "description": "Operational layer over GitHub for indie multidisciplinary teams: briefing since last visit, attention queue, blockers, and team capacity.",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
