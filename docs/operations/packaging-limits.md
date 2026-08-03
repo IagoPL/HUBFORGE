@@ -1,13 +1,13 @@
-# Packaging limits
+# Límites de empaquetado
 
-HubForge is **free for now** (no Stripe / paid plans). Soft caps exist only as abuse guards and can be raised via env.
+HubForge es **gratuito por ahora** (sin Stripe / planes de pago). Los límites suaves existen solo como protección contra abuso y pueden subirse vía env.
 
-| Resource                                   | Env override                | Default |
+| Recurso                                    | Override env                | Default |
 | ------------------------------------------ | --------------------------- | ------- |
-| Organizations owned per user               | `HF_LIMIT_ORGS_PER_USER`    | 3       |
-| Non-archived projects per organization     | `HF_LIMIT_PROJECTS_PER_ORG` | 10      |
-| Members + pending invites per organization | `HF_LIMIT_MEMBERS_PER_ORG`  | 15      |
+| Organizaciones propias por usuario         | `HF_LIMIT_ORGS_PER_USER`    | 3       |
+| Proyectos no archivados por organización   | `HF_LIMIT_PROJECTS_PER_ORG` | 10      |
+| Miembros + invitaciones pendientes por org | `HF_LIMIT_MEMBERS_PER_ORG`  | 15      |
 
-Enforced in server actions (`createOrganizationAction`, `createProjectAction`, `inviteMemberAction`). Usage is shown on Organizations, Projects, and Team.
+Aplicado en server actions (`createOrganizationAction`, `createProjectAction`, `inviteMemberAction`). El uso se muestra en Organizations, Projects y Team.
 
-Invalid or missing env values fall back to the defaults above.
+Valores de env inválidos o ausentes vuelven a los defaults anteriores.
