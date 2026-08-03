@@ -38,7 +38,8 @@ export async function getPackagingUsageAction(
       gate.supabase
         .from("projects")
         .select("id", { count: "exact", head: true })
-        .eq("organization_id", organizationId),
+        .eq("organization_id", organizationId)
+        .neq("status", "archived"),
       gate.supabase
         .from("organization_members")
         .select("user_id", { count: "exact", head: true })

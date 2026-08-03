@@ -11,6 +11,9 @@ import {
 import {
   createOrganizationAction,
   createProjectAction,
+  deleteOrganizationAction,
+  deleteProjectAction,
+  updateProjectStatusAction,
 } from "@/features/organizations/actions";
 import {
   getActiveOrganization,
@@ -18,6 +21,7 @@ import {
   getProjectsForOrganization,
   type WorkspaceState,
 } from "@/features/organizations/workspace-state";
+import type { Project } from "@/lib/domain/types";
 
 const PREFS_STORAGE_KEY = "hubforge.workspace.prefs.v1";
 
@@ -30,6 +34,9 @@ type WorkspaceContextValue = {
   error: string | null;
   addOrganization: (name: string) => Promise<void>;
   addProject: (input: { name: string; description: string }) => Promise<void>;
+  setProjectStatus: (projectId: string, status: Project["status"]) => Promise<void>;
+  removeProject: (projectId: string) => Promise<void>;
+  removeOrganization: (organizationId: string) => Promise<void>;
   setActiveOrganization: (organizationId: string) => void;
   setActiveProject: (projectId: string) => void;
 };
@@ -98,6 +105,92 @@ export function WorkspaceProvider({
     [state.activeOrganizationId, state.organizations],
   );
 
+  const setProjectStatus = useCallback(
+    async (projectId: string, status: Project["status"]) => {
+      setPending(true);
+      setError(null);
+      const result = await updateProjectStatusAction({ projectId, status });
+      setPending(false);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setState((current) => ({
+        ...current,
+        projects: current.projects.map((project) =>
+          project.id === result.data.id ? result.data : project,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const removeProject = useCallback(async (projectId: string) => {
+    setPending(true);
+    setError(null);
+    const result = await deleteProjectAction(projectId);
+    setPending(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setState((current) => {
+      const projects = current.projects.filter((project) => project.id !== projectId);
+      const organizationId = current.activeOrganizationId;
+      const remaining = projects.filter(
+        (project) => project.organizationId === organizationId,
+      );
+      const next = {
+        ...current,
+        projects,
+        activeProjectId:
+          current.activeProjectId === projectId
+            ? (remaining[0]?.id ?? "")
+            : current.activeProjectId,
+      };
+      writePrefs(next.activeOrganizationId, next.activeProjectId);
+      return next;
+    });
+  }, []);
+
+  const removeOrganization = useCallback(async (organizationId: string) => {
+    setPending(true);
+    setError(null);
+    const result = await deleteOrganizationAction(organizationId);
+    setPending(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setState((current) => {
+      const organizations = current.organizations.filter(
+        (organization) => organization.id !== organizationId,
+      );
+      const projects = current.projects.filter(
+        (project) => project.organizationId !== organizationId,
+      );
+      const nextOrganizationId =
+        current.activeOrganizationId === organizationId
+          ? (organizations[0]?.id ?? "")
+          : current.activeOrganizationId;
+      const remaining = projects.filter(
+        (project) => project.organizationId === nextOrganizationId,
+      );
+      const next = {
+        ...current,
+        organizations,
+        projects,
+        activeOrganizationId: nextOrganizationId,
+        activeProjectId:
+          current.activeOrganizationId === organizationId
+            ? (remaining[0]?.id ?? "")
+            : current.activeProjectId,
+      };
+      writePrefs(next.activeOrganizationId, next.activeProjectId);
+      return next;
+    });
+  }, []);
+
   const setActiveOrganization = useCallback((organizationId: string) => {
     setState((current) => {
       const projects = getProjectsForOrganization(current, organizationId);
@@ -134,6 +227,9 @@ export function WorkspaceProvider({
       error,
       addOrganization,
       addProject,
+      setProjectStatus,
+      removeProject,
+      removeOrganization,
       setActiveOrganization,
       setActiveProject,
     };
@@ -143,6 +239,9 @@ export function WorkspaceProvider({
     error,
     addOrganization,
     addProject,
+    setProjectStatus,
+    removeProject,
+    removeOrganization,
     setActiveOrganization,
     setActiveProject,
   ]);

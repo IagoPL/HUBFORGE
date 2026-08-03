@@ -20,6 +20,10 @@ export function OrganizationsPanel({
     current: string;
     liveHint: string;
     limitReached: string;
+    delete: string;
+    confirmDelete: string;
+    confirmDeleteAction: string;
+    cancel: string;
     packaging: {
       title: string;
       plan: string;
@@ -34,11 +38,13 @@ export function OrganizationsPanel({
     state,
     activeOrganization,
     addOrganization,
+    removeOrganization,
     setActiveOrganization,
     pending,
     error,
   } = useWorkspace();
   const [name, setName] = useState("");
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const usage = usePackagingUsage(activeOrganization?.id, state.organizations.length);
   const limited = usage ? atOrganizationLimit(usage) : false;
 
@@ -54,17 +60,19 @@ export function OrganizationsPanel({
       <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
         {state.organizations.map((organization) => {
           const active = organization.id === activeOrganization?.id;
+          const confirming = confirmingId === organization.id;
 
           return (
-            <li key={organization.id}>
+            <li key={organization.id} className="panel grid gap-3 p-4">
               <button
                 type="button"
                 onClick={() => setActiveOrganization(organization.id)}
                 aria-current={active ? "true" : undefined}
                 className={cn(
-                  "panel w-full p-4 text-left transition-colors",
-                  "duration-[var(--motion-feedback)] hover:bg-[var(--hf-ground-3)]",
-                  active && "bg-[var(--hf-accent-quiet)]",
+                  "w-full text-left transition-colors",
+                  "duration-[var(--motion-feedback)]",
+                  active &&
+                    "rounded-[var(--radius-md)] bg-[var(--hf-accent-quiet)] p-2 -m-2",
                 )}
               >
                 <span className="flex items-center gap-2">
@@ -77,6 +85,48 @@ export function OrganizationsPanel({
                   {organization.slug}
                 </span>
               </button>
+
+              {confirming ? (
+                <div className="grid gap-2 border-t border-[var(--hf-rule-faint)] pt-3">
+                  <p className="t-body-sm text-[var(--hf-ink-muted)]">
+                    {labels.confirmDelete}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={pending}
+                      onClick={() => {
+                        void removeOrganization(organization.id).then(() =>
+                          setConfirmingId(null),
+                        );
+                      }}
+                    >
+                      {labels.confirmDeleteAction}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={pending}
+                      onClick={() => setConfirmingId(null)}
+                    >
+                      {labels.cancel}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={pending}
+                  className="justify-self-start"
+                  onClick={() => setConfirmingId(organization.id)}
+                >
+                  {labels.delete}
+                </Button>
+              )}
             </li>
           );
         })}
