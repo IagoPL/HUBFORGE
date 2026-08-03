@@ -17,7 +17,6 @@ export default async function OrganizationsPage() {
         create: t.organizations.create,
         name: t.organizations.name,
         current: t.organizations.current,
-        switchHint: t.organizations.switchHint,
         liveHint: t.organizations.liveHint,
       }}
     />

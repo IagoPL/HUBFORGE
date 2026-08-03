@@ -1,17 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { getDemoWorkspace } from "@/data/demo-workspace";
-import { taskStatusSchema } from "@/lib/domain/types";
+import { organizationSchema, projectSchema, taskStatusSchema } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
-describe("demo workspace", () => {
-  it("returns a coherent org → project → tasks graph", () => {
-    const workspace = getDemoWorkspace();
+describe("domain schemas", () => {
+  it("accepts valid organization and project shapes", () => {
+    const organization = organizationSchema.parse({
+      id: "org_1",
+      name: "Northlight Studio",
+      slug: "northlight",
+    });
+    const project = projectSchema.parse({
+      id: "proj_1",
+      organizationId: organization.id,
+      name: "Aurora Launch",
+      slug: "aurora-launch",
+      description: "Ship the collaborative workspace MVP.",
+      status: "active",
+    });
 
-    expect(workspace.project.organizationId).toBe(workspace.organization.id);
-    expect(workspace.tasks.every((task) => task.projectId === workspace.project.id)).toBe(
-      true,
-    );
-    expect(workspace.members.length).toBeGreaterThan(0);
+    expect(project.organizationId).toBe(organization.id);
   });
 });
 

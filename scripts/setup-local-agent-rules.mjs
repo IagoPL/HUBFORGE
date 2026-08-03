@@ -55,7 +55,6 @@ alwaysApply: true
 - Modular monolith: Next.js app + Supabase managed services.
 - Organize by domain when modules have real code; do not create empty feature folders.
 - Keep presentation, domain, data access, authz, and external integrations separated.
-- Demo data must stay behind clear adapters (\`getDemoWorkspace\`).
 - Do not edit applied migrations; add new ones.
 - Do not introduce microservices, Redux, CQRS, or generic repository layers without a documented need.
 `,

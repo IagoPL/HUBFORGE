@@ -1,5 +1,5 @@
 import { CircleDot, CircleSlash, PencilLine } from "lucide-react";
-import type { AttentionSignal, RevisionKind } from "@/data/demo-operations";
+import type { AttentionSignal, RevisionKind } from "@/lib/operations";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 import { RelativeTime } from "./relative-time";

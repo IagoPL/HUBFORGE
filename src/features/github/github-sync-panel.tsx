@@ -1,89 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   linkRepositoryAction,
   listLinkedRepositoryAction,
+  listSyncedCommitsAction,
   listSyncedIssuesAction,
+  listSyncedPullRequestsAction,
   unlinkRepositoryAction,
   type LinkedRepository,
+  type SyncedCommitSummary,
   type SyncedIssueSummary,
+  type SyncedPullRequestSummary,
 } from "@/features/github/actions";
 import { isValidRepoFullName, normalizeRepoFullName } from "@/features/github/repo-utils";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
-
-const DEMO_REPO_KEY = "hubforge.demo.github.repo.v1";
-const DEMO_ISSUES_KEY = "hubforge.demo.github.issues.v1";
-
-type DemoRepo = LinkedRepository & { projectId: string };
-
-function loadDemoRepo(projectId: string): LinkedRepository | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(DEMO_REPO_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as DemoRepo[];
-    return parsed.find((item) => item.projectId === projectId) ?? null;
-  } catch {
-    return null;
-  }
-}
-
-function saveDemoRepo(repo: DemoRepo | null, projectId: string) {
-  const raw = window.localStorage.getItem(DEMO_REPO_KEY);
-  const current = raw ? (JSON.parse(raw) as DemoRepo[]) : [];
-  const next = current.filter((item) => item.projectId !== projectId);
-  if (repo) next.push(repo);
-  window.localStorage.setItem(DEMO_REPO_KEY, JSON.stringify(next));
-}
-
-function loadDemoIssues(projectId: string): SyncedIssueSummary[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(DEMO_ISSUES_KEY);
-    if (!raw) return defaultDemoIssues(projectId);
-    const parsed = JSON.parse(raw) as Array<SyncedIssueSummary & { projectId: string }>;
-    const filtered = parsed.filter((item) => item.projectId === projectId);
-    return filtered.length > 0 ? filtered : defaultDemoIssues(projectId);
-  } catch {
-    return defaultDemoIssues(projectId);
-  }
-}
-
-function defaultDemoIssues(projectId: string): SyncedIssueSummary[] {
-  return [
-    {
-      id: `gh_${projectId}_1`,
-      number: 12,
-      title: "Wire GitHub App webhooks",
-      state: "open",
-      htmlUrl: "https://github.com/example/hubforge/issues/12",
-      origin: "github",
-    },
-    {
-      id: `gh_${projectId}_2`,
-      number: 9,
-      title: "Map issues into HubForge tasks",
-      state: "closed",
-      htmlUrl: "https://github.com/example/hubforge/issues/9",
-      origin: "github",
-    },
-  ];
-}
-
-function saveDemoIssues(projectId: string, issues: SyncedIssueSummary[]) {
-  const raw = window.localStorage.getItem(DEMO_ISSUES_KEY);
-  const current = raw
-    ? (JSON.parse(raw) as Array<SyncedIssueSummary & { projectId: string }>)
-    : [];
-  const next = [
-    ...current.filter((item) => item.projectId !== projectId),
-    ...issues.map((issue) => ({ ...issue, projectId })),
-  ];
-  window.localStorage.setItem(DEMO_ISSUES_KEY, JSON.stringify(next));
-}
 
 export function GitHubSyncPanel({
   labels,
@@ -100,58 +33,55 @@ export function GitHubSyncPanel({
     emptyProject: string;
     emptyRepo: string;
     syncedIssues: string;
+    syncedPullRequests: string;
+    syncedCommits: string;
+    recentActivity: string;
     setupHint: string;
-    demoHint: string;
     install: string;
     repoFormat: string;
   };
   appConfigured: boolean;
   installUrl: string | null;
 }) {
-  const { mode, activeOrganization, activeProject } = useWorkspace();
+  const { activeOrganization, activeProject } = useWorkspace();
   const projectId = activeProject?.id ?? "";
   const organizationId = activeOrganization?.id ?? "";
-  const [demoTick, setDemoTick] = useState(0);
   const [repo, setRepo] = useState<LinkedRepository | null>(null);
   const [issues, setIssues] = useState<SyncedIssueSummary[]>([]);
+  const [pullRequests, setPullRequests] = useState<SyncedPullRequestSummary[]>([]);
+  const [commits, setCommits] = useState<SyncedCommitSummary[]>([]);
   const [fullName, setFullName] = useState("");
   const [installationId, setInstallationId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const demoRepo = useMemo(() => {
-    void demoTick;
-    if (mode !== "demo" || !projectId) return null;
-    return loadDemoRepo(projectId);
-  }, [mode, projectId, demoTick]);
-
-  const demoIssues = useMemo(() => {
-    void demoTick;
-    if (mode !== "demo" || !projectId) return [];
-    return loadDemoIssues(projectId);
-  }, [mode, projectId, demoTick]);
-
-  const linked = mode === "demo" ? demoRepo : repo;
-  const synced = mode === "demo" ? demoIssues : issues;
+  const installHref =
+    installUrl && organizationId
+      ? `${installUrl}${installUrl.includes("?") ? "&" : "?"}state=${encodeURIComponent(organizationId)}`
+      : installUrl;
 
   useEffect(() => {
-    if (mode !== "live" || !projectId) return;
+    if (!projectId) return;
     let cancelled = false;
     startTransition(() => {
       void Promise.all([
         listLinkedRepositoryAction(projectId),
         listSyncedIssuesAction(projectId),
-      ]).then(([repoResult, issuesResult]) => {
+        listSyncedPullRequestsAction(projectId),
+        listSyncedCommitsAction(projectId),
+      ]).then(([repoResult, issuesResult, prsResult, commitsResult]) => {
         if (cancelled) return;
         if (repoResult.ok) setRepo(repoResult.data);
         else setError(repoResult.error);
         if (issuesResult.ok) setIssues(issuesResult.data);
+        if (prsResult.ok) setPullRequests(prsResult.data);
+        if (commitsResult.ok) setCommits(commitsResult.data);
       });
     });
     return () => {
       cancelled = true;
     };
-  }, [mode, projectId]);
+  }, [projectId]);
 
   function linkRepo() {
     if (!projectId || !organizationId) return;
@@ -159,22 +89,6 @@ export function GitHubSyncPanel({
     const normalized = normalizeRepoFullName(fullName);
     if (!isValidRepoFullName(normalized)) {
       setError(labels.repoFormat);
-      return;
-    }
-
-    if (mode === "demo") {
-      const next: DemoRepo = {
-        id: `repo_${crypto.randomUUID().slice(0, 8)}`,
-        projectId,
-        organizationId,
-        fullName: normalized,
-        htmlUrl: `https://github.com/${normalized}`,
-        installationId: installationId ? Number(installationId) : null,
-      };
-      saveDemoRepo(next, projectId);
-      saveDemoIssues(projectId, defaultDemoIssues(projectId));
-      setDemoTick((value) => value + 1);
-      setFullName("");
       return;
     }
 
@@ -198,11 +112,6 @@ export function GitHubSyncPanel({
   function unlinkRepo() {
     if (!projectId) return;
     setError(null);
-    if (mode === "demo") {
-      saveDemoRepo(null, projectId);
-      setDemoTick((value) => value + 1);
-      return;
-    }
     startTransition(() => {
       void unlinkRepositoryAction(projectId).then((result) => {
         if (!result.ok) {
@@ -211,6 +120,8 @@ export function GitHubSyncPanel({
         }
         setRepo(null);
         setIssues([]);
+        setPullRequests([]);
+        setCommits([]);
       });
     });
   }
@@ -227,9 +138,7 @@ export function GitHubSyncPanel({
     <div className="grid gap-5 px-4 py-5 sm:px-6">
       <div className="grid gap-1">
         <p className="lead">{labels.subtitle}</p>
-        <p className="t-body-sm text-[var(--hf-ink-faint)]">
-          {mode === "demo" ? labels.demoHint : labels.setupHint}
-        </p>
+        <p className="t-body-sm text-[var(--hf-ink-faint)]">{labels.setupHint}</p>
       </div>
 
       {error ? (
@@ -238,10 +147,10 @@ export function GitHubSyncPanel({
         </p>
       ) : null}
 
-      {installUrl && mode === "live" ? (
+      {installHref ? (
         <p className="t-body">
           <a
-            href={installUrl}
+            href={installHref}
             className="font-medium text-[var(--hf-accent)] underline underline-offset-2"
             target="_blank"
             rel="noreferrer"
@@ -254,15 +163,15 @@ export function GitHubSyncPanel({
         </p>
       ) : null}
 
-      {linked ? (
+      {repo ? (
         <section className="panel flex flex-wrap items-center gap-3 p-4">
           <a
-            href={linked.htmlUrl}
+            href={repo.htmlUrl}
             className="t-mono font-medium text-[var(--hf-accent)] underline underline-offset-2"
             target="_blank"
             rel="noreferrer"
           >
-            {linked.fullName}
+            {repo.fullName}
           </a>
           <Badge tone="brand">linked</Badge>
           <Button
@@ -316,41 +225,109 @@ export function GitHubSyncPanel({
         </form>
       )}
 
-      <section aria-labelledby="synced-heading" className="grid gap-2">
-        <h2 id="synced-heading" className="t-display-sm text-[var(--hf-ink)]">
-          {labels.syncedIssues}
+      <section aria-labelledby="activity-heading" className="grid gap-4">
+        <h2 id="activity-heading" className="t-display-sm text-[var(--hf-ink)]">
+          {labels.recentActivity}
         </h2>
-        {synced.length === 0 ? (
-          <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
-        ) : (
-          <ul className="grid gap-2">
-            {synced.map((issue) => (
-              <li
-                key={issue.id}
-                className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3"
-              >
-                <span
-                  className="t-mono-sm shrink-0 text-[var(--hf-ink-faint)]"
-                  data-tabular
+
+        <div className="grid gap-2">
+          <h3 className="t-label text-[var(--hf-ink-faint)]">{labels.syncedIssues}</h3>
+          {issues.length === 0 ? (
+            <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
+          ) : (
+            <ul className="grid gap-2">
+              {issues.map((issue) => (
+                <li
+                  key={issue.id}
+                  className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3"
                 >
-                  #{issue.number}
-                </span>
-                <a
-                  href={issue.htmlUrl}
-                  className="t-body min-w-0 flex-1 font-medium text-[var(--hf-ink)] underline-offset-2 hover:underline"
-                  target="_blank"
-                  rel="noreferrer"
+                  <span
+                    className="t-mono-sm shrink-0 text-[var(--hf-ink-faint)]"
+                    data-tabular
+                  >
+                    #{issue.number}
+                  </span>
+                  <a
+                    href={issue.htmlUrl}
+                    className="t-body min-w-0 flex-1 font-medium text-[var(--hf-ink)] underline-offset-2 hover:underline"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {issue.title}
+                  </a>
+                  <Badge tone={issue.state === "open" ? "success" : "neutral"}>
+                    {issue.state}
+                  </Badge>
+                  <Badge>{issue.origin}</Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="grid gap-2">
+          <h3 className="t-label text-[var(--hf-ink-faint)]">
+            {labels.syncedPullRequests}
+          </h3>
+          {pullRequests.length === 0 ? (
+            <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
+          ) : (
+            <ul className="grid gap-2">
+              {pullRequests.map((pr) => (
+                <li
+                  key={pr.id}
+                  className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3"
                 >
-                  {issue.title}
-                </a>
-                <Badge tone={issue.state === "open" ? "success" : "neutral"}>
-                  {issue.state}
-                </Badge>
-                <Badge>{issue.origin}</Badge>
-              </li>
-            ))}
-          </ul>
-        )}
+                  <span className="t-mono-sm text-[var(--hf-ink-faint)]" data-tabular>
+                    #{pr.number}
+                  </span>
+                  <a
+                    href={pr.htmlUrl}
+                    className="t-body min-w-0 flex-1 font-medium text-[var(--hf-ink)] underline-offset-2 hover:underline"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {pr.title}
+                  </a>
+                  <Badge tone={pr.merged ? "success" : "neutral"}>
+                    {pr.merged ? "merged" : pr.state}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="grid gap-2">
+          <h3 className="t-label text-[var(--hf-ink-faint)]">{labels.syncedCommits}</h3>
+          {commits.length === 0 ? (
+            <p className="t-body-sm text-[var(--hf-ink-muted)]">{labels.emptyRepo}</p>
+          ) : (
+            <ul className="grid gap-2">
+              {commits.map((commit) => (
+                <li
+                  key={commit.id}
+                  className="panel flex flex-wrap items-center gap-x-3 gap-y-1 p-3"
+                >
+                  <span className="t-mono-sm text-[var(--hf-ink-faint)]">
+                    {commit.sha.slice(0, 7)}
+                  </span>
+                  <a
+                    href={commit.htmlUrl}
+                    className="t-body min-w-0 flex-1 truncate text-[var(--hf-ink)] underline-offset-2 hover:underline"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {commit.message || commit.sha}
+                  </a>
+                  <span className="t-mono-sm text-[var(--hf-ink-faint)]">
+                    {commit.authorLogin}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </section>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,38 +10,7 @@ import {
 } from "@/features/availability/actions";
 import { listMembersAction } from "@/features/collaboration/actions";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
-import { getDemoWorkspace } from "@/data/demo-workspace";
 import type { AvailabilityEntry, Member } from "@/lib/domain/types";
-
-const DEMO_AVAIL_KEY = "hubforge.demo.availability.v1";
-
-function loadDemoAvailability(organizationId: string): AvailabilityEntry[] {
-  const seed = getDemoWorkspace().availability;
-  if (typeof window === "undefined") {
-    return organizationId === "org_demo" ? seed : [];
-  }
-  try {
-    const raw = window.localStorage.getItem(DEMO_AVAIL_KEY);
-    if (!raw) return organizationId === "org_demo" ? seed : [];
-    const parsed = JSON.parse(raw) as Array<
-      AvailabilityEntry & { organizationId?: string }
-    >;
-    const filtered = parsed.filter(
-      (entry) =>
-        (entry as { organizationId?: string }).organizationId === organizationId ||
-        (!("organizationId" in entry) && organizationId === "org_demo"),
-    );
-    if (filtered.length > 0) return filtered;
-    return organizationId === "org_demo" ? seed : [];
-  } catch {
-    return organizationId === "org_demo" ? seed : [];
-  }
-}
-
-function saveDemoAvailability(organizationId: string, entries: AvailabilityEntry[]) {
-  const stamped = entries.map((entry) => ({ ...entry, organizationId }));
-  window.localStorage.setItem(DEMO_AVAIL_KEY, JSON.stringify(stamped));
-}
 
 function toLocalInputValue(date: Date) {
   const pad = (value: number) => String(value).padStart(2, "0");
@@ -63,10 +32,9 @@ export function AvailabilityPanel({
     remove: string;
   };
 }) {
-  const { mode, activeOrganization } = useWorkspace();
+  const { activeOrganization } = useWorkspace();
   const organizationId = activeOrganization?.id ?? "";
-  const [demoTick, setDemoTick] = useState(0);
-  const [liveEntries, setLiveEntries] = useState<AvailabilityEntry[]>([]);
+  const [entries, setEntries] = useState<AvailabilityEntry[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -78,26 +46,10 @@ export function AvailabilityPanel({
   const [kind, setKind] = useState<AvailabilityEntry["kind"]>("unavailable");
   const noteInputRef = useRef<HTMLInputElement | null>(null);
 
-  const demoEntries = useMemo(() => {
-    void demoTick;
-    if (mode !== "demo" || !organizationId) return [];
-    return loadDemoAvailability(organizationId);
-  }, [mode, organizationId, demoTick]);
-
-  const entries = mode === "demo" ? demoEntries : liveEntries;
-
-  const demoMembers = useMemo(() => {
-    if (mode !== "demo") return [];
-    return getDemoWorkspace().members.filter(
-      (member) => member.organizationId === (organizationId || "org_demo"),
-    );
-  }, [mode, organizationId]);
-
-  const visibleMembers = mode === "demo" ? demoMembers : members;
-  const memberById = new Map(visibleMembers.map((member) => [member.id, member]));
+  const memberById = new Map(members.map((member) => [member.id, member]));
 
   useEffect(() => {
-    if (mode !== "live" || !organizationId) return;
+    if (!organizationId) return;
     let cancelled = false;
     startTransition(() => {
       void Promise.all([
@@ -105,7 +57,7 @@ export function AvailabilityPanel({
         listMembersAction(organizationId),
       ]).then(([availabilityResult, membersResult]) => {
         if (cancelled) return;
-        if (availabilityResult.ok) setLiveEntries(availabilityResult.data);
+        if (availabilityResult.ok) setEntries(availabilityResult.data);
         else setError(availabilityResult.error);
         if (membersResult.ok) setMembers(membersResult.data);
       });
@@ -113,27 +65,12 @@ export function AvailabilityPanel({
     return () => {
       cancelled = true;
     };
-  }, [mode, organizationId]);
+  }, [organizationId]);
 
   function createEntry(submittedNote: string) {
     if (!organizationId) return;
     setError(null);
     const resolvedNote = submittedNote.trim() || "Personal window";
-
-    if (mode === "demo") {
-      const entry: AvailabilityEntry = {
-        id: `av_${crypto.randomUUID().slice(0, 8)}`,
-        memberId: "mem_self",
-        startsAt: new Date(startsAt).toISOString(),
-        endsAt: new Date(endsAt).toISOString(),
-        kind,
-        note: resolvedNote,
-      };
-      saveDemoAvailability(organizationId, [...demoEntries, entry]);
-      setDemoTick((value) => value + 1);
-      if (noteInputRef.current) noteInputRef.current.value = "";
-      return;
-    }
 
     startTransition(() => {
       void createAvailabilityAction({
@@ -147,7 +84,7 @@ export function AvailabilityPanel({
           setError(result.error);
           return;
         }
-        setLiveEntries((current) =>
+        setEntries((current) =>
           [...current, result.data].sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
         );
         if (noteInputRef.current) noteInputRef.current.value = "";
@@ -157,14 +94,6 @@ export function AvailabilityPanel({
 
   function removeEntry(entryId: string) {
     setError(null);
-    if (mode === "demo") {
-      saveDemoAvailability(
-        organizationId,
-        demoEntries.filter((entry) => entry.id !== entryId),
-      );
-      setDemoTick((value) => value + 1);
-      return;
-    }
 
     startTransition(() => {
       void deleteAvailabilityAction(entryId).then((result) => {
@@ -172,7 +101,7 @@ export function AvailabilityPanel({
           setError(result.error);
           return;
         }
-        setLiveEntries((current) => current.filter((entry) => entry.id !== entryId));
+        setEntries((current) => current.filter((entry) => entry.id !== entryId));
       });
     });
   }
@@ -266,11 +195,7 @@ export function AvailabilityPanel({
       ) : (
         <ul className="grid gap-2">
           {entries.map((entry) => {
-            const member =
-              memberById.get(entry.memberId) ??
-              (entry.memberId === "mem_self"
-                ? { name: "You", avatarInitials: "YO" }
-                : null);
+            const member = memberById.get(entry.memberId);
 
             return (
               <li
@@ -280,7 +205,6 @@ export function AvailabilityPanel({
                 <p className="t-body font-medium text-[var(--hf-ink)]">
                   {member?.name ?? "Team member"}
                 </p>
-                {/* A closed window is a state, not a failure: danger stays for errors. */}
                 <Badge
                   tone={
                     entry.kind === "available"

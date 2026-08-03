@@ -6,7 +6,6 @@ export const es = {
     signIn: "Iniciar sesión",
     openWorkspace: "Abrir espacio",
     open: "Abrir",
-    demoMode: "Modo demo",
     signOut: "Cerrar sesión",
     mockData: "Datos de prueba",
     language: "Idioma",
@@ -38,8 +37,6 @@ export const es = {
     headline: "Construid juntos sin perder el contexto.",
     subtitle:
       "HubForge conecta planificación, disponibilidad, responsabilidades y actividad de GitHub en un espacio colaborativo para equipos técnicos y creativos pequeños.",
-    enterDemo: "Entrar al espacio demo",
-    signInPreview: "Vista previa de acceso",
     boardProject: "Aurora Launch",
     boardOrg: "Northlight Studio",
     ready: "Listo",
@@ -77,21 +74,17 @@ export const es = {
     securityTitle: "Hecho para confiar entre organizaciones",
     securityBody:
       "Límites multi-tenant, mínimo privilegio y acciones auditables forman parte de la base del producto.",
-    exploreDemo: "Explorar la demo",
     footerTagline: "HubForge · espacio colaborativo de proyectos",
-    footerStatus: "MVP · modo demo sin credenciales",
+    footerStatus: "MVP · requiere iniciar sesión",
   },
   login: {
     title: "Iniciar sesión",
     body: "Continúa con GitHub mediante Supabase Auth. Las sesiones van en cookies y se renuevan con el proxy de Next.js.",
     continueGithub: "Continuar con GitHub",
-    enterDemo: "Entrar al espacio demo",
     configWarning:
       "Supabase aún no está configurado. Añade NEXT_PUBLIC_SUPABASE_URL y una clave publishable/anon en .env.local y activa el proveedor de GitHub.",
   },
   app: {
-    demoWorkspace: "Espacio demo",
-    liveWorkspace: "Espacio en vivo",
     openTasks: "Tareas abiertas",
     members: "Miembros",
     unread: "Sin leer",
@@ -199,14 +192,31 @@ export const es = {
     subtitle:
       "Las organizaciones son el tenant superior para proyectos, miembros y permisos.",
     current: "Organización actual",
-    switchHint: "En modo demo las organizaciones se guardan en este navegador.",
     liveHint: "Con sesión iniciada, el espacio se guarda en Supabase con RLS.",
   },
   onboarding: {
     title: "Configura tu espacio",
-    body: "Crea una organización y después un proyecto. El modo demo usa datos locales hasta que inicies sesión.",
+    body: "Crea una organización y después un proyecto para empezar a trabajar en tu espacio.",
     stepOrg: "1. Organización",
     stepProject: "2. Proyecto",
+  },
+  invite: {
+    invalidTitle: "Invitación no válida",
+    invalidBody:
+      "Este enlace no incluye un token. Pide a tu compañero que envíe una invitación nueva.",
+    failedTitle: "No se pudo aceptar la invitación",
+    goToApp: "Ir al espacio",
+    emailSubject: "Únete a {org} en HubForge",
+    emailBody:
+      "Te han invitado a unirte a {org} en HubForge.\n\nAcepta la invitación:\n{url}",
+  },
+  legal: {
+    privacyTitle: "Política de privacidad",
+    privacyBody:
+      "HubForge almacena datos de cuenta, contenido del espacio y actividad necesaria para operar espacios colaborativos.\n\nUsamos Supabase para autenticación y almacenamiento. Los datos de GitHub sincronizados mediante la GitHub App se limitan a lo que vincule tu organización.\n\nContacta con el administrador de tu organización o con el operador de HubForge para solicitudes de acceso, corrección o eliminación.",
+    termsTitle: "Términos del servicio",
+    termsBody:
+      "HubForge se ofrece como espacio colaborativo para equipos. Eres responsable del contenido que creas y de invitar a personas de confianza.\n\nNo abuses del servicio, no intentes accesos no autorizados ni subas material ilegal. La disponibilidad y las funciones pueden cambiar en versiones tempranas.\n\nEl uso continuado implica aceptar estos términos para el espacio de tu organización.",
   },
   team: {
     title: "Equipo",
@@ -219,6 +229,12 @@ export const es = {
     pending: "Invitaciones pendientes",
     saveRoles: "Guardar roles",
     empty: "Invita a compañeros a esta organización.",
+    copyLink: "Copiar enlace de invitación",
+    inviteSent: "Invitación enviada.",
+    inviteLinkHint: "Comparte este enlace si el correo no se entrega.",
+    emailNotDelivered: "No se entregó el correo. Copia el enlace de invitación.",
+    removeMember: "Quitar",
+    revokeInvite: "Revocar",
   },
   tasks: {
     title: "Tareas",
@@ -231,6 +247,11 @@ export const es = {
     assignee: "Asignado",
     emptyProject: "Selecciona o crea un proyecto antes de gestionar tareas.",
     unassigned: "Sin asignar",
+    listView: "Lista",
+    boardView: "Tablero",
+    saveTask: "Guardar tarea",
+    dependsOn: "Depende de",
+    editTask: "Editar tarea",
   },
   calendar: {
     title: "Disponibilidad",
@@ -259,9 +280,11 @@ export const es = {
     emptyProject: "Selecciona o crea un proyecto antes de vincular GitHub.",
     emptyRepo: "Todavía no hay repositorio vinculado.",
     syncedIssues: "Issues sincronizados",
+    syncedPullRequests: "Pull requests sincronizados",
+    syncedCommits: "Commits sincronizados",
+    recentActivity: "Actividad reciente",
     setupHint:
       "Configura las variables de la GitHub App y apunta los webhooks a /api/github/webhooks.",
-    demoHint: "En modo demo el repositorio vinculado se guarda en este navegador.",
     install: "Instalar la GitHub App",
     repoFormat: "Usa el formato propietario/repositorio.",
   },
@@ -275,7 +298,6 @@ export const es = {
     send: "Enviar",
     emptyProject: "Selecciona o crea un proyecto antes de abrir el chat.",
     emptyMessages: "Todavía no hay mensajes. Saluda al equipo.",
-    demoHint: "En modo demo los mensajes se guardan en este navegador.",
     liveHint: "Con sesión iniciada, el chat usa Supabase Realtime para mensajes nuevos.",
   },
 } as const satisfies Dictionary;

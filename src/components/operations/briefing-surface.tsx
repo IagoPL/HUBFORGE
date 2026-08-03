@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { AttentionItem } from "@/data/demo-operations";
+import type { AttentionItem } from "@/lib/operations";
 import type { Locale } from "@/i18n/config";
 import type { Member } from "@/lib/domain/types";
 import { Briefing } from "./briefing";

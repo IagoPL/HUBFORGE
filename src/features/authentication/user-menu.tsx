@@ -14,7 +14,7 @@ export function UserMenu({
   signOutLabel?: string;
 }) {
   // The shell already states which workspace you are looking at, so this slot
-  // offers the way out of the demo rather than repeating the label.
+  // Signed-out slot shows sign-in; signed-in shows account menu.
   if (!user) {
     return (
       <Link

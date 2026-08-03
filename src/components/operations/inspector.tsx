@@ -2,16 +2,25 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { X } from "lucide-react";
-import { useEffect, useRef } from "react";
-import type { OperationsTask } from "@/data/demo-operations";
-import { memberById } from "@/data/demo-operations";
+import { useEffect, useRef, useState, useTransition } from "react";
+import type { OperationsTask } from "@/lib/operations";
+import { memberById } from "@/lib/operations";
 import type { Locale } from "@/i18n/config";
 import type { Member, Task } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Avatar } from "./briefing";
 import { statusLabel, type OperationsLabels, type WorkLabels } from "./labels";
 import { RelativeTime } from "./relative-time";
 import { RevisionMark } from "./revision-mark";
+
+export type InspectorSaveInput = {
+  title: string;
+  description: string;
+  priority: Task["priority"];
+  assigneeIds: string[];
+  dependsOnTaskIds: string[];
+};
 
 /**
  * Level 3 of the navigation model: detail arrives as a layer over the list, so
@@ -25,8 +34,12 @@ export function Inspector({
   locale,
   labels,
   statusLabels,
+  saveLabel,
+  unassignedLabel,
+  editable,
   onClose,
   onSelect,
+  onSave,
 }: {
   task: OperationsTask;
   tasks: OperationsTask[];
@@ -35,17 +48,31 @@ export function Inspector({
   locale: Locale;
   labels: WorkLabels;
   statusLabels: OperationsLabels;
+  saveLabel: string;
+  unassignedLabel: string;
+  editable: boolean;
   onClose: () => void;
   onSelect: (taskId: string) => void;
+  onSave?: (input: InspectorSaveInput) => Promise<string | null>;
 }) {
   const panelRef = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  // Parent remounts this layer with `key={task.id}` when selection changes.
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description);
+  const [priority, setPriority] = useState(task.priority);
+  const [assigneeId, setAssigneeId] = useState(task.assigneeIds[0] ?? "");
+  const [dependsOnTaskId, setDependsOnTaskId] = useState(task.dependsOn[0] ?? "");
 
   const upstream = tasks.filter((candidate) => task.dependsOn.includes(candidate.id));
   const downstream = tasks.filter((candidate) => task.blocks.includes(candidate.id));
   const assignees = task.assigneeIds
     .map((id) => memberById(members, id))
     .filter((member): member is Member => member !== null);
+  const dependencyOptions = tasks.filter((candidate) => candidate.id !== task.id);
 
   useEffect(() => {
     panelRef.current?.focus();
@@ -59,9 +86,24 @@ export function Inspector({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
 
+  function save() {
+    if (!onSave) return;
+    setError(null);
+    startTransition(() => {
+      void onSave({
+        title,
+        description,
+        priority,
+        assigneeIds: assigneeId ? [assigneeId] : [],
+        dependsOnTaskIds: dependsOnTaskId ? [dependsOnTaskId] : [],
+      }).then((message) => {
+        if (message) setError(message);
+      });
+    });
+  }
+
   return (
     <>
-      {/* Mobile only: the sheet covers the list, so it needs a dismiss surface. */}
       <button
         type="button"
         tabIndex={-1}
@@ -84,17 +126,31 @@ export function Inspector({
           "border-t border-[var(--hf-rule-strong)] bg-[var(--hf-ground-1)]",
           "lg:static lg:bottom-auto lg:max-h-none lg:w-[22rem] lg:shrink-0",
           "lg:border-l lg:border-t-0 lg:overflow-y-visible",
-          // Focused on open so assistive tech lands inside the layer. No ring:
-          // the accent marks user-driven focus, not a programmatic move.
           "outline-none",
         )}
       >
         <div className="sticky top-0 flex items-start justify-between gap-3 border-b border-[var(--hf-rule)] bg-[var(--hf-ground-1)] p-4">
           <div className="min-w-0">
             <p className="t-label text-[var(--hf-ink-faint)]">{labels.detail}</p>
-            <h2 id="inspector-heading" className="t-display-sm mt-1 text-[var(--hf-ink)]">
-              {task.title}
-            </h2>
+            {editable ? (
+              <label className="mt-1 grid gap-1">
+                <span className="sr-only">{labels.detail}</span>
+                <input
+                  id="inspector-heading"
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  className="input t-display-sm"
+                  disabled={pending}
+                />
+              </label>
+            ) : (
+              <h2
+                id="inspector-heading"
+                className="t-display-sm mt-1 text-[var(--hf-ink)]"
+              >
+                {task.title}
+              </h2>
+            )}
           </div>
           <button
             type="button"
@@ -114,9 +170,31 @@ export function Inspector({
         <div className="grid gap-5 p-4">
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
             <Field label={labels.status}>{statusLabel(task.status, statusLabels)}</Field>
-            <Field label={labels.priority}>{priorityLabel(task.priority, labels)}</Field>
-            {/* Timestamps and refs are machine data, so these read in mono.
-                A workspace with no modification time simply omits the row. */}
+            {editable ? (
+              <>
+                <dt className="t-label pt-0.5 text-[var(--hf-ink-faint)]">
+                  {labels.priority}
+                </dt>
+                <dd>
+                  <select
+                    value={priority}
+                    onChange={(event) =>
+                      setPriority(event.target.value as Task["priority"])
+                    }
+                    className="input"
+                    disabled={pending}
+                  >
+                    <option value="low">{labels.priorityLow}</option>
+                    <option value="medium">{labels.priorityMedium}</option>
+                    <option value="high">{labels.priorityHigh}</option>
+                  </select>
+                </dd>
+              </>
+            ) : (
+              <Field label={labels.priority}>
+                {priorityLabel(task.priority, labels)}
+              </Field>
+            )}
             {task.updatedAt ? (
               <Field label={labels.updated} mono>
                 <RelativeTime
@@ -146,13 +224,37 @@ export function Inspector({
             />
           ) : null}
 
-          {task.description ? (
+          {editable ? (
+            <label className="grid gap-1.5">
+              <span className="t-label text-[var(--hf-ink-faint)]">{labels.detail}</span>
+              <textarea
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                className="input min-h-24"
+                disabled={pending}
+              />
+            </label>
+          ) : task.description ? (
             <p className="t-body text-[var(--hf-ink-muted)]">{task.description}</p>
           ) : null}
 
           <section>
             <h3 className="t-label text-[var(--hf-ink-faint)]">{labels.assignees}</h3>
-            {assignees.length === 0 ? (
+            {editable ? (
+              <select
+                value={assigneeId}
+                onChange={(event) => setAssigneeId(event.target.value)}
+                className="input mt-2"
+                disabled={pending}
+              >
+                <option value="">{unassignedLabel}</option>
+                {members.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+            ) : assignees.length === 0 ? (
               <p className="t-body mt-2 text-[var(--hf-ink-faint)]">{labels.nobody}</p>
             ) : (
               <ul className="mt-2 grid gap-2">
@@ -169,7 +271,27 @@ export function Inspector({
             )}
           </section>
 
-          {/* Dependency lines are drawn only because these relations exist. */}
+          {editable ? (
+            <label className="grid gap-1.5">
+              <span className="t-label text-[var(--hf-ink-faint)]">
+                {labels.dependsOn}
+              </span>
+              <select
+                value={dependsOnTaskId}
+                onChange={(event) => setDependsOnTaskId(event.target.value)}
+                className="input"
+                disabled={pending}
+              >
+                <option value="">{unassignedLabel}</option>
+                {dependencyOptions.map((candidate) => (
+                  <option key={candidate.id} value={candidate.id}>
+                    {candidate.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
           {upstream.length > 0 || downstream.length > 0 ? (
             <section>
               <h3 className="t-label text-[var(--hf-ink-faint)]">
@@ -200,6 +322,19 @@ export function Inspector({
                 />
               </div>
             </section>
+          ) : null}
+
+          {editable ? (
+            <div className="grid gap-2">
+              {error ? (
+                <p role="status" className="t-body-sm text-[var(--hf-danger)]">
+                  {error}
+                </p>
+              ) : null}
+              <Button type="button" disabled={pending || !title.trim()} onClick={save}>
+                {saveLabel}
+              </Button>
+            </div>
           ) : null}
         </div>
       </motion.aside>

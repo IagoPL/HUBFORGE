@@ -26,6 +26,9 @@ export default async function TasksPage() {
           assignee: t.tasks.assignee,
           emptyProject: t.tasks.emptyProject,
           unassigned: t.tasks.unassigned,
+          listView: t.tasks.listView,
+          boardView: t.tasks.boardView,
+          saveTask: t.tasks.saveTask,
         }}
       />
     </Suspense>

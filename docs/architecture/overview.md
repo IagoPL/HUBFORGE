@@ -6,7 +6,7 @@ HubForge is a **modular monolith**: one Next.js application with managed Supabas
 src/
   app/                 # routes (landing, auth preview, app shell pages)
   components/          # ui + shared + shell + landing
-  data/                # demo workspace adapters (swap later for Supabase)
+  data/                # reserved; domain data lives in Supabase
   lib/                 # utils, domain types, supabase clients
   server/              # reserved for privileged server modules (auth, github, security)
 ```
@@ -17,7 +17,7 @@ src/
 | ------------ | ------------------------------------------------------------- |
 | Presentation | No direct privileged Supabase access from visual components   |
 | Domain types | Zod schemas in `lib/domain`                                   |
-| Demo data    | Behind `getDemoWorkspace()`                                   |
+| Data         | Supabase Postgres with RLS                                    |
 | Secrets      | Env only; never logged                                        |
 | Multi-tenant | Every project entity must resolve to org + project; RLS later |
 

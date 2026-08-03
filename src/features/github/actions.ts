@@ -173,3 +173,107 @@ export async function unlinkRepositoryAction(
   revalidatePath("/app", "layout");
   return { ok: true, data: { projectId } };
 }
+
+export type SyncedPullRequestSummary = {
+  id: string;
+  number: number;
+  title: string;
+  state: "open" | "closed";
+  merged: boolean;
+  htmlUrl: string;
+  authorLogin: string;
+};
+
+export type SyncedCommitSummary = {
+  id: string;
+  sha: string;
+  message: string;
+  htmlUrl: string;
+  authorLogin: string;
+  committedAt: string | null;
+};
+
+export async function listSyncedPullRequestsAction(
+  projectId: string,
+): Promise<ActionResult<SyncedPullRequestSummary[]>> {
+  const gate = await requireLive();
+  if (!gate.ok) return gate;
+
+  const { data, error } = await gate.supabase
+    .from("github_synced_pull_requests")
+    .select("id, number, title, state, merged, html_url, author_login")
+    .eq("project_id", projectId)
+    .order("number", { ascending: false })
+    .limit(40);
+
+  if (error) return { ok: false, error: error.message };
+  return {
+    ok: true,
+    data: (data ?? []).map((row) => ({
+      id: row.id,
+      number: row.number,
+      title: row.title,
+      state: row.state as "open" | "closed",
+      merged: row.merged,
+      htmlUrl: row.html_url,
+      authorLogin: row.author_login,
+    })),
+  };
+}
+
+export async function listSyncedCommitsAction(
+  projectId: string,
+): Promise<ActionResult<SyncedCommitSummary[]>> {
+  const gate = await requireLive();
+  if (!gate.ok) return gate;
+
+  const { data, error } = await gate.supabase
+    .from("github_synced_commits")
+    .select("id, sha, message, html_url, author_login, committed_at")
+    .eq("project_id", projectId)
+    .order("committed_at", { ascending: false, nullsFirst: false })
+    .limit(40);
+
+  if (error) return { ok: false, error: error.message };
+  return {
+    ok: true,
+    data: (data ?? []).map((row) => ({
+      id: row.id,
+      sha: row.sha,
+      message: row.message,
+      htmlUrl: row.html_url,
+      authorLogin: row.author_login,
+      committedAt: row.committed_at,
+    })),
+  };
+}
+
+export async function recordGitHubInstallationAction(input: {
+  organizationId: string;
+  installationId: number;
+  accountLogin?: string;
+  accountType?: "Organization" | "User";
+}): Promise<ActionResult<{ installationId: number }>> {
+  const gate = await requireLive();
+  if (!gate.ok) return gate;
+
+  if (!Number.isFinite(input.installationId)) {
+    return { ok: false, error: "Installation id must be a number." };
+  }
+
+  const { error } = await gate.supabase.from("github_installations").upsert(
+    {
+      organization_id: input.organizationId,
+      installation_id: input.installationId,
+      account_login: input.accountLogin?.trim() || "github",
+      account_type: input.accountType ?? "Organization",
+      created_by: gate.user.id,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "installation_id" },
+  );
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/app", "layout");
+  return { ok: true, data: { installationId: input.installationId } };
+}

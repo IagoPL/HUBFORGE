@@ -2,8 +2,8 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { AlertTriangle, CornerDownRight, Inbox, RotateCcw } from "lucide-react";
-import type { OperationsTask } from "@/data/demo-operations";
-import { memberById } from "@/data/demo-operations";
+import type { OperationsTask } from "@/lib/operations";
+import { memberById } from "@/lib/operations";
 import type { Locale } from "@/i18n/config";
 import type { Member, TaskStatus } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";

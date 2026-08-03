@@ -3,7 +3,7 @@ import { getPublicSupabaseConfig } from "@/lib/supabase/config";
 
 /**
  * Browser Supabase client.
- * Returns null when env is not configured so the demo UI can still render.
+ * Returns null when env is not configured.
  */
 export function createSupabaseBrowserClient() {
   const config = getPublicSupabaseConfig();
