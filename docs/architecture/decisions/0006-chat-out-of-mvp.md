@@ -20,3 +20,10 @@ HubForge se reposiciona como capa de interpretación operativa sobre GitHub para
 - Menos superficie que mantener en el camino crítico.
 - ADR 0001 y 0004 siguen históricos; esta decisión corrige el alcance de producto.
 - Hay que actualizar copy, tests e IA que asuman chat como capacidad MVP.
+
+## Soft-retire en la aplicación
+
+- `/app/chat` redirige a `/app?notice=chat-retired` (sin bucle).
+- El briefing puede mostrar un aviso no intrusivo cuando llega ese parámetro.
+- El chat no aparece en rail, overflow móvil, command palette, landing ni onboarding.
+- Tablas, triggers, migraciones e historial de chat **no** se eliminan en esta fase.
