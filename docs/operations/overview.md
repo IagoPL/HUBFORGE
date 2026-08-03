@@ -12,6 +12,10 @@
 
 Store only in environment providers (Vercel/Supabase/GitHub Actions). Never in Git.
 
-## Observability (later)
+## Observability
 
-Add structured server logs without private message content or tokens.
+Optional Sentry — see [error-tracking.md](./error-tracking.md).
+
+## Packaging
+
+Free-tier org/project/member caps — see [packaging-limits.md](./packaging-limits.md). Billing is deferred until prices are decided.

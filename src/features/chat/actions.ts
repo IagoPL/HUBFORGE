@@ -56,6 +56,69 @@ export async function listChannelsAction(
   };
 }
 
+function peerIdFromDirectName(channelName: string, userId: string) {
+  const [left, right] = channelName.split(":");
+  if (!left || !right) return null;
+  if (left === userId) return right;
+  if (right === userId) return left;
+  return null;
+}
+
+export async function listDirectChannelsAction(
+  organizationId: string,
+): Promise<ActionResult<ChatChannel[]>> {
+  const gate = await requireLive();
+  if (!gate.ok) return gate;
+
+  const { data, error } = await gate.supabase
+    .from("chat_channels")
+    .select("id, organization_id, project_id, kind, name")
+    .eq("organization_id", organizationId)
+    .eq("kind", "direct")
+    .order("created_at", { ascending: false });
+
+  if (error) return { ok: false, error: error.message };
+
+  const peerIds = [
+    ...new Set(
+      (data ?? [])
+        .map((row) => peerIdFromDirectName(row.name, gate.user.id))
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ];
+
+  const profiles = peerIds.length
+    ? await gate.supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", peerIds)
+    : { data: [], error: null };
+
+  if (profiles.error) return { ok: false, error: profiles.error.message };
+
+  const byId = new Map((profiles.data ?? []).map((row) => [row.id, row]));
+
+  return {
+    ok: true,
+    data: (data ?? []).map((row) => {
+      const peerId = peerIdFromDirectName(row.name, gate.user.id);
+      const profile = peerId ? byId.get(peerId) : null;
+      const label =
+        profile?.full_name?.trim() ||
+        profile?.email?.trim() ||
+        (peerId ? peerId.slice(0, 8) : row.name);
+
+      return {
+        id: row.id,
+        organizationId: row.organization_id,
+        projectId: row.project_id,
+        kind: "direct" as const,
+        name: label,
+      };
+    }),
+  };
+}
+
 export async function ensureProjectGeneralChannelAction(input: {
   projectId: string;
   organizationId: string;
@@ -199,14 +262,22 @@ export async function createDirectChannelAction(input: {
   const gate = await requireLive();
   if (!gate.ok) return gate;
 
+  const otherUserId = input.otherUserId.trim();
+  if (!otherUserId) return { ok: false, error: "Pick a teammate." };
+  if (otherUserId === gate.user.id) {
+    return { ok: false, error: "Cannot message yourself." };
+  }
+
   const { data, error } = await gate.supabase.rpc("create_direct_chat", {
     org_id: input.organizationId,
-    other_user_id: input.otherUserId,
+    other_user_id: otherUserId,
   });
 
   if (error || !data) {
     return { ok: false, error: error?.message ?? "Could not create DM." };
   }
+
+  const label = input.otherUserName.trim() || otherUserId.slice(0, 8);
 
   return {
     ok: true,
@@ -215,7 +286,7 @@ export async function createDirectChannelAction(input: {
       organizationId: input.organizationId,
       projectId: null,
       kind: "direct",
-      name: input.otherUserName,
+      name: label,
     },
   };
 }

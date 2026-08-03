@@ -19,6 +19,17 @@ export default async function ProjectsPage() {
         name: t.projects.name,
         description: t.projects.description,
         emptyHint: t.projects.emptyHint,
+        limitReached: t.projects.limitReached,
+        archive: t.projects.archive,
+        unarchive: t.projects.unarchive,
+        delete: t.projects.delete,
+        confirmDelete: t.projects.confirmDelete,
+        confirmDeleteAction: t.projects.confirmDeleteAction,
+        cancel: t.projects.cancel,
+        statusActive: t.projects.statusActive,
+        statusPaused: t.projects.statusPaused,
+        statusArchived: t.projects.statusArchived,
+        packaging: t.packaging,
       }}
     />
   );

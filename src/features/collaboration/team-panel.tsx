@@ -13,7 +13,10 @@ import {
 } from "@/features/collaboration/actions";
 import type { Invitation } from "@/features/collaboration/mapping";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
+import { UsagePanel } from "@/features/packaging/usage-panel";
+import { usePackagingUsage } from "@/features/packaging/use-packaging-usage";
 import { memberRoleSchema, type AccessRole, type Member } from "@/lib/domain/types";
+import { atMemberLimit } from "@/lib/packaging/limits";
 import { cn } from "@/lib/utils";
 
 const accessLabels: Record<AccessRole, string> = {
@@ -44,6 +47,15 @@ export function TeamPanel({
     emailNotDelivered: string;
     removeMember: string;
     revokeInvite: string;
+    limitReached: string;
+    packaging: {
+      title: string;
+      plan: string;
+      organizations: string;
+      projects: string;
+      members: string;
+      ofLimit: string;
+    };
   };
 }) {
   const { activeOrganization } = useWorkspace();
@@ -57,6 +69,11 @@ export function TeamPanel({
   const [email, setEmail] = useState("");
   const [accessRole, setAccessRole] = useState<AccessRole>("member");
   const [functionalRole, setFunctionalRole] = useState("");
+  const usage = usePackagingUsage(
+    organizationId || null,
+    members.length + invitations.length,
+  );
+  const limited = usage ? atMemberLimit(usage) : false;
 
   useEffect(() => {
     if (!organizationId) return;
@@ -83,7 +100,7 @@ export function TeamPanel({
   const roleOptions = memberRoleSchema.options;
 
   function invite() {
-    if (!organizationId || !email.trim()) return;
+    if (!organizationId || !email.trim() || limited) return;
     setError(null);
     setInviteUrl(null);
     setInviteNotice(null);
@@ -145,6 +162,8 @@ export function TeamPanel({
     <div className="grid gap-5 px-4 py-5 sm:px-6">
       <p className="lead">{labels.subtitle}</p>
 
+      {usage ? <UsagePanel usage={usage} labels={labels.packaging} /> : null}
+
       {error ? (
         <p role="alert" className="t-body-sm text-[var(--hf-error)]">
           {error}
@@ -171,7 +190,7 @@ export function TeamPanel({
             onChange={(event) => setEmail(event.target.value)}
             className="input"
             required
-            disabled={pending || !organizationId}
+            disabled={pending || !organizationId || limited}
           />
         </label>
         <label className="grid gap-1.5">
@@ -182,7 +201,7 @@ export function TeamPanel({
             value={accessRole}
             onChange={(event) => setAccessRole(event.target.value as AccessRole)}
             className="input"
-            disabled={pending || !organizationId}
+            disabled={pending || !organizationId || limited}
           >
             {roleOptions.map((role) => (
               <option key={role} value={role}>
@@ -199,12 +218,17 @@ export function TeamPanel({
             value={functionalRole}
             onChange={(event) => setFunctionalRole(event.target.value)}
             className="input"
-            disabled={pending || !organizationId}
+            disabled={pending || !organizationId || limited}
           />
         </label>
+        {limited ? (
+          <p role="status" className="t-body-sm text-[var(--hf-ink-muted)] md:col-span-2">
+            {labels.limitReached}
+          </p>
+        ) : null}
         <Button
           type="submit"
-          disabled={pending || !organizationId}
+          disabled={pending || !organizationId || limited}
           className="justify-self-start md:col-span-2"
         >
           {labels.invite}

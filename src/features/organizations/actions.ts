@@ -11,7 +11,10 @@ import {
   type ProjectRow,
 } from "@/features/organizations/workspace-mapping";
 import { slugify } from "@/features/organizations/workspace-state";
-import type { Organization, Project } from "@/lib/domain/types";
+import { projectSchema, type Organization, type Project } from "@/lib/domain/types";
+import { getPackagingLimits } from "@/lib/packaging/limits";
+
+const projectStatusSchema = projectSchema.shape.status;
 
 export type WorkspaceActionResult<T> =
   { ok: true; data: T } | { ok: false; error: string };
@@ -38,6 +41,21 @@ export async function createOrganizationAction(
 
   const name = nameInput.trim();
   if (!name) return { ok: false, error: "Organization name is required." };
+
+  const limits = getPackagingLimits();
+  const { count: ownedOrgs, error: countError } = await gate.supabase
+    .from("organization_members")
+    .select("organization_id", { count: "exact", head: true })
+    .eq("user_id", gate.user.id)
+    .eq("access_role", "organization_owner");
+
+  if (countError) return { ok: false, error: countError.message };
+  if ((ownedOrgs ?? 0) >= limits.organizationsPerUser) {
+    return {
+      ok: false,
+      error: `Organization limit reached (${limits.organizationsPerUser}).`,
+    };
+  }
 
   const baseSlug = slugify(name) || `org-${Date.now()}`;
   const { data: existing } = await gate.supabase.from("organizations").select("slug");
@@ -77,6 +95,21 @@ export async function createProjectAction(input: {
   if (!name) return { ok: false, error: "Project name is required." };
   if (!organizationId) return { ok: false, error: "Pick an organization first." };
 
+  const limits = getPackagingLimits();
+  const { count: projectCount, error: projectCountError } = await gate.supabase
+    .from("projects")
+    .select("id", { count: "exact", head: true })
+    .eq("organization_id", organizationId)
+    .neq("status", "archived");
+
+  if (projectCountError) return { ok: false, error: projectCountError.message };
+  if ((projectCount ?? 0) >= limits.projectsPerOrganization) {
+    return {
+      ok: false,
+      error: `Project limit reached (${limits.projectsPerOrganization}).`,
+    };
+  }
+
   const baseSlug = slugify(name) || `project-${Date.now()}`;
   const { data: existing } = await gate.supabase
     .from("projects")
@@ -106,4 +139,72 @@ export async function createProjectAction(input: {
 
   revalidatePath("/app", "layout");
   return { ok: true, data: mapProjectRow(data as ProjectRow) };
+}
+
+export async function updateProjectStatusAction(input: {
+  projectId: string;
+  status: Project["status"];
+}): Promise<WorkspaceActionResult<Project>> {
+  const gate = await requireLiveClient();
+  if (!gate.ok) return { ok: false, error: gate.error };
+
+  const projectId = input.projectId.trim();
+  if (!projectId) return { ok: false, error: "Project is required." };
+
+  const status = projectStatusSchema.parse(input.status);
+
+  const { data, error } = await gate.supabase
+    .from("projects")
+    .update({ status })
+    .eq("id", projectId)
+    .select("id, organization_id, name, slug, description, status")
+    .single();
+
+  if (error || !data) {
+    return { ok: false, error: error?.message ?? "Could not update project." };
+  }
+
+  revalidatePath("/app", "layout");
+  return { ok: true, data: mapProjectRow(data as ProjectRow) };
+}
+
+export async function deleteProjectAction(
+  projectIdInput: string,
+): Promise<WorkspaceActionResult<{ id: string }>> {
+  const gate = await requireLiveClient();
+  if (!gate.ok) return { ok: false, error: gate.error };
+
+  const projectId = projectIdInput.trim();
+  if (!projectId) return { ok: false, error: "Project is required." };
+
+  const { error } = await gate.supabase.from("projects").delete().eq("id", projectId);
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath("/app", "layout");
+  return { ok: true, data: { id: projectId } };
+}
+
+export async function deleteOrganizationAction(
+  organizationIdInput: string,
+): Promise<WorkspaceActionResult<{ id: string }>> {
+  const gate = await requireLiveClient();
+  if (!gate.ok) return { ok: false, error: gate.error };
+
+  const organizationId = organizationIdInput.trim();
+  if (!organizationId) return { ok: false, error: "Organization is required." };
+
+  const { error } = await gate.supabase
+    .from("organizations")
+    .delete()
+    .eq("id", organizationId);
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath("/app", "layout");
+  return { ok: true, data: { id: organizationId } };
 }

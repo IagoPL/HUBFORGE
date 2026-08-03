@@ -3,71 +3,112 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
+  createDirectChannelAction,
   ensureProjectGeneralChannelAction,
   listChannelsAction,
+  listDirectChannelsAction,
   listMessagesAction,
   sendMessageAction,
   type ChatChannel,
   type ChatMessage,
 } from "@/features/chat/actions";
+import { listMembersAction } from "@/features/collaboration/actions";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
+import type { Member } from "@/lib/domain/types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 export function ChatPanel({
+  currentUserId,
   labels,
 }: {
+  currentUserId: string;
   labels: {
     title: string;
     subtitle: string;
     channels: string;
+    directMessages: string;
     messages: string;
     placeholder: string;
     send: string;
+    emptyOrganization: string;
     emptyProject: string;
     emptyMessages: string;
     liveHint: string;
+    startDm: string;
+    pickMember: string;
+    you: string;
   };
 }) {
   const { activeOrganization, activeProject } = useWorkspace();
   const projectId = activeProject?.id ?? "";
   const organizationId = activeOrganization?.id ?? "";
-  const [channels, setChannels] = useState<ChatChannel[]>([]);
+  const [projectChannels, setProjectChannels] = useState<ChatChannel[]>([]);
+  const [directChannels, setDirectChannels] = useState<ChatChannel[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [activeChannelId, setActiveChannelId] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
+  const [dmUserId, setDmUserId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  const channels = [...projectChannels, ...directChannels];
   const currentChannelId = activeChannelId || channels[0]?.id || "";
+  const currentChannel = channels.find((item) => item.id === currentChannelId);
+  const peers = members.filter((member) => member.id !== currentUserId);
 
   useEffect(() => {
-    if (!projectId || !organizationId) return;
+    if (!organizationId) return;
     let cancelled = false;
 
     startTransition(() => {
-      void ensureProjectGeneralChannelAction({ projectId, organizationId }).then(
-        async (ensured) => {
-          if (cancelled) return;
-          if (!ensured.ok) {
-            setError(ensured.error);
-            return;
-          }
-          const listed = await listChannelsAction(projectId);
-          if (cancelled) return;
-          if (!listed.ok) {
-            setError(listed.error);
-            return;
-          }
-          setChannels(listed.data);
-          const channelId = listed.data[0]?.id ?? ensured.data.id;
-          setActiveChannelId(channelId);
-          const messageResult = await listMessagesAction(channelId);
+      void Promise.all([
+        listDirectChannelsAction(organizationId),
+        listMembersAction(organizationId),
+        projectId
+          ? ensureProjectGeneralChannelAction({ projectId, organizationId }).then(
+              async (ensured) => {
+                if (!ensured.ok) return ensured;
+                return listChannelsAction(projectId);
+              },
+            )
+          : Promise.resolve({
+              ok: true as const,
+              data: [] as ChatChannel[],
+            }),
+      ]).then(([directResult, membersResult, projectResult]) => {
+        if (cancelled) return;
+        if (!directResult.ok) {
+          setError(directResult.error);
+          return;
+        }
+        if (!membersResult.ok) {
+          setError(membersResult.error);
+          return;
+        }
+        if (!projectResult.ok) {
+          setError(projectResult.error);
+          return;
+        }
+
+        setDirectChannels(directResult.data);
+        setMembers(membersResult.data);
+        setProjectChannels(projectResult.data);
+
+        const nextChannels = [...projectResult.data, ...directResult.data];
+        const channelId = nextChannels[0]?.id ?? "";
+        setActiveChannelId(channelId);
+        if (!channelId) {
+          setMessages([]);
+          return;
+        }
+        void listMessagesAction(channelId).then((messageResult) => {
           if (cancelled) return;
           if (messageResult.ok) setMessages(messageResult.data);
-        },
-      );
+        });
+      });
     });
 
     return () => {
@@ -135,6 +176,32 @@ export function ChatPanel({
     });
   }
 
+  function startDm() {
+    if (!organizationId || !dmUserId) return;
+    const peer = peers.find((member) => member.id === dmUserId);
+    if (!peer) return;
+    setError(null);
+
+    startTransition(() => {
+      void createDirectChannelAction({
+        organizationId,
+        otherUserId: peer.id,
+        otherUserName: peer.name,
+      }).then((result) => {
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        setDirectChannels((current) => {
+          if (current.some((item) => item.id === result.data.id)) return current;
+          return [result.data, ...current];
+        });
+        setDmUserId("");
+        selectChannel(result.data.id);
+      });
+    });
+  }
+
   function send() {
     if (!currentChannelId || !organizationId) return;
     const body = draft.trim();
@@ -161,16 +228,23 @@ export function ChatPanel({
     });
   }
 
-  if (!projectId) {
+  function authorLabel(authorId: string) {
+    if (authorId === currentUserId) return labels.you;
+    const member = members.find((item) => item.id === authorId);
+    return member?.name || authorId.slice(0, 8);
+  }
+
+  function channelLabel(channel: ChatChannel) {
+    return channel.kind === "direct" ? channel.name : `#${channel.name}`;
+  }
+
+  if (!organizationId) {
     return (
       <div className="px-4 py-5 sm:px-6">
-        <p className="lead">{labels.emptyProject}</p>
+        <p className="lead">{labels.emptyOrganization}</p>
       </div>
     );
   }
-
-  const currentChannelName =
-    channels.find((item) => item.id === currentChannelId)?.name ?? "general";
 
   return (
     <div className="grid gap-4 px-4 py-5 sm:px-6">
@@ -185,50 +259,120 @@ export function ChatPanel({
         </p>
       ) : null}
 
-      <div className="grid gap-3 lg:grid-cols-[13rem_1fr]">
-        <nav aria-label={labels.channels} className="panel p-2">
-          <p className="t-label px-2 py-1 text-[var(--hf-ink-faint)]">
-            {labels.channels}
-          </p>
-          <ul className="grid gap-0.5">
-            {channels.map((channel) => {
-              const active = channel.id === currentChannelId;
+      <div className="grid gap-3 lg:grid-cols-[14rem_1fr]">
+        <div className="grid gap-3 content-start">
+          <nav aria-label={labels.channels} className="panel p-2">
+            <p className="t-label px-2 py-1 text-[var(--hf-ink-faint)]">
+              {labels.channels}
+            </p>
+            {projectChannels.length === 0 ? (
+              <p className="t-body-sm px-2 py-1 text-[var(--hf-ink-muted)]">
+                {labels.emptyProject}
+              </p>
+            ) : (
+              <ul className="grid gap-0.5">
+                {projectChannels.map((channel) => {
+                  const active = channel.id === currentChannelId;
+                  return (
+                    <li key={channel.id}>
+                      <button
+                        type="button"
+                        onClick={() => selectChannel(channel.id)}
+                        aria-current={active ? "true" : undefined}
+                        className={cn(
+                          "t-mono relative flex min-h-9 w-full items-center rounded-[var(--radius-sm)]",
+                          "px-2 text-left transition-colors duration-[var(--motion-feedback)]",
+                          active
+                            ? "bg-[var(--hf-accent-quiet)] text-[var(--hf-accent-hover)]"
+                            : "text-[var(--hf-ink-muted)] hover:bg-[var(--hf-ground-3)] hover:text-[var(--hf-ink)]",
+                        )}
+                      >
+                        {channelLabel(channel)}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </nav>
 
-              return (
-                <li key={channel.id}>
-                  <button
-                    type="button"
-                    onClick={() => selectChannel(channel.id)}
-                    aria-current={active ? "true" : undefined}
-                    className={cn(
-                      "t-mono relative flex min-h-9 w-full items-center rounded-[var(--radius-sm)]",
-                      "px-2 text-left transition-colors duration-[var(--motion-feedback)]",
-                      active
-                        ? "bg-[var(--hf-accent-quiet)] text-[var(--hf-accent-hover)]"
-                        : "text-[var(--hf-ink-muted)] hover:bg-[var(--hf-ground-3)] hover:text-[var(--hf-ink)]",
-                    )}
-                  >
-                    #{channel.name}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+          <nav aria-label={labels.directMessages} className="panel p-2">
+            <p className="t-label px-2 py-1 text-[var(--hf-ink-faint)]">
+              {labels.directMessages}
+            </p>
+            <ul className="grid gap-0.5">
+              {directChannels.map((channel) => {
+                const active = channel.id === currentChannelId;
+                return (
+                  <li key={channel.id}>
+                    <button
+                      type="button"
+                      onClick={() => selectChannel(channel.id)}
+                      aria-current={active ? "true" : undefined}
+                      className={cn(
+                        "t-body relative flex min-h-9 w-full items-center rounded-[var(--radius-sm)]",
+                        "px-2 text-left transition-colors duration-[var(--motion-feedback)]",
+                        active
+                          ? "bg-[var(--hf-accent-quiet)] text-[var(--hf-accent-hover)]"
+                          : "text-[var(--hf-ink-muted)] hover:bg-[var(--hf-ground-3)] hover:text-[var(--hf-ink)]",
+                      )}
+                    >
+                      {channelLabel(channel)}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <form
+              className="mt-2 grid gap-2 border-t border-[var(--hf-rule-faint)] px-1 pt-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                startDm();
+              }}
+            >
+              <label className="grid gap-1">
+                <span className="sr-only">{labels.pickMember}</span>
+                <select
+                  value={dmUserId}
+                  onChange={(event) => setDmUserId(event.target.value)}
+                  className="input"
+                  disabled={pending || peers.length === 0}
+                >
+                  <option value="">{labels.pickMember}</option>
+                  {peers.map((member) => (
+                    <option key={member.id} value={member.id}>
+                      {member.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={pending || !dmUserId}
+                className="justify-self-start"
+              >
+                {labels.startDm}
+              </Button>
+            </form>
+          </nav>
+        </div>
 
         <section
-          aria-label={currentChannelName}
+          aria-label={currentChannel ? channelLabel(currentChannel) : labels.messages}
           className="panel flex min-h-[28rem] flex-col"
         >
           <div className="flex items-baseline gap-3 border-b border-[var(--hf-rule)] px-4 py-2.5">
             <p className="t-mono font-medium text-[var(--hf-ink)]">
-              #{currentChannelName}
+              {currentChannel ? channelLabel(currentChannel) : "—"}
             </p>
             <p className="t-body-sm text-[var(--hf-ink-faint)]">{labels.messages}</p>
           </div>
 
           <div className="flex-1 overflow-y-auto bg-[var(--hf-ground-1)] px-4 py-3">
-            {messages.length === 0 ? (
+            {!currentChannelId ? (
+              <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyMessages}</p>
+            ) : messages.length === 0 ? (
               <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyMessages}</p>
             ) : (
               <ol className="grid gap-3">
@@ -237,7 +381,7 @@ export function ChatPanel({
                     <article className="border-l border-[var(--hf-rule)] pl-3">
                       <div className="flex flex-wrap items-baseline gap-2">
                         <span className="t-mono-sm font-medium text-[var(--hf-ink)]">
-                          {message.authorId.slice(0, 8)}
+                          {authorLabel(message.authorId)}
                         </span>
                         <time
                           dateTime={message.createdAt}
