@@ -315,13 +315,18 @@ export const es = {
   chat: {
     title: "Chat",
     subtitle:
-      "Los canales de proyecto mantienen las decisiones junto al trabajo. Solo texto plano.",
+      "Canales de proyecto y mensajes directos mantienen las decisiones junto al trabajo.",
     channels: "Canales",
+    directMessages: "Mensajes directos",
     messages: "Mensajes",
     placeholder: "Escribe un mensaje",
     send: "Enviar",
-    emptyProject: "Selecciona o crea un proyecto antes de abrir el chat.",
+    emptyOrganization: "Selecciona o crea una organización antes de abrir el chat.",
+    emptyProject: "Selecciona un proyecto para abrir sus canales.",
     emptyMessages: "Todavía no hay mensajes. Saluda al equipo.",
     liveHint: "Con sesión iniciada, el chat usa Supabase Realtime para mensajes nuevos.",
+    startDm: "Mensaje",
+    pickMember: "Elige a un compañero",
+    you: "Tú",
   },
 } as const satisfies Dictionary;

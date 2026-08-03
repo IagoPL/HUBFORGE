@@ -316,15 +316,19 @@ export const en = {
   },
   chat: {
     title: "Chat",
-    subtitle:
-      "Project channels keep decisions next to the work. Messages are plain text.",
+    subtitle: "Project channels and direct messages keep decisions next to the work.",
     channels: "Channels",
+    directMessages: "Direct messages",
     messages: "Messages",
     placeholder: "Write a message",
     send: "Send",
-    emptyProject: "Select or create a project before opening chat.",
+    emptyOrganization: "Select or create an organization before opening chat.",
+    emptyProject: "Select a project to open its channels.",
     emptyMessages: "No messages yet. Say hello to the team.",
     liveHint: "Signed-in chat uses Supabase Realtime for new messages.",
+    startDm: "Message",
+    pickMember: "Pick a teammate",
+    you: "You",
   },
 } as const satisfies MessageTree;
 
