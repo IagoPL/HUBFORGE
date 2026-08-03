@@ -32,6 +32,14 @@ export const es = {
     chat: "Chat",
     more: "Más",
     skipToContent: "Ir al contenido",
+    commandPalette: "Paleta de comandos",
+    commandPlaceholder: "Ir a una página o cambiar densidad…",
+    commandNavigate: "Navegar",
+    commandPreferences: "Preferencias",
+    densityComfortable: "Densidad: Cómoda",
+    densityCompact: "Densidad: Compacta",
+    commandEmpty: "Sin coincidencias.",
+    commandOpenHint: "Ctrl/⌘ K · ↑↓ · Enter",
   },
   landing: {
     headline: "Construid juntos sin perder el contexto.",
@@ -308,9 +316,13 @@ export const es = {
     syncedCommits: "Commits sincronizados",
     recentActivity: "Actividad reciente",
     setupHint:
-      "Configura las variables de la GitHub App y apunta los webhooks a /api/github/webhooks.",
+      "Configura las variables de la GitHub App y apunta los webhooks a /api/github/webhooks. Tras vincular con un ID de instalación, HubForge puede importar issues, PRs y commits recientes.",
     install: "Instalar la GitHub App",
     repoFormat: "Usa el formato propietario/repositorio.",
+    syncNow: "Sincronizar ahora",
+    syncSuccess: "Sincronizado desde GitHub.",
+    emptyActivity:
+      "Aún no hay actividad sincronizada. Vincula un repo con ID de instalación y sincroniza.",
   },
   chat: {
     title: "Chat",

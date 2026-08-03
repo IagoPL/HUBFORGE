@@ -18,26 +18,11 @@ export type WorkspaceState = z.infer<typeof workspaceStateSchema>;
 export const WORKSPACE_STORAGE_KEY = "hubforge.workspace.v1";
 
 export function createDefaultWorkspaceState(): WorkspaceState {
-  const organization = organizationSchema.parse({
-    id: "org_demo",
-    name: "Northlight Studio",
-    slug: "northlight",
-  });
-
-  const project = projectSchema.parse({
-    id: "proj_aurora",
-    organizationId: organization.id,
-    name: "Aurora Launch",
-    slug: "aurora-launch",
-    description: "Ship the collaborative workspace MVP with clear ownership.",
-    status: "active",
-  });
-
   return {
-    organizations: [organization],
-    projects: [project],
-    activeOrganizationId: organization.id,
-    activeProjectId: project.id,
+    organizations: [],
+    projects: [],
+    activeOrganizationId: "",
+    activeProjectId: "",
   };
 }
 

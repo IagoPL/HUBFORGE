@@ -14,7 +14,7 @@ HubForge centralizes planning, availability, responsibilities, communication, an
 
 ## Status
 
-**MVP code complete** — sign in with Supabase + GitHub OAuth; GitHub App sync requires additional env configuration.
+**MVP code complete** — free to use (soft abuse caps, no billing). Sign in needs Supabase + GitHub OAuth env; repository sync needs a GitHub App.
 
 | Area                                                                | Status                                      |
 | ------------------------------------------------------------------- | ------------------------------------------- |
@@ -23,8 +23,9 @@ HubForge centralizes planning, availability, responsibilities, communication, an
 | Members, access/functional roles, task board                        | Implemented                                 |
 | Availability calendar + internal notifications                      | Implemented                                 |
 | Project chat channels + Realtime messages                           | Implemented                                 |
-| GitHub App link, webhooks, issue sync                               | Implemented (requires App + env)            |
+| GitHub App link, webhooks, API backfill (issues/PRs/commits)        | Implemented (requires App + env)            |
 | GitHub OAuth via Supabase Auth                                      | Implemented (requires env + provider setup) |
+| Soft free-tier packaging limits                                     | Implemented (no Stripe)                     |
 | Quality tooling (lint, format, typecheck, vitest, playwright smoke) | Implemented                                 |
 | CI + branch protection on `main`                                    | Implemented                                 |
 
@@ -50,36 +51,45 @@ pnpm install
 pnpm dev
 ```
 
-Copy `.env.example` to `.env.local` when connecting Supabase Auth. Leave placeholders empty to run the visual demo.
+Copy `.env.example` to `.env.local` and fill Supabase (and optional GitHub App) values. Without Supabase configured, `/app` redirects to login — there is no offline demo workspace.
+
+```bash
+pnpm verify:env   # reports missing env flags (no secret values)
+```
+
+Production checklist: `docs/operations/production-checklist.md` (domain `hubforge-six.vercel.app`).
 
 - Auth: `docs/operations/supabase-auth-setup.md`
 - GitHub App sync: `docs/operations/github-app-setup.md`
+- Invite email (optional): `docs/operations/email-setup.md`
+- Soft limits: `docs/operations/packaging-limits.md`
 
 ### Scripts
 
-| Script                              | Purpose            |
-| ----------------------------------- | ------------------ |
-| `pnpm dev`                          | Local development  |
-| `pnpm lint`                         | ESLint             |
-| `pnpm format` / `pnpm format:check` | Prettier           |
-| `pnpm typecheck`                    | TypeScript         |
-| `pnpm test`                         | Unit tests         |
-| `pnpm test:e2e`                     | Playwright smoke   |
-| `pnpm build`                        | Production build   |
-| `pnpm verify:git-identity`          | Commit author gate |
+| Script                              | Purpose             |
+| ----------------------------------- | ------------------- |
+| `pnpm dev`                          | Local development   |
+| `pnpm lint`                         | ESLint              |
+| `pnpm format` / `pnpm format:check` | Prettier            |
+| `pnpm typecheck`                    | TypeScript          |
+| `pnpm test`                         | Unit tests          |
+| `pnpm test:e2e`                     | Playwright smoke    |
+| `pnpm build`                        | Production build    |
+| `pnpm verify:git-identity`          | Commit author gate  |
+| `pnpm verify:env`                   | Env readiness flags |
 
 ## Testing
 
-- Unit: domain schemas, GitHub helpers, workspace mapping
-- E2E smoke: landing, demo org/project/task/availability/GitHub/chat flows, axe gate on landing
+- Unit: domain schemas, GitHub helpers (webhooks, App JWT, backfill gates), workspace mapping
+- E2E smoke: landing, login CTA, i18n, legal pages, unauthenticated `/app` redirect, axe on landing
 
 ## Roadmap
 
-**Done (MVP):** auth wiring, orgs/projects, members/roles/tasks, availability/notifications, GitHub App sync foundation, chat Realtime.
+**Done (MVP):** auth wiring, orgs/projects, members/roles/tasks, availability/notifications, GitHub App webhooks + API backfill, chat Realtime, free soft limits.
 
-**Next (ops / polish):** configure live OAuth + GitHub App, optional Vercel demo, Dependabot majors.
+**Next (ops):** configure live OAuth + GitHub App, optional Vercel deployment.
 
-**Post-MVP:** AI assistant, sprints/analytics, PWA/push, richer chat.
+**Post-MVP:** AI assistant, sprints/analytics, PWA/push, richer chat. Billing remains deferred while the product stays free.
 
 ## Security
 

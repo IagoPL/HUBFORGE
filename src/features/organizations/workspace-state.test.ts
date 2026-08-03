@@ -12,10 +12,12 @@ describe("workspace-state", () => {
     expect(slugify("Northlight Studio")).toBe("northlight-studio");
   });
 
-  it("creates organizations and projects under the active org", () => {
+  it("starts empty and creates organizations and projects under the active org", () => {
     let state = createDefaultWorkspaceState();
+    expect(state.organizations).toHaveLength(0);
+
     state = createOrganization(state, { name: "Coyote Labs" });
-    expect(state.organizations).toHaveLength(2);
+    expect(state.organizations).toHaveLength(1);
     expect(state.activeOrganizationId).toBe(state.organizations.at(-1)?.id);
 
     state = createProject(state, {

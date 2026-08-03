@@ -45,15 +45,20 @@ function getServerSnapshot(): Density {
   return "comfortable";
 }
 
-function setDensity(next: Density) {
+export function setDensity(next: Density) {
+  ensureHydrated();
   currentDensity = next;
   document.documentElement.dataset.density = next;
   window.localStorage.setItem(KEY, next);
   for (const listener of listeners) listener();
 }
 
+export function useDensity() {
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
 export function DensityToggle() {
-  const density = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const density = useDensity();
 
   return (
     <div

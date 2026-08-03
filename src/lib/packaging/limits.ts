@@ -1,6 +1,6 @@
 /**
- * Soft packaging limits for the free tier.
- * Override with env until paid plans / Stripe exist (prices still undecided).
+ * Soft packaging limits while HubForge stays free.
+ * Override with env; caps are abuse guards only (no billing).
  */
 
 function positiveInt(value: string | undefined, fallback: number) {

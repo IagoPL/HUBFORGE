@@ -34,6 +34,9 @@ export default async function GitHubPage() {
         setupHint: t.github.setupHint,
         install: t.github.install,
         repoFormat: t.github.repoFormat,
+        syncNow: t.github.syncNow,
+        syncSuccess: t.github.syncSuccess,
+        emptyActivity: t.github.emptyActivity,
       }}
     />
   );

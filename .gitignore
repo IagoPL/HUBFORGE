@@ -48,6 +48,12 @@ next-env.d.ts
 supabase/.temp
 supabase/.branches
 
+# Local one-off audit / history rebuild helpers (do not publish)
+.audit-*.mjs
+.git-bundles/
+scripts/rebuild-feature-branches.mjs
+scripts/rebuild-redated-history.mjs
+
 # AI / agent configuration (local only — do not publish)
 AGENTS.md
 .cursor/
