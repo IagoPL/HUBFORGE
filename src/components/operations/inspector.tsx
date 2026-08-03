@@ -60,20 +60,12 @@ export function Inspector({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
+  // Parent remounts this layer with `key={task.id}` when selection changes.
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
   const [priority, setPriority] = useState(task.priority);
   const [assigneeId, setAssigneeId] = useState(task.assigneeIds[0] ?? "");
   const [dependsOnTaskId, setDependsOnTaskId] = useState(task.dependsOn[0] ?? "");
-
-  useEffect(() => {
-    setTitle(task.title);
-    setDescription(task.description);
-    setPriority(task.priority);
-    setAssigneeId(task.assigneeIds[0] ?? "");
-    setDependsOnTaskId(task.dependsOn[0] ?? "");
-    setError(null);
-  }, [task]);
 
   const upstream = tasks.filter((candidate) => task.dependsOn.includes(candidate.id));
   const downstream = tasks.filter((candidate) => task.blocks.includes(candidate.id));

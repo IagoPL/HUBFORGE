@@ -79,8 +79,8 @@ export function WorkSurface({
   const [view, setView] = useState<ViewMode>("list");
 
   const loaded = !projectId || live?.projectId === projectId;
-  const tasks = live?.tasks ?? [];
-  const members = live?.members ?? [];
+  const tasks = useMemo(() => live?.tasks ?? [], [live]);
+  const members = useMemo(() => live?.members ?? [], [live]);
   const now = new Date().toISOString();
 
   useEffect(() => {
