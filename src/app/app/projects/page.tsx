@@ -19,6 +19,8 @@ export default async function ProjectsPage() {
         name: t.projects.name,
         description: t.projects.description,
         emptyHint: t.projects.emptyHint,
+        limitReached: t.projects.limitReached,
+        packaging: t.packaging,
       }}
     />
   );

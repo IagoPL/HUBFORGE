@@ -12,6 +12,7 @@ import {
 } from "@/features/organizations/workspace-mapping";
 import { slugify } from "@/features/organizations/workspace-state";
 import type { Organization, Project } from "@/lib/domain/types";
+import { getPackagingLimits } from "@/lib/packaging/limits";
 
 export type WorkspaceActionResult<T> =
   { ok: true; data: T } | { ok: false; error: string };
@@ -38,6 +39,21 @@ export async function createOrganizationAction(
 
   const name = nameInput.trim();
   if (!name) return { ok: false, error: "Organization name is required." };
+
+  const limits = getPackagingLimits();
+  const { count: ownedOrgs, error: countError } = await gate.supabase
+    .from("organization_members")
+    .select("organization_id", { count: "exact", head: true })
+    .eq("user_id", gate.user.id)
+    .eq("access_role", "organization_owner");
+
+  if (countError) return { ok: false, error: countError.message };
+  if ((ownedOrgs ?? 0) >= limits.organizationsPerUser) {
+    return {
+      ok: false,
+      error: `Organization limit reached (${limits.organizationsPerUser}).`,
+    };
+  }
 
   const baseSlug = slugify(name) || `org-${Date.now()}`;
   const { data: existing } = await gate.supabase.from("organizations").select("slug");
@@ -76,6 +92,20 @@ export async function createProjectAction(input: {
   const organizationId = input.organizationId.trim();
   if (!name) return { ok: false, error: "Project name is required." };
   if (!organizationId) return { ok: false, error: "Pick an organization first." };
+
+  const limits = getPackagingLimits();
+  const { count: projectCount, error: projectCountError } = await gate.supabase
+    .from("projects")
+    .select("id", { count: "exact", head: true })
+    .eq("organization_id", organizationId);
+
+  if (projectCountError) return { ok: false, error: projectCountError.message };
+  if ((projectCount ?? 0) >= limits.projectsPerOrganization) {
+    return {
+      ok: false,
+      error: `Project limit reached (${limits.projectsPerOrganization}).`,
+    };
+  }
 
   const baseSlug = slugify(name) || `project-${Date.now()}`;
   const { data: existing } = await gate.supabase

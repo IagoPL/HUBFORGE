@@ -27,6 +27,8 @@ export default async function TeamPage() {
         emailNotDelivered: t.team.emailNotDelivered,
         removeMember: t.team.removeMember,
         revokeInvite: t.team.revokeInvite,
+        limitReached: t.team.limitReached,
+        packaging: t.packaging,
       }}
     />
   );

@@ -183,6 +183,7 @@ export const es = {
     name: "Nombre del proyecto",
     description: "Descripción",
     emptyHint: "Crea tu primer proyecto para empezar a planificar el trabajo.",
+    limitReached: "Se alcanzó el límite de proyectos de esta organización.",
   },
   organizations: {
     title: "Organizaciones",
@@ -193,6 +194,15 @@ export const es = {
       "Las organizaciones son el tenant superior para proyectos, miembros y permisos.",
     current: "Organización actual",
     liveHint: "Con sesión iniciada, el espacio se guarda en Supabase con RLS.",
+    limitReached: "Se alcanzó el límite de organizaciones de este plan.",
+  },
+  packaging: {
+    title: "Uso del plan",
+    plan: "Plan gratuito",
+    organizations: "Organizaciones de las que eres propietario",
+    projects: "Proyectos en esta organización",
+    members: "Miembros e invitaciones pendientes",
+    ofLimit: "{used} / {max}",
   },
   onboarding: {
     title: "Configura tu espacio",
@@ -235,6 +245,7 @@ export const es = {
     emailNotDelivered: "No se entregó el correo. Copia el enlace de invitación.",
     removeMember: "Quitar",
     revokeInvite: "Revocar",
+    limitReached: "Se alcanzó el límite de miembros de esta organización.",
   },
   tasks: {
     title: "Tareas",
