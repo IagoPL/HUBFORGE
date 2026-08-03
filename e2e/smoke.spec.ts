@@ -8,7 +8,10 @@ test.describe("smoke", () => {
       "Build together without losing context",
     );
     await expect(
-      page.getByRole("link", { name: /Sign in|Iniciar sesión/i }),
+      page
+        .getByRole("main")
+        .getByRole("link", { name: /Sign in|Iniciar sesión/i })
+        .first(),
     ).toBeVisible();
   });
 
