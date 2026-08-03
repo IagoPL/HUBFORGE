@@ -1,8 +1,8 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import type { AttentionItem } from "@/data/demo-operations";
-import { memberById } from "@/data/demo-operations";
+import type { AttentionItem } from "@/lib/operations";
+import { memberById } from "@/lib/operations";
 import type { Locale } from "@/i18n/config";
 import type { Member } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";

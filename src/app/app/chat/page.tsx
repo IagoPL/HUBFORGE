@@ -20,7 +20,6 @@ export default async function ChatPage() {
         send: t.chat.send,
         emptyProject: t.chat.emptyProject,
         emptyMessages: t.chat.emptyMessages,
-        demoHint: t.chat.demoHint,
         liveHint: t.chat.liveHint,
       }}
     />

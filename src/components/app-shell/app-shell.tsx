@@ -26,9 +26,6 @@ import { cn } from "@/lib/utils";
 type ShellLabels = {
   brand: string;
   organization: string;
-  demoWorkspace: string;
-  liveWorkspace: string;
-  mockData: string;
   language: string;
   english: string;
   spanish: string;
@@ -73,7 +70,7 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { mode, activeOrganization, activeProject } = useWorkspace();
+  const { activeOrganization, activeProject } = useWorkspace();
   const moreRef = useRef<HTMLDialogElement>(null);
 
   const destinations: Destination[] = [
@@ -230,9 +227,6 @@ export function AppShell({
           <h1 className="t-display text-[var(--hf-ink)]">
             {current?.label ?? labels.brand}
           </h1>
-          <p className="t-mono-sm text-[var(--hf-ink-faint)]" data-tabular>
-            {mode === "demo" ? labels.demoWorkspace : labels.liveWorkspace}
-          </p>
         </div>
       </header>
 

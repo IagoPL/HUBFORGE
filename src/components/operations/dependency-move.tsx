@@ -2,8 +2,8 @@
 
 import { CornerDownRight, Move } from "lucide-react";
 import { useRef, useState } from "react";
-import type { OperationsTask } from "@/data/demo-operations";
-import { STATUS_ORDER } from "@/data/demo-operations";
+import type { OperationsTask } from "@/lib/operations";
+import { STATUS_ORDER } from "@/lib/operations";
 import type { TaskStatus } from "@/lib/domain/types";
 import { cn, fill } from "@/lib/utils";
 import { plural, statusLabel, type OperationsLabels, type WorkLabels } from "./labels";

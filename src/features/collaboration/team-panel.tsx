@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   inviteMemberAction,
   listInvitationsAction,
   listMembersAction,
+  removeMemberAction,
+  revokeInvitationAction,
   updateMemberRolesAction,
 } from "@/features/collaboration/actions";
 import type { Invitation } from "@/features/collaboration/mapping";
-import { initialsFromName } from "@/features/collaboration/mapping";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
-import { getDemoWorkspace } from "@/data/demo-workspace";
 import { memberRoleSchema, type AccessRole, type Member } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
@@ -24,29 +24,6 @@ const accessLabels: Record<AccessRole, string> = {
   member: "Member",
   guest: "Guest",
 };
-
-const DEMO_MEMBERS_KEY = "hubforge.demo.members.v1";
-
-function loadDemoMembers(organizationId: string): Member[] {
-  const seed = getDemoWorkspace().members;
-  if (typeof window === "undefined") {
-    return organizationId === "org_demo" ? seed : [];
-  }
-  try {
-    const raw = window.localStorage.getItem(DEMO_MEMBERS_KEY);
-    if (!raw) return organizationId === "org_demo" ? seed : [];
-    const parsed = JSON.parse(raw) as Member[];
-    const filtered = parsed.filter((member) => member.organizationId === organizationId);
-    if (filtered.length > 0) return filtered;
-    return organizationId === "org_demo" ? seed : [];
-  } catch {
-    return organizationId === "org_demo" ? seed : [];
-  }
-}
-
-function saveDemoMembers(members: Member[]) {
-  window.localStorage.setItem(DEMO_MEMBERS_KEY, JSON.stringify(members));
-}
 
 export function TeamPanel({
   labels,
@@ -65,12 +42,13 @@ export function TeamPanel({
     inviteSent: string;
     inviteLinkHint: string;
     emailNotDelivered: string;
+    removeMember: string;
+    revokeInvite: string;
   };
 }) {
-  const { mode, activeOrganization } = useWorkspace();
+  const { activeOrganization } = useWorkspace();
   const organizationId = activeOrganization?.id ?? "";
-  const [demoTick, setDemoTick] = useState(0);
-  const [draftMembers, setDraftMembers] = useState<Member[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [inviteNotice, setInviteNotice] = useState<string | null>(null);
@@ -80,16 +58,8 @@ export function TeamPanel({
   const [accessRole, setAccessRole] = useState<AccessRole>("member");
   const [functionalRole, setFunctionalRole] = useState("");
 
-  const demoMembers = useMemo(() => {
-    void demoTick;
-    if (mode !== "demo" || !organizationId) return [];
-    return loadDemoMembers(organizationId);
-  }, [mode, organizationId, demoTick]);
-
-  const members = mode === "demo" ? demoMembers : draftMembers;
-
   useEffect(() => {
-    if (mode !== "live" || !organizationId) return;
+    if (!organizationId) return;
 
     let cancelled = false;
     startTransition(() => {
@@ -99,7 +69,7 @@ export function TeamPanel({
       ]).then(([membersResult, invitesResult]) => {
         if (cancelled) return;
         if (membersResult.ok) {
-          setDraftMembers(membersResult.data);
+          setMembers(membersResult.data);
         } else setError(membersResult.error);
         if (invitesResult.ok) setInvitations(invitesResult.data);
       });
@@ -108,34 +78,15 @@ export function TeamPanel({
     return () => {
       cancelled = true;
     };
-  }, [mode, organizationId]);
+  }, [organizationId]);
 
-  const roleOptions = useMemo(() => memberRoleSchema.options, []);
+  const roleOptions = memberRoleSchema.options;
 
   function invite() {
     if (!organizationId || !email.trim()) return;
     setError(null);
     setInviteUrl(null);
     setInviteNotice(null);
-
-    if (mode === "demo") {
-      const name = email.split("@")[0] || "Member";
-      const member: Member = {
-        id: `mem_${crypto.randomUUID().slice(0, 8)}`,
-        organizationId,
-        name,
-        email: email.trim().toLowerCase(),
-        accessRole,
-        functionalRole: functionalRole.trim() || "Contributor",
-        avatarInitials: initialsFromName(name).slice(0, 3),
-        presence: "offline",
-      };
-      saveDemoMembers([...demoMembers, member]);
-      setDemoTick((value) => value + 1);
-      setEmail("");
-      setFunctionalRole("");
-      return;
-    }
 
     startTransition(() => {
       void inviteMemberAction({
@@ -149,7 +100,7 @@ export function TeamPanel({
           return;
         }
         if (result.data.member) {
-          setDraftMembers((current) => [...current, result.data.member!]);
+          setMembers((current) => [...current, result.data.member!]);
         } else {
           setInvitations((current) => [result.data.invitation, ...current]);
           setInviteUrl(result.data.inviteUrl);
@@ -164,26 +115,13 @@ export function TeamPanel({
   }
 
   function updateDraft(memberId: string, patch: Partial<Member>) {
-    if (mode === "demo") {
-      const next = demoMembers.map((item) =>
-        item.id === memberId ? { ...item, ...patch } : item,
-      );
-      saveDemoMembers(next);
-      setDemoTick((value) => value + 1);
-      return;
-    }
-    setDraftMembers((current) =>
+    setMembers((current) =>
       current.map((item) => (item.id === memberId ? { ...item, ...patch } : item)),
     );
   }
 
   function saveMember(member: Member) {
     setError(null);
-    if (mode === "demo") {
-      saveDemoMembers(demoMembers.map((item) => (item.id === member.id ? member : item)));
-      setDemoTick((value) => value + 1);
-      return;
-    }
 
     startTransition(() => {
       void updateMemberRolesAction({
@@ -196,7 +134,7 @@ export function TeamPanel({
           setError(result.error);
           return;
         }
-        setDraftMembers((current) =>
+        setMembers((current) =>
           current.map((item) => (item.id === result.data.id ? result.data : item)),
         );
       });
@@ -299,15 +237,42 @@ export function TeamPanel({
           <h2 className="t-display-sm text-[var(--hf-ink)]">{labels.pending}</h2>
           <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
             {invitations.map((invitation) => (
-              /* Dashed rule: drawn but not yet built. */
-              <li key={invitation.id} className="panel border-dashed p-4">
-                <p className="t-body font-medium text-[var(--hf-ink)]">
-                  {invitation.email}
-                </p>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  <Badge tone="brand">{accessLabels[invitation.accessRole]}</Badge>
-                  <Badge>{invitation.functionalRole || "Contributor"}</Badge>
+              <li key={invitation.id} className="panel grid gap-3 border-dashed p-4">
+                <div>
+                  <p className="t-body font-medium text-[var(--hf-ink)]">
+                    {invitation.email}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <Badge tone="brand">{accessLabels[invitation.accessRole]}</Badge>
+                    <Badge>{invitation.functionalRole || "Contributor"}</Badge>
+                  </div>
                 </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={pending}
+                  className="justify-self-start"
+                  onClick={() => {
+                    setError(null);
+                    startTransition(() => {
+                      void revokeInvitationAction({
+                        organizationId,
+                        invitationId: invitation.id,
+                      }).then((result) => {
+                        if (!result.ok) {
+                          setError(result.error);
+                          return;
+                        }
+                        setInvitations((current) =>
+                          current.filter((item) => item.id !== invitation.id),
+                        );
+                      });
+                    });
+                  }}
+                >
+                  {labels.revokeInvite}
+                </Button>
               </li>
             ))}
           </ul>
@@ -373,16 +338,42 @@ export function TeamPanel({
                   disabled={pending}
                 />
               </label>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                disabled={pending}
-                onClick={() => saveMember(member)}
-                className="justify-self-start"
-              >
-                {labels.saveRoles}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  disabled={pending}
+                  onClick={() => saveMember(member)}
+                >
+                  {labels.saveRoles}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={pending}
+                  onClick={() => {
+                    setError(null);
+                    startTransition(() => {
+                      void removeMemberAction({
+                        organizationId,
+                        userId: member.id,
+                      }).then((result) => {
+                        if (!result.ok) {
+                          setError(result.error);
+                          return;
+                        }
+                        setMembers((current) =>
+                          current.filter((item) => item.id !== member.id),
+                        );
+                      });
+                    });
+                  }}
+                >
+                  {labels.removeMember}
+                </Button>
+              </div>
             </li>
           ))}
         </ul>

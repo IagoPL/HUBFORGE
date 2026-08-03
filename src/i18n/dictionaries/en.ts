@@ -8,7 +8,6 @@ export const en = {
     signIn: "Sign in",
     openWorkspace: "Open workspace",
     open: "Open",
-    demoMode: "Demo mode",
     signOut: "Sign out",
     mockData: "Mock data",
     language: "Language",
@@ -40,8 +39,6 @@ export const en = {
     headline: "Build together without losing context.",
     subtitle:
       "HubForge connects planning, availability, responsibilities, and GitHub activity in one collaborative workspace for small technical and creative teams.",
-    enterDemo: "Enter demo workspace",
-    signInPreview: "Sign in preview",
     boardProject: "Aurora Launch",
     boardOrg: "Northlight Studio",
     ready: "Ready",
@@ -79,21 +76,17 @@ export const en = {
     securityTitle: "Built for trust between organizations",
     securityBody:
       "Multi-tenant boundaries, least privilege, and audit-ready actions are part of the product foundation—not a later patch.",
-    exploreDemo: "Explore the demo",
     footerTagline: "HubForge · collaborative project workspace",
-    footerStatus: "MVP · demo mode without credentials",
+    footerStatus: "MVP · sign in required",
   },
   login: {
     title: "Sign in",
     body: "Continue with GitHub through Supabase Auth. Sessions are cookie-based and refreshed by the Next.js proxy.",
     continueGithub: "Continue with GitHub",
-    enterDemo: "Enter demo workspace",
     configWarning:
       "Supabase is not configured yet. Add NEXT_PUBLIC_SUPABASE_URL and a publishable/anon key to .env.local, then enable the GitHub provider.",
   },
   app: {
-    demoWorkspace: "Demo workspace",
-    liveWorkspace: "Live workspace",
     openTasks: "Open tasks",
     members: "Members",
     unread: "Unread",
@@ -201,12 +194,11 @@ export const en = {
     subtitle:
       "Organizations are the top-level tenant for projects, members, and permissions.",
     current: "Current organization",
-    switchHint: "Demo mode stores organizations in this browser.",
     liveHint: "Signed-in workspaces persist in Supabase with RLS.",
   },
   onboarding: {
     title: "Set up your workspace",
-    body: "Create an organization, then a project. Demo mode uses local data until you sign in.",
+    body: "Create an organization, then a project, to start tracking work in your workspace.",
     stepOrg: "1. Organization",
     stepProject: "2. Project",
   },
@@ -242,6 +234,8 @@ export const en = {
     inviteSent: "Invitation sent.",
     inviteLinkHint: "Share this link if email delivery is unavailable.",
     emailNotDelivered: "Email was not delivered. Copy the invite link instead.",
+    removeMember: "Remove",
+    revokeInvite: "Revoke",
   },
   tasks: {
     title: "Tasks",
@@ -292,7 +286,6 @@ export const en = {
     recentActivity: "Recent activity",
     setupHint:
       "Configure the GitHub App env vars and point webhooks to /api/github/webhooks.",
-    demoHint: "Demo mode stores the linked repository in this browser.",
     install: "Install GitHub App",
     repoFormat: "Use the owner/repo format.",
   },
@@ -306,7 +299,6 @@ export const en = {
     send: "Send",
     emptyProject: "Select or create a project before opening chat.",
     emptyMessages: "No messages yet. Say hello to the team.",
-    demoHint: "Demo mode stores chat messages in this browser.",
     liveHint: "Signed-in chat uses Supabase Realtime for new messages.",
   },
 } as const satisfies MessageTree;

@@ -3,8 +3,8 @@
 import { motion, useReducedMotion } from "motion/react";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
-import type { OperationsTask } from "@/data/demo-operations";
-import { memberById } from "@/data/demo-operations";
+import type { OperationsTask } from "@/lib/operations";
+import { memberById } from "@/lib/operations";
 import type { Locale } from "@/i18n/config";
 import type { Member, Task } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";

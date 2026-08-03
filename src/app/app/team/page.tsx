@@ -25,6 +25,8 @@ export default async function TeamPage() {
         inviteSent: t.team.inviteSent,
         inviteLinkHint: t.team.inviteLinkHint,
         emailNotDelivered: t.team.emailNotDelivered,
+        removeMember: t.team.removeMember,
+        revokeInvite: t.team.revokeInvite,
       }}
     />
   );

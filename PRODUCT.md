@@ -52,7 +52,7 @@ Restricciones técnicas que el trabajo futuro debe preservar:
 
 - Next.js 16 App Router, React 19, TypeScript, Tailwind CSS v4 con una capa de tokens en variables CSS.
 - Supabase para autenticación y datos, con verificación de sesión en servidor y autorización multi-tenant; toda entidad de proyecto resuelve a una organización y un proyecto.
-- Monolito modular; los datos de demostración permanecen detrás del adaptador `getDemoWorkspace()`.
+- Monolito modular; los datos de workspace viven en Supabase con RLS.
 - `motion` v12 y las View Transitions de React 19 son las primitivas de animación disponibles. No hay ninguna librería de drag & drop instalada; esa elección queda deliberadamente abierta.
 - `lucide-react` es la infraestructura de iconos existente.
 - Internacionalizado en inglés y español; todo el texto de interfaz se resuelve a través de `src/i18n/dictionaries`.
@@ -78,7 +78,7 @@ No existen clientes públicos, ni testimonios, ni métricas de tracción, ni cas
 
 Donde no existan datos reales, la interfaz usa estados vacíos de alta calidad, ejemplos claramente etiquetados como demostración, o guías de onboarding. La confianza del usuario se gana mostrando un producto sólido, nunca insinuando tracción.
 
-Material real disponible: el adaptador de workspace de demostración en `src/data/demo-workspace.ts`, la actividad real del repositorio de GitHub, y la propia documentación del proyecto en `docs/`.
+Material real disponible: la actividad del repositorio de GitHub, y la propia documentación del proyecto en `docs/`.
 
 ## Product Principles
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { STATUS_ORDER, type OperationsTask } from "@/data/demo-operations";
+import { STATUS_ORDER, type OperationsTask } from "@/lib/operations";
 import type { Locale } from "@/i18n/config";
 import type { Member, TaskStatus } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";

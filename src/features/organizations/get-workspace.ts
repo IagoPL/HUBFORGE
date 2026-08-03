@@ -10,16 +10,14 @@ import {
 } from "@/features/organizations/workspace-mapping";
 import type { WorkspaceState } from "@/features/organizations/workspace-state";
 
-export type WorkspaceMode = "demo" | "live";
-
 export async function getWorkspaceSnapshot(prefs?: {
   preferredOrganizationId?: string | null;
   preferredProjectId?: string | null;
-}): Promise<{ mode: WorkspaceMode; state: WorkspaceState }> {
+}): Promise<WorkspaceState> {
   const user = await getCurrentUser();
   const supabase = user ? await createSupabaseServerClient() : null;
   if (!user || !supabase) {
-    return { mode: "demo", state: emptyWorkspaceState() };
+    return emptyWorkspaceState();
   }
 
   const [orgResult, projectResult] = await Promise.all([
@@ -34,7 +32,7 @@ export async function getWorkspaceSnapshot(prefs?: {
   ]);
 
   if (orgResult.error || projectResult.error) {
-    return { mode: "live", state: emptyWorkspaceState() };
+    return emptyWorkspaceState();
   }
 
   const organizations = ((orgResult.data ?? []) as OrganizationRow[]).map(
@@ -42,13 +40,10 @@ export async function getWorkspaceSnapshot(prefs?: {
   );
   const projects = ((projectResult.data ?? []) as ProjectRow[]).map(mapProjectRow);
 
-  return {
-    mode: "live",
-    state: buildWorkspaceState({
-      organizations,
-      projects,
-      preferredOrganizationId: prefs?.preferredOrganizationId,
-      preferredProjectId: prefs?.preferredProjectId,
-    }),
-  };
+  return buildWorkspaceState({
+    organizations,
+    projects,
+    preferredOrganizationId: prefs?.preferredOrganizationId,
+    preferredProjectId: prefs?.preferredProjectId,
+  });
 }

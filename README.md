@@ -14,7 +14,7 @@ HubForge centralizes planning, availability, responsibilities, communication, an
 
 ## Status
 
-**MVP code complete** — demo mode works without credentials; live mode needs Supabase + GitHub OAuth and (for sync) a GitHub App.
+**MVP code complete** — sign in with Supabase + GitHub OAuth; GitHub App sync requires additional env configuration.
 
 | Area                                                                | Status                                      |
 | ------------------------------------------------------------------- | ------------------------------------------- |
@@ -39,7 +39,7 @@ HubForge centralizes planning, availability, responsibilities, communication, an
 
 ## Architecture
 
-Modular monolith: one Next.js app with domain-oriented folders under `src/`. Demo data uses browser storage / `getDemoWorkspace()`; signed-in sessions use Supabase with RLS.
+Modular monolith: one Next.js app with domain-oriented folders under `src/`. Signed-in sessions use Supabase with RLS.
 
 See `docs/architecture/` for ADRs and boundaries. Product scope: `docs/product/mvp.md`.
 

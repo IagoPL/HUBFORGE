@@ -8,7 +8,15 @@ import { getPublicSupabaseConfig } from "@/lib/supabase/config";
  */
 export async function updateSession(request: NextRequest) {
   const config = getPublicSupabaseConfig();
+  const pathname = request.nextUrl.pathname;
+
   if (!config) {
+    if (pathname === "/app" || pathname.startsWith("/app/")) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.search = `?next=${encodeURIComponent(pathname)}`;
+      return NextResponse.redirect(loginUrl);
+    }
     return NextResponse.next({ request });
   }
 
@@ -34,11 +42,8 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // Validate JWT claims (do not trust getSession() alone for authz).
   const { data } = await supabase.auth.getClaims();
   const isAuthenticated = Boolean(data?.claims?.sub);
-  const pathname = request.nextUrl.pathname;
-  const wantsDemo = request.cookies.get("hf_demo")?.value === "1";
 
   if (pathname === "/login" && isAuthenticated) {
     const next = request.nextUrl.searchParams.get("next");
@@ -54,13 +59,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(appUrl);
   }
 
-  // Production / configured: /app is live-only. Anonymous visitors use /demo
-  // (sets hf_demo) instead of seeing fabricated workspace data as their own.
-  if (
-    pathname === "/app" ||
-    pathname.startsWith("/app/")
-  ) {
-    if (!isAuthenticated && !wantsDemo) {
+  if (pathname === "/app" || pathname.startsWith("/app/")) {
+    if (!isAuthenticated) {
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = "/login";
       loginUrl.search = `?next=${encodeURIComponent(pathname)}`;

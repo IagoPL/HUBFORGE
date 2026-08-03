@@ -15,12 +15,10 @@ export function OrganizationsPanel({
     create: string;
     name: string;
     current: string;
-    switchHint: string;
     liveHint: string;
   };
 }) {
   const {
-    mode,
     state,
     activeOrganization,
     addOrganization,
@@ -34,9 +32,7 @@ export function OrganizationsPanel({
     <div className="grid gap-5 px-4 py-5 sm:px-6">
       <div className="grid gap-1">
         <p className="lead">{labels.subtitle}</p>
-        <p className="t-body-sm text-[var(--hf-ink-faint)]">
-          {mode === "live" ? labels.liveHint : labels.switchHint}
-        </p>
+        <p className="t-body-sm text-[var(--hf-ink-faint)]">{labels.liveHint}</p>
       </div>
 
       <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">

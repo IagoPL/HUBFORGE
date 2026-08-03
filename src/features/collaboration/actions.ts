@@ -5,7 +5,7 @@ import {
   operationsTasksFromLive,
   type OperationsTask,
   type TaskEventRow,
-} from "@/data/demo-operations";
+} from "@/lib/operations";
 import { getCurrentUser } from "@/features/authentication/get-current-user";
 import {
   mapInvitationRow,
@@ -296,6 +296,47 @@ export async function updateMemberRolesAction(input: {
       profiles: profile,
     }),
   };
+}
+
+export async function removeMemberAction(input: {
+  organizationId: string;
+  userId: string;
+}): Promise<ActionResult<{ userId: string }>> {
+  const gate = await requireLive();
+  if (!gate.ok) return gate;
+
+  if (input.userId === gate.user.id) {
+    return { ok: false, error: "You cannot remove yourself from the organization." };
+  }
+
+  const { error } = await gate.supabase
+    .from("organization_members")
+    .delete()
+    .eq("organization_id", input.organizationId)
+    .eq("user_id", input.userId);
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/app", "layout");
+  return { ok: true, data: { userId: input.userId } };
+}
+
+export async function revokeInvitationAction(input: {
+  organizationId: string;
+  invitationId: string;
+}): Promise<ActionResult<{ invitationId: string }>> {
+  const gate = await requireLive();
+  if (!gate.ok) return gate;
+
+  const { error } = await gate.supabase
+    .from("organization_invitations")
+    .update({ status: "revoked" })
+    .eq("id", input.invitationId)
+    .eq("organization_id", input.organizationId)
+    .eq("status", "pending");
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/app", "layout");
+  return { ok: true, data: { invitationId: input.invitationId } };
 }
 
 export async function acceptInvitationAction(

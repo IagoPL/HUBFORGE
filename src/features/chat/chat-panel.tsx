@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ensureProjectGeneralChannelAction,
@@ -12,33 +12,7 @@ import {
 } from "@/features/chat/actions";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { getCurrentUserClientLabel } from "@/features/chat/demo-identity";
 import { cn } from "@/lib/utils";
-
-const DEMO_CHAT_KEY = "hubforge.demo.chat.v1";
-
-type DemoStore = {
-  channels: Array<ChatChannel & { projectId: string }>;
-  messages: Array<ChatMessage & { projectId: string }>;
-};
-
-function loadDemoStore(): DemoStore {
-  if (typeof window === "undefined") {
-    return { channels: [], messages: [] };
-  }
-  try {
-    const raw = window.localStorage.getItem(DEMO_CHAT_KEY);
-    if (!raw) return { channels: [], messages: [] };
-    return JSON.parse(raw) as DemoStore;
-  } catch {
-    return { channels: [], messages: [] };
-  }
-}
-
-function saveDemoStore(store: DemoStore) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(DEMO_CHAT_KEY, JSON.stringify(store));
-}
 
 export function ChatPanel({
   labels,
@@ -52,14 +26,12 @@ export function ChatPanel({
     send: string;
     emptyProject: string;
     emptyMessages: string;
-    demoHint: string;
     liveHint: string;
   };
 }) {
-  const { mode, activeOrganization, activeProject } = useWorkspace();
+  const { activeOrganization, activeProject } = useWorkspace();
   const projectId = activeProject?.id ?? "";
   const organizationId = activeOrganization?.id ?? "";
-  const [demoTick, setDemoTick] = useState(0);
   const [channels, setChannels] = useState<ChatChannel[]>([]);
   const [activeChannelId, setActiveChannelId] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -68,43 +40,10 @@ export function ChatPanel({
   const [pending, startTransition] = useTransition();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const demoData = useMemo(() => {
-    void demoTick;
-    if (mode !== "demo" || !projectId || !organizationId) {
-      return { channels: [] as ChatChannel[], messages: [] as ChatMessage[] };
-    }
-    const store = loadDemoStore();
-    let projectChannels = store.channels.filter((item) => item.projectId === projectId);
-    if (projectChannels.length === 0) {
-      const general: ChatChannel & { projectId: string } = {
-        id: `ch_${projectId}_general`,
-        organizationId,
-        projectId,
-        kind: "project",
-        name: "general",
-      };
-      if (typeof window !== "undefined") {
-        store.channels.push(general);
-        saveDemoStore(store);
-      }
-      projectChannels = [general];
-    }
-    return {
-      channels: projectChannels,
-      messages: store.messages.filter(
-        (item) =>
-          item.projectId === projectId &&
-          item.channelId === (activeChannelId || projectChannels[0]?.id),
-      ),
-    };
-  }, [mode, projectId, organizationId, demoTick, activeChannelId]);
-
-  const visibleChannels = mode === "demo" ? demoData.channels : channels;
-  const visibleMessages = mode === "demo" ? demoData.messages : messages;
-  const currentChannelId = activeChannelId || visibleChannels[0]?.id || "";
+  const currentChannelId = activeChannelId || channels[0]?.id || "";
 
   useEffect(() => {
-    if (mode !== "live" || !projectId || !organizationId) return;
+    if (!projectId || !organizationId) return;
     let cancelled = false;
 
     startTransition(() => {
@@ -134,10 +73,10 @@ export function ChatPanel({
     return () => {
       cancelled = true;
     };
-  }, [mode, projectId, organizationId]);
+  }, [projectId, organizationId]);
 
   useEffect(() => {
-    if (mode !== "live" || !currentChannelId) return;
+    if (!currentChannelId) return;
     const client = createSupabaseBrowserClient();
     if (!client) return;
 
@@ -179,49 +118,28 @@ export function ChatPanel({
     return () => {
       void client.removeChannel(channel);
     };
-  }, [mode, currentChannelId]);
+  }, [currentChannelId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [visibleMessages.length]);
+  }, [messages.length]);
 
   function selectChannel(channelId: string) {
     setActiveChannelId(channelId);
     setError(null);
-    if (mode === "live") {
-      startTransition(() => {
-        void listMessagesAction(channelId).then((result) => {
-          if (result.ok) setMessages(result.data);
-          else setError(result.error);
-        });
+    startTransition(() => {
+      void listMessagesAction(channelId).then((result) => {
+        if (result.ok) setMessages(result.data);
+        else setError(result.error);
       });
-    } else {
-      setDemoTick((value) => value + 1);
-    }
+    });
   }
 
   function send() {
-    if (!currentChannelId || !organizationId || !projectId) return;
+    if (!currentChannelId || !organizationId) return;
     const body = draft.trim();
     if (!body) return;
     setError(null);
-
-    if (mode === "demo") {
-      const store = loadDemoStore();
-      const message: ChatMessage & { projectId: string } = {
-        id: `msg_${crypto.randomUUID().slice(0, 8)}`,
-        channelId: currentChannelId,
-        authorId: getCurrentUserClientLabel(),
-        body,
-        createdAt: new Date().toISOString(),
-        projectId,
-      };
-      store.messages.push(message);
-      saveDemoStore(store);
-      setDraft("");
-      setDemoTick((value) => value + 1);
-      return;
-    }
 
     startTransition(() => {
       void sendMessageAction({
@@ -252,15 +170,13 @@ export function ChatPanel({
   }
 
   const currentChannelName =
-    visibleChannels.find((item) => item.id === currentChannelId)?.name ?? "general";
+    channels.find((item) => item.id === currentChannelId)?.name ?? "general";
 
   return (
     <div className="grid gap-4 px-4 py-5 sm:px-6">
       <div className="grid gap-1">
         <p className="lead">{labels.subtitle}</p>
-        <p className="t-body-sm text-[var(--hf-ink-faint)]">
-          {mode === "demo" ? labels.demoHint : labels.liveHint}
-        </p>
+        <p className="t-body-sm text-[var(--hf-ink-faint)]">{labels.liveHint}</p>
       </div>
 
       {error ? (
@@ -275,7 +191,7 @@ export function ChatPanel({
             {labels.channels}
           </p>
           <ul className="grid gap-0.5">
-            {visibleChannels.map((channel) => {
+            {channels.map((channel) => {
               const active = channel.id === currentChannelId;
 
               return (
@@ -312,14 +228,12 @@ export function ChatPanel({
           </div>
 
           <div className="flex-1 overflow-y-auto bg-[var(--hf-ground-1)] px-4 py-3">
-            {visibleMessages.length === 0 ? (
+            {messages.length === 0 ? (
               <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyMessages}</p>
             ) : (
               <ol className="grid gap-3">
-                {visibleMessages.map((message) => (
+                {messages.map((message) => (
                   <li key={message.id}>
-                    {/* Attribution as a drawn margin, so the message body stays
-                        the widest thing on the line. */}
                     <article className="border-l border-[var(--hf-rule)] pl-3">
                       <div className="flex flex-wrap items-baseline gap-2">
                         <span className="t-mono-sm font-medium text-[var(--hf-ink)]">

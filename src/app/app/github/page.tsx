@@ -32,7 +32,6 @@ export default async function GitHubPage() {
         syncedCommits: t.github.syncedCommits,
         recentActivity: t.github.recentActivity,
         setupHint: t.github.setupHint,
-        demoHint: t.github.demoHint,
         install: t.github.install,
         repoFormat: t.github.repoFormat,
       }}

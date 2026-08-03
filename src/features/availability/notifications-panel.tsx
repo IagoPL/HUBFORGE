@@ -1,33 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   listNotificationsAction,
   markNotificationReadAction,
 } from "@/features/availability/actions";
-import { useWorkspace } from "@/features/organizations/workspace-provider";
-import { getDemoWorkspace } from "@/data/demo-workspace";
 import type { Notification } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
-
-const DEMO_NOTIF_KEY = "hubforge.demo.notifications.v1";
-
-function loadDemoNotifications(): Notification[] {
-  if (typeof window === "undefined") return getDemoWorkspace().notifications;
-  try {
-    const raw = window.localStorage.getItem(DEMO_NOTIF_KEY);
-    if (!raw) return getDemoWorkspace().notifications;
-    return JSON.parse(raw) as Notification[];
-  } catch {
-    return getDemoWorkspace().notifications;
-  }
-}
-
-function saveDemoNotifications(notifications: Notification[]) {
-  window.localStorage.setItem(DEMO_NOTIF_KEY, JSON.stringify(notifications));
-}
 
 export function NotificationsPanel({
   labels,
@@ -40,46 +21,28 @@ export function NotificationsPanel({
     isNew: string;
   };
 }) {
-  const { mode } = useWorkspace();
-  const [demoTick, setDemoTick] = useState(0);
-  const [liveNotifications, setLiveNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const demoNotifications = useMemo(() => {
-    void demoTick;
-    if (mode !== "demo") return [];
-    return loadDemoNotifications();
-  }, [mode, demoTick]);
-
-  const notifications = mode === "demo" ? demoNotifications : liveNotifications;
   const unread = notifications.filter((item) => !item.read).length;
 
   useEffect(() => {
-    if (mode !== "live") return;
     let cancelled = false;
     startTransition(() => {
       void listNotificationsAction().then((result) => {
         if (cancelled) return;
-        if (result.ok) setLiveNotifications(result.data);
+        if (result.ok) setNotifications(result.data);
         else setError(result.error);
       });
     });
     return () => {
       cancelled = true;
     };
-  }, [mode]);
+  }, []);
 
   function markRead(notificationId: string) {
     setError(null);
-    if (mode === "demo") {
-      const next = demoNotifications.map((item) =>
-        item.id === notificationId ? { ...item, read: true } : item,
-      );
-      saveDemoNotifications(next);
-      setDemoTick((value) => value + 1);
-      return;
-    }
 
     startTransition(() => {
       void markNotificationReadAction(notificationId).then((result) => {
@@ -87,7 +50,7 @@ export function NotificationsPanel({
           setError(result.error);
           return;
         }
-        setLiveNotifications((current) =>
+        setNotifications((current) =>
           current.map((item) =>
             item.id === notificationId ? { ...item, read: true } : item,
           ),

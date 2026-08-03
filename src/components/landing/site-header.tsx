@@ -60,12 +60,12 @@ export function SiteHeader({
             {t.common.signIn}
           </Link>
           <Link
-            href="/demo"
+            href="/login"
             className={cn(buttonVariants({ size: "sm" }), "hidden sm:inline-flex")}
           >
             {t.common.openWorkspace}
           </Link>
-          <Link href="/demo" className={cn(buttonVariants({ size: "sm" }), "sm:hidden")}>
+          <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "sm:hidden")}>
             {t.common.open}
           </Link>
         </div>

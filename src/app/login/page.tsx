@@ -68,15 +68,6 @@ export default async function LoginPage({
             {t.login.continueGithub}
           </button>
         </form>
-
-        {!configured ? (
-          <Link
-            href="/demo"
-            className={cn(buttonVariants({ variant: "outline" }), "flex w-full")}
-          >
-            {t.login.enterDemo}
-          </Link>
-        ) : null}
       </section>
     </main>
   );

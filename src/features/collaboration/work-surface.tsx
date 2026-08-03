@@ -14,8 +14,7 @@ import {
 } from "@/components/operations/labels";
 import { WorkBoard } from "@/components/operations/work-board";
 import { WorkList, type ListState } from "@/components/operations/work-list";
-import { DEMO_NOW_AT, toOperationsTasks, type OperationsTask } from "@/data/demo-operations";
-import { getDemoWorkspace } from "@/data/demo-workspace";
+import type { OperationsTask } from "@/lib/operations";
 import {
   createTaskAction,
   listMembersAction,
@@ -32,37 +31,6 @@ import { cn, fill } from "@/lib/utils";
 
 type ViewMode = "list" | "board";
 
-const DEMO_TASKS_KEY = "hubforge.demo.tasks.v1";
-
-function toPlainTasks(tasks: OperationsTask[]): Task[] {
-  return tasks.map(({ dependsOn: _d, blocks: _b, updatedAt: _u, revision: _r, ...task }) => task);
-}
-
-function loadDemoTasks(projectId: string): Task[] {
-  const seed = getDemoWorkspace().tasks.filter((task) => task.projectId === projectId);
-  if (typeof window === "undefined") return seed;
-  try {
-    const raw = window.localStorage.getItem(DEMO_TASKS_KEY);
-    if (!raw) return seed;
-    const parsed = JSON.parse(raw) as Task[];
-    const filtered = parsed.filter((task) => task.projectId === projectId);
-    return filtered.length > 0 ? filtered : seed;
-  } catch {
-    return seed;
-  }
-}
-
-function saveDemoTasks(tasks: Task[]) {
-  window.localStorage.setItem(DEMO_TASKS_KEY, JSON.stringify(tasks));
-}
-
-/**
- * The work surface: create work, read it at the density you need, and move it
- * with its dependencies in view.
- *
- * Selection lives in the URL so opening a task is real navigation — linkable,
- * and the back button closes the layer.
- */
 export function WorkSurface({
   locale,
   labels,
@@ -86,14 +54,12 @@ export function WorkSurface({
     saveTask: string;
   };
 }) {
-  const { mode, activeProject, activeOrganization } = useWorkspace();
+  const { activeProject, activeOrganization } = useWorkspace();
   const projectId = activeProject?.id ?? "";
   const organizationId = activeOrganization?.id ?? "";
   const searchParams = useSearchParams();
 
-  /** Bumped to re-read local demo storage, and to retry a failed live fetch. */
   const [reloadKey, setReloadKey] = useState(0);
-  /** Tagged with the project it belongs to, so "loaded" is derived, not tracked. */
   const [live, setLive] = useState<{
     projectId: string;
     tasks: OperationsTask[];
@@ -112,32 +78,13 @@ export function WorkSurface({
   const [assigneeId, setAssigneeId] = useState("");
   const [view, setView] = useState<ViewMode>("list");
 
-  const demoTasks = useMemo(() => {
-    void reloadKey;
-    if (mode !== "demo" || !projectId) return [];
-    return loadDemoTasks(projectId);
-  }, [mode, projectId, reloadKey]);
-
-  const demoMembers = useMemo(() => {
-    if (mode !== "demo") return [];
-    return getDemoWorkspace().members.filter(
-      (member) => member.organizationId === (organizationId || "org_demo"),
-    );
-  }, [mode, organizationId]);
-
-  const loaded = mode === "demo" || !projectId || live?.projectId === projectId;
-  const tasks = useMemo(
-    () =>
-      mode === "demo"
-        ? toOperationsTasks(demoTasks, true)
-        : (live?.tasks ?? []),
-    [mode, demoTasks, live],
-  );
-  const members = mode === "demo" ? demoMembers : (live?.members ?? []);
-  const now = mode === "demo" ? DEMO_NOW_AT : new Date().toISOString();
+  const loaded = !projectId || live?.projectId === projectId;
+  const tasks = live?.tasks ?? [];
+  const members = live?.members ?? [];
+  const now = new Date().toISOString();
 
   useEffect(() => {
-    if (mode !== "live" || !projectId) return;
+    if (!projectId) return;
 
     let cancelled = false;
     void Promise.all([
@@ -161,7 +108,7 @@ export function WorkSurface({
     return () => {
       cancelled = true;
     };
-  }, [mode, projectId, organizationId, reloadKey]);
+  }, [projectId, organizationId, reloadKey]);
 
   const selectedId = searchParams.get("task");
   const selected = useMemo(
@@ -169,7 +116,6 @@ export function WorkSurface({
     [tasks, selectedId],
   );
 
-  /** Native history so the URL changes without a server round-trip. */
   const setParam = useCallback((key: string, value: string | null) => {
     const url = new URL(window.location.href);
     if (value === null) url.searchParams.delete(key);
@@ -179,7 +125,6 @@ export function WorkSurface({
 
   const select = useCallback((taskId: string) => setParam("task", taskId), [setParam]);
 
-  /** Closing returns focus to the row the layer came from. */
   const close = useCallback(() => {
     const origin = selectedId;
     setParam("task", null);
@@ -195,12 +140,6 @@ export function WorkSurface({
         : "ready";
 
   function persist(next: OperationsTask[], changed: { id: string; status: TaskStatus }[]) {
-    if (mode === "demo") {
-      saveDemoTasks(toPlainTasks(next));
-      setReloadKey((value) => value + 1);
-      return;
-    }
-
     setLive((current) => (current ? { ...current, tasks: next } : current));
     startTransition(() => {
       void Promise.all(
@@ -254,25 +193,6 @@ export function WorkSurface({
   async function saveTask(input: InspectorSaveInput): Promise<string | null> {
     if (!selectedId) return "No task selected.";
 
-    if (mode === "demo") {
-      const next = demoTasks.map((task) =>
-        task.id === selectedId
-          ? {
-              ...task,
-              title: input.title.trim(),
-              description: input.description.trim(),
-              priority: input.priority,
-              assigneeIds: input.assigneeIds,
-            }
-          : task,
-      );
-      saveDemoTasks(next);
-      // Demo deps live only in the authored map; keep plain tasks in sync.
-      setReloadKey((value) => value + 1);
-      setAnnouncement(formLabels.saveTask);
-      return null;
-    }
-
     const update = await updateTaskAction({
       taskId: selectedId,
       title: input.title,
@@ -302,24 +222,6 @@ export function WorkSurface({
     if (!projectId || !title.trim()) return;
     setError(null);
     const assigneeIds = assigneeId ? [assigneeId] : [];
-
-    if (mode === "demo") {
-      const task: Task = {
-        id: `task_${crypto.randomUUID().slice(0, 8)}`,
-        projectId,
-        title: title.trim(),
-        description: description.trim(),
-        status: "backlog",
-        priority,
-        assigneeIds,
-      };
-      saveDemoTasks([...demoTasks, task]);
-      setReloadKey((value) => value + 1);
-      setTitle("");
-      setDescription("");
-      setAssigneeId("");
-      return;
-    }
 
     startTransition(() => {
       void createTaskAction({
@@ -562,7 +464,6 @@ export function WorkSurface({
         ) : null}
       </AnimatePresence>
 
-      {/* Every state change is announced, not only drawn. */}
       <p role="status" aria-live="polite" className="sr-only">
         {announcement}
       </p>
