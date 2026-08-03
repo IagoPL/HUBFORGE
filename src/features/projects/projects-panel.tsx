@@ -21,6 +21,15 @@ export function ProjectsPanel({
     description: string;
     emptyHint: string;
     limitReached: string;
+    archive: string;
+    unarchive: string;
+    delete: string;
+    confirmDelete: string;
+    confirmDeleteAction: string;
+    cancel: string;
+    statusActive: string;
+    statusPaused: string;
+    statusArchived: string;
     packaging: {
       title: string;
       plan: string;
@@ -37,13 +46,23 @@ export function ProjectsPanel({
     activeProject,
     addProject,
     setActiveProject,
+    setProjectStatus,
+    removeProject,
     pending,
     error,
   } = useWorkspace();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const usage = usePackagingUsage(activeOrganization?.id, organizationProjects.length);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const activeCount = organizationProjects.filter((p) => p.status !== "archived").length;
+  const usage = usePackagingUsage(activeOrganization?.id, activeCount);
   const limited = usage ? atProjectLimit(usage) : false;
+
+  const statusLabel = {
+    active: labels.statusActive,
+    paused: labels.statusPaused,
+    archived: labels.statusArchived,
+  } as const;
 
   return (
     <div className="grid gap-5 px-4 py-5 sm:px-6">
@@ -57,24 +76,29 @@ export function ProjectsPanel({
         <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
           {organizationProjects.map((project) => {
             const active = project.id === activeProject?.id;
+            const confirming = confirmingId === project.id;
+            const archived = project.status === "archived";
 
             return (
-              <li key={project.id}>
+              <li key={project.id} className="panel grid h-full gap-3 p-4">
                 <button
                   type="button"
                   onClick={() => setActiveProject(project.id)}
                   aria-current={active ? "true" : undefined}
                   className={cn(
-                    "panel h-full w-full p-4 text-left transition-colors",
-                    "duration-[var(--motion-feedback)] hover:bg-[var(--hf-ground-3)]",
-                    active && "bg-[var(--hf-accent-quiet)]",
+                    "w-full text-left transition-colors",
+                    "duration-[var(--motion-feedback)]",
+                    active &&
+                      "rounded-[var(--radius-md)] bg-[var(--hf-accent-quiet)] p-2 -m-2",
                   )}
                 >
                   <span className="flex flex-wrap items-center gap-2">
                     <span className="t-display-sm text-[var(--hf-ink)]">
                       {project.name}
                     </span>
-                    <Badge tone={active ? "brand" : "neutral"}>{project.status}</Badge>
+                    <Badge tone={archived ? "neutral" : active ? "brand" : "neutral"}>
+                      {statusLabel[project.status]}
+                    </Badge>
                   </span>
                   <span className="t-body-sm mt-1.5 block text-[var(--hf-ink-muted)]">
                     {project.description}
@@ -85,6 +109,63 @@ export function ProjectsPanel({
                     </span>
                   ) : null}
                 </button>
+
+                {confirming ? (
+                  <div className="grid gap-2 border-t border-[var(--hf-rule-faint)] pt-3">
+                    <p className="t-body-sm text-[var(--hf-ink-muted)]">
+                      {labels.confirmDelete}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={pending}
+                        onClick={() => {
+                          void removeProject(project.id).then(() =>
+                            setConfirmingId(null),
+                          );
+                        }}
+                      >
+                        {labels.confirmDeleteAction}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={pending}
+                        onClick={() => setConfirmingId(null)}
+                      >
+                        {labels.cancel}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2 border-t border-[var(--hf-rule-faint)] pt-3">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={pending}
+                      onClick={() =>
+                        void setProjectStatus(
+                          project.id,
+                          archived ? "active" : "archived",
+                        )
+                      }
+                    >
+                      {archived ? labels.unarchive : labels.archive}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={pending}
+                      onClick={() => setConfirmingId(project.id)}
+                    >
+                      {labels.delete}
+                    </Button>
+                  </div>
+                )}
               </li>
             );
           })}
