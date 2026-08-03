@@ -74,7 +74,10 @@ test.describe("smoke", () => {
 
     await page.goto("/app/tasks");
     // The create form sits inside a collapsed details panel.
-    await page.locator("details summary").filter({ hasText: /Create task|Crear tarea/i }).click();
+    await page
+      .locator("details summary")
+      .filter({ hasText: /Create task|Crear tarea/i })
+      .click();
     await page.getByLabel(/^Title$|^Título$/i).fill("Write acceptance checks");
     await page.getByRole("button", { name: /Create task|Crear tarea/i }).click();
     await expect(page.getByText("Write acceptance checks").first()).toBeVisible();
