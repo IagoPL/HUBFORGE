@@ -36,11 +36,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           organizations: t.organizations.title,
           github: t.nav.github,
           chat: t.nav.chat,
+          more: t.nav.more,
+          skipToContent: t.nav.skipToContent,
         }}
         userSlot={
           <UserMenu
             user={user}
-            demoLabel={t.common.demoMode}
+            signInLabel={t.common.signIn}
             signOutLabel={t.common.signOut}
           />
         }

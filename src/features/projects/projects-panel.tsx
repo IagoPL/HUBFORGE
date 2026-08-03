@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
+import { cn } from "@/lib/utils";
 
 export function ProjectsPanel({
   labels,
@@ -31,46 +32,53 @@ export function ProjectsPanel({
   const [description, setDescription] = useState("");
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-          {labels.title}
-        </h1>
-        <p className="text-[var(--hf-fg-muted)]">{labels.subtitle}</p>
-      </header>
+    <div className="grid gap-5 px-4 py-5 sm:px-6">
+      <p className="lead">{labels.subtitle}</p>
 
       {organizationProjects.length === 0 ? (
-        <p className="text-sm text-[var(--hf-fg-muted)]">{labels.emptyHint}</p>
+        <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyHint}</p>
       ) : (
-        <ul className="grid gap-3 md:grid-cols-2">
-          {organizationProjects.map((project) => (
-            <li key={project.id}>
-              <button
-                type="button"
-                onClick={() => setActiveProject(project.id)}
-                className="w-full rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5 text-left transition-colors hover:bg-[var(--hf-surface-2)]"
-              >
-                <div className="mb-3 flex items-center gap-2">
-                  <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold">
-                    {project.name}
-                  </h2>
-                  <Badge tone="success">{project.status}</Badge>
-                  {project.id === activeProject?.id ? (
-                    <Badge tone="brand">Active</Badge>
+        <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+          {organizationProjects.map((project) => {
+            const active = project.id === activeProject?.id;
+
+            return (
+              <li key={project.id}>
+                <button
+                  type="button"
+                  onClick={() => setActiveProject(project.id)}
+                  aria-current={active ? "true" : undefined}
+                  className={cn(
+                    "panel h-full w-full p-4 text-left transition-colors",
+                    "duration-[var(--motion-feedback)] hover:bg-[var(--hf-ground-3)]",
+                    active && "bg-[var(--hf-accent-quiet)]",
+                  )}
+                >
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="t-display-sm text-[var(--hf-ink)]">
+                      {project.name}
+                    </span>
+                    <Badge tone={active ? "brand" : "neutral"}>{project.status}</Badge>
+                  </span>
+                  <span className="t-body-sm mt-1.5 block text-[var(--hf-ink-muted)]">
+                    {project.description}
+                  </span>
+                  {/* The rail's crumb trail already names the organization, so
+                      this only speaks when it differs from the active one. */}
+                  {activeOrganization ? (
+                    <span className="t-mono-sm mt-3 block text-[var(--hf-ink-faint)]">
+                      {activeOrganization.name}
+                    </span>
                   ) : null}
-                </div>
-                <p className="text-sm text-[var(--hf-fg-muted)]">{project.description}</p>
-                <p className="mt-4 text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
-                  {labels.organization} · {activeOrganization?.name ?? "—"}
-                </p>
-              </button>
-            </li>
-          ))}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
 
       <form
-        className="max-w-lg space-y-3 rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5"
+        className="panel grid max-w-lg gap-3 p-5"
         onSubmit={(event) => {
           event.preventDefault();
           if (!name.trim() || pending) return;
@@ -80,30 +88,40 @@ export function ProjectsPanel({
           });
         }}
       >
-        <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold">
-          {labels.create}
-        </h2>
-        <label className="block space-y-2 text-sm">
-          <span className="font-medium">{labels.name}</span>
+        <h2 className="t-display-sm text-[var(--hf-ink)]">{labels.create}</h2>
+        <label className="grid gap-1.5">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.name}
+          </span>
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+            className="input"
             required
             disabled={pending || !activeOrganization}
           />
         </label>
-        <label className="block space-y-2 text-sm">
-          <span className="font-medium">{labels.description}</span>
+        <label className="grid gap-1.5">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.description}
+          </span>
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            className="min-h-24 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3 py-2"
+            className="input min-h-24"
             disabled={pending || !activeOrganization}
           />
         </label>
-        {error ? <p className="text-sm text-[var(--hf-danger)]">{error}</p> : null}
-        <Button type="submit" disabled={pending || !activeOrganization}>
+        {error ? (
+          <p role="alert" className="t-body-sm text-[var(--hf-error)]">
+            {error}
+          </p>
+        ) : null}
+        <Button
+          type="submit"
+          disabled={pending || !activeOrganization}
+          className="justify-self-start"
+        >
           {labels.create}
         </Button>
       </form>

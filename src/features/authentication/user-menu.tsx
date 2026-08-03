@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { signOut } from "@/features/authentication/actions";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -5,29 +6,34 @@ import type { AuthUserSummary } from "@/features/authentication/get-current-user
 
 export function UserMenu({
   user,
-  demoLabel = "Demo mode",
+  signInLabel = "Sign in",
   signOutLabel = "Sign out",
 }: {
   user: AuthUserSummary | null;
-  demoLabel?: string;
+  signInLabel?: string;
   signOutLabel?: string;
 }) {
+  // The shell already states which workspace you are looking at, so this slot
+  // offers the way out of the demo rather than repeating the label.
   if (!user) {
     return (
-      <span className="hidden text-xs text-[var(--hf-fg-muted)] sm:inline">
-        {demoLabel}
-      </span>
+      <Link
+        href="/login"
+        className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+      >
+        {signInLabel}
+      </Link>
     );
   }
 
   return (
     <div className="flex items-center gap-2">
-      <div className="hidden text-right sm:block">
-        <p className="text-xs font-medium text-[var(--hf-fg)]">
-          {user.fullName ?? user.email ?? "Signed in"}
+      <div className="hidden min-w-0 text-right sm:block">
+        <p className="t-body-sm truncate font-medium text-[var(--hf-ink)]">
+          {user.fullName ?? user.email}
         </p>
-        {user.email ? (
-          <p className="text-[10px] text-[var(--hf-fg-muted)]">{user.email}</p>
+        {user.fullName && user.email ? (
+          <p className="t-body-sm truncate text-[var(--hf-ink-faint)]">{user.email}</p>
         ) : null}
       </div>
       <form action={signOut}>

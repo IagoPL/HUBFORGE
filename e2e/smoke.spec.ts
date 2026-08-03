@@ -12,7 +12,11 @@ test.describe("smoke", () => {
 
   test("demo workspace overview is reachable", async ({ page }) => {
     await page.goto("/app");
-    await expect(page.getByRole("heading", { name: "Aurora Launch" })).toBeVisible();
+    // Surface title lives in the shell title block; project context is a crumb.
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Briefing/i }),
+    ).toBeVisible();
+    await expect(page.getByText("Aurora Launch").first()).toBeVisible();
   });
 
   test("login offers GitHub OAuth CTA", async ({ page }) => {
@@ -57,7 +61,7 @@ test.describe("smoke", () => {
     await page.getByLabel(/Project name|Nombre del proyecto/i).fill("Alpha Board");
     await page.getByLabel(/Description|Descripción/i).fill("First real project");
     await page.getByRole("button", { name: /Create project|Crear proyecto/i }).click();
-    await expect(page.getByRole("heading", { name: "Alpha Board" })).toBeVisible();
+    await expect(page.getByText("Alpha Board").first()).toBeVisible();
   });
 
   test("can invite a member and create a task in demo mode", async ({ page }) => {
@@ -71,6 +75,11 @@ test.describe("smoke", () => {
     await expect(page.getByText("casey@example.com")).toBeVisible();
 
     await page.goto("/app/tasks");
+    // The create form sits inside a collapsed details panel.
+    await page
+      .locator("details summary")
+      .filter({ hasText: /Create task|Crear tarea/i })
+      .click();
     await page.getByLabel(/^Title$|^Título$/i).fill("Write acceptance checks");
     await page.getByRole("button", { name: /Create task|Crear tarea/i }).click();
     await expect(page.getByText("Write acceptance checks").first()).toBeVisible();
@@ -86,7 +95,7 @@ test.describe("smoke", () => {
         name: /Add availability window|Añadir ventana de disponibilidad/i,
       })
       .click();
-    await expect(page.getByText("Deep work block")).toBeVisible();
+    await expect(page.getByText("Deep work block").first()).toBeVisible();
 
     await page.goto("/app");
     await expect(
@@ -106,9 +115,8 @@ test.describe("smoke", () => {
     await page.goto("/app");
     await expect(page.getByRole("heading").first()).toBeVisible();
     await page.goto("/app/github");
-    await expect(
-      page.getByRole("heading", { name: /GitHub sync|Sincronización GitHub/i }),
-    ).toBeVisible();
+    // Panel title moved into the shell; assert the surface and the form.
+    await expect(page.getByRole("heading", { name: /^GitHub$/i })).toBeVisible();
     const repoInput = page.getByLabel(/Repository|Repositorio/i);
     await expect(repoInput).toBeVisible();
     await repoInput.fill("IagoPL/HUBFORGE");

@@ -10,6 +10,7 @@ import {
 import { useWorkspace } from "@/features/organizations/workspace-provider";
 import { getDemoWorkspace } from "@/data/demo-workspace";
 import type { Notification } from "@/lib/domain/types";
+import { cn } from "@/lib/utils";
 
 const DEMO_NOTIF_KEY = "hubforge.demo.notifications.v1";
 
@@ -36,6 +37,7 @@ export function NotificationsPanel({
     markRead: string;
     empty: string;
     unread: string;
+    isNew: string;
   };
 }) {
   const { mode } = useWorkspace();
@@ -95,47 +97,61 @@ export function NotificationsPanel({
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold">
+    <section aria-labelledby="notifications-heading" className="panel p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 id="notifications-heading" className="t-display-sm text-[var(--hf-ink)]">
           {labels.title}
         </h2>
-        <Badge tone={unread > 0 ? "brand" : "neutral"}>
+        <Badge tone={unread > 0 ? "brand" : "neutral"} data-tabular>
           {labels.unread}: {unread}
         </Badge>
       </div>
-      {error ? <p className="mb-3 text-sm text-[var(--hf-danger)]">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="t-body-sm mb-3 text-[var(--hf-error)]">
+          {error}
+        </p>
+      ) : null}
       {notifications.length === 0 ? (
-        <p className="text-sm text-[var(--hf-fg-muted)]">{labels.empty}</p>
+        <p className="t-body text-[var(--hf-ink-muted)]">{labels.empty}</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="grid gap-2">
           {notifications.map((item) => (
-            <li key={item.id} className="rounded-xl bg-[var(--hf-surface-2)] p-3">
-              <div className="mb-1 flex flex-wrap items-center gap-2">
-                <p className="text-sm font-medium">{item.title}</p>
-                {!item.read ? <Badge tone="brand">New</Badge> : null}
+            <li
+              key={item.id}
+              className={cn(
+                "rounded-[var(--radius-md)] border border-[var(--hf-rule-faint)] p-3",
+                item.read ? "bg-[var(--hf-ground-1)]" : "bg-[var(--hf-ground-3)]",
+              )}
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="t-body font-medium text-[var(--hf-ink)]">{item.title}</p>
+                {!item.read ? <Badge tone="brand">{labels.isNew}</Badge> : null}
               </div>
-              <p className="text-sm text-[var(--hf-fg-muted)]">{item.body}</p>
-              <p className="mt-2 font-[family-name:var(--font-mono)] text-xs text-[var(--hf-fg-muted)]">
-                {new Date(item.createdAt).toLocaleString()}
-              </p>
-              {!item.read ? (
-                <div className="mt-3">
+              <p className="t-body-sm mt-0.5 text-[var(--hf-ink-muted)]">{item.body}</p>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <time
+                  dateTime={item.createdAt}
+                  className="t-mono-sm text-[var(--hf-ink-faint)]"
+                  data-tabular
+                >
+                  {new Date(item.createdAt).toLocaleString()}
+                </time>
+                {!item.read ? (
                   <Button
                     type="button"
                     size="sm"
-                    variant="secondary"
+                    variant="ghost"
                     disabled={pending}
                     onClick={() => markRead(item.id)}
                   >
                     {labels.markRead}
                   </Button>
-                </div>
-              ) : null}
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>
       )}
-    </div>
+    </section>
   );
 }

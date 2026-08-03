@@ -178,55 +178,60 @@ export function AvailabilityPanel({
   }
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-          {labels.title}
-        </h1>
-        <p className="text-[var(--hf-fg-muted)]">{labels.subtitle}</p>
-      </header>
+    <div className="grid gap-5 px-4 py-5 sm:px-6">
+      <p className="lead">{labels.subtitle}</p>
 
-      {error ? <p className="text-sm text-[var(--hf-danger)]">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="t-body-sm text-[var(--hf-error)]">
+          {error}
+        </p>
+      ) : null}
 
       <form
-        className="grid max-w-3xl gap-3 rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5 md:grid-cols-2"
+        className="panel grid max-w-3xl gap-3 p-5 md:grid-cols-2"
         onSubmit={(event) => {
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
           createEntry(String(formData.get("note") ?? ""));
         }}
       >
-        <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold md:col-span-2">
+        <h2 className="t-display-sm text-[var(--hf-ink)] md:col-span-2">
           {labels.create}
         </h2>
-        <label className="block space-y-2 text-sm">
-          <span className="font-medium">{labels.startsAt}</span>
+        <label className="grid gap-1.5">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.startsAt}
+          </span>
           <input
             type="datetime-local"
             value={startsAt}
             onChange={(event) => setStartsAt(event.target.value)}
-            className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+            className="input"
             required
             disabled={pending || !organizationId}
           />
         </label>
-        <label className="block space-y-2 text-sm">
-          <span className="font-medium">{labels.endsAt}</span>
+        <label className="grid gap-1.5">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.endsAt}
+          </span>
           <input
             type="datetime-local"
             value={endsAt}
             onChange={(event) => setEndsAt(event.target.value)}
-            className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+            className="input"
             required
             disabled={pending || !organizationId}
           />
         </label>
-        <label className="block space-y-2 text-sm">
-          <span className="font-medium">{labels.kind}</span>
+        <label className="grid gap-1.5">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.kind}
+          </span>
           <select
             value={kind}
             onChange={(event) => setKind(event.target.value as AvailabilityEntry["kind"])}
-            className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+            className="input"
             disabled={pending || !organizationId}
           >
             <option value="available">available</option>
@@ -234,69 +239,81 @@ export function AvailabilityPanel({
             <option value="unavailable">unavailable</option>
           </select>
         </label>
-        <label className="block space-y-2 text-sm" htmlFor="availability-note">
-          <span className="font-medium">{labels.note}</span>
+        <label className="grid gap-1.5" htmlFor="availability-note">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.note}
+          </span>
           <input
             ref={noteInputRef}
             id="availability-note"
             name="note"
             defaultValue=""
-            className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+            className="input"
             disabled={pending || !organizationId}
           />
         </label>
-        <div className="md:col-span-2">
-          <Button type="submit" disabled={pending || !organizationId}>
-            {labels.create}
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          disabled={pending || !organizationId}
+          className="justify-self-start md:col-span-2"
+        >
+          {labels.create}
+        </Button>
       </form>
 
       {entries.length === 0 ? (
-        <p className="text-sm text-[var(--hf-fg-muted)]">{labels.empty}</p>
+        <p className="t-body text-[var(--hf-ink-muted)]">{labels.empty}</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="grid gap-2">
           {entries.map((entry) => {
             const member =
               memberById.get(entry.memberId) ??
               (entry.memberId === "mem_self"
                 ? { name: "You", avatarInitials: "YO" }
                 : null);
+
             return (
               <li
                 key={entry.id}
-                className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-4"
+                className="panel flex flex-wrap items-center gap-x-4 gap-y-2 p-3"
               >
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <p className="font-medium">{member?.name ?? "Team member"}</p>
-                  <Badge
-                    tone={
-                      entry.kind === "unavailable"
-                        ? "danger"
-                        : entry.kind === "busy"
-                          ? "warning"
-                          : "success"
-                    }
-                  >
-                    {entry.kind}
-                  </Badge>
-                </div>
-                <p className="text-sm text-[var(--hf-fg-muted)]">{entry.note}</p>
-                <p className="mt-2 font-[family-name:var(--font-mono)] text-xs text-[var(--hf-fg-muted)]">
-                  {new Date(entry.startsAt).toLocaleString()} →{" "}
-                  {new Date(entry.endsAt).toLocaleString()}
+                <p className="t-body font-medium text-[var(--hf-ink)]">
+                  {member?.name ?? "Team member"}
                 </p>
-                <div className="mt-3">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    disabled={pending}
-                    onClick={() => removeEntry(entry.id)}
-                  >
-                    {labels.remove}
-                  </Button>
-                </div>
+                {/* A closed window is a state, not a failure: danger stays for errors. */}
+                <Badge
+                  tone={
+                    entry.kind === "available"
+                      ? "success"
+                      : entry.kind === "busy"
+                        ? "warning"
+                        : "neutral"
+                  }
+                >
+                  {entry.kind}
+                </Badge>
+                <p className="t-mono-sm text-[var(--hf-ink-faint)]" data-tabular>
+                  <time dateTime={entry.startsAt}>
+                    {new Date(entry.startsAt).toLocaleString()}
+                  </time>
+                  {" → "}
+                  <time dateTime={entry.endsAt}>
+                    {new Date(entry.endsAt).toLocaleString()}
+                  </time>
+                </p>
+                <p className="t-body-sm min-w-0 flex-1 text-[var(--hf-ink-muted)]">
+                  {entry.note}
+                </p>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={pending}
+                  onClick={() => removeEntry(entry.id)}
+                >
+                  {labels.remove}
+                  <span className="sr-only"> — {entry.note}</span>
+                </Button>
               </li>
             );
           })}

@@ -23,13 +23,16 @@ export default async function AuthErrorPage({
   const message = reasons[reason] ?? reasons["auth-code"];
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-4 py-12">
-      <section className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-6">
-        <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold">
-          Sign-in failed
-        </h1>
-        <p className="mt-3 text-sm text-[var(--hf-fg-muted)]">{message}</p>
-        <div className="mt-6 flex flex-wrap gap-3">
+    <main className="mx-auto flex min-h-dvh w-full max-w-lg flex-col justify-center px-4 py-12">
+      <section className="panel grid gap-4 p-5">
+        <div className="grid gap-1">
+          <p className="t-body-sm inline-flex items-center gap-1.5 font-medium text-[var(--hf-error)]">
+            Error
+          </p>
+          <h1 className="t-display text-[var(--hf-ink)]">Sign-in failed</h1>
+          <p className="t-body text-[var(--hf-ink-muted)]">{message}</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
           <Link href="/login" className={cn(buttonVariants())}>
             Back to sign in
           </Link>

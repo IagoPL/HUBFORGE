@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Sora } from "next/font/google";
+import { Archivo, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { getLocale } from "@/i18n/get-dictionary";
 import "./globals.css";
 
-const display = Sora({
+// Engineering gothic for the title block, surface headlines and structural
+// numbering only. Used sparingly on purpose — see DESIGN.md typography.
+const display = Archivo({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  axes: ["wdth"],
 });
 
 const body = IBM_Plex_Sans({
@@ -41,6 +43,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       data-theme="light"
+      data-density="comfortable"
       className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
       suppressHydrationWarning
     >

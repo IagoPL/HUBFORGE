@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ensureProjectGeneralChannelAction,
@@ -14,6 +13,7 @@ import {
 import { useWorkspace } from "@/features/organizations/workspace-provider";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { getCurrentUserClientLabel } from "@/features/chat/demo-identity";
+import { cn } from "@/lib/utils";
 
 const DEMO_CHAT_KEY = "hubforge.demo.chat.v1";
 
@@ -245,85 +245,107 @@ export function ChatPanel({
 
   if (!projectId) {
     return (
-      <div className="space-y-2">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-          {labels.title}
-        </h1>
-        <p className="text-[var(--hf-fg-muted)]">{labels.emptyProject}</p>
+      <div className="px-4 py-5 sm:px-6">
+        <p className="lead">{labels.emptyProject}</p>
       </div>
     );
   }
 
+  const currentChannelName =
+    visibleChannels.find((item) => item.id === currentChannelId)?.name ?? "general";
+
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-          {labels.title}
-        </h1>
-        <p className="max-w-2xl text-[var(--hf-fg-muted)]">{labels.subtitle}</p>
-        <p className="text-xs text-[var(--hf-fg-muted)]">
+    <div className="grid gap-4 px-4 py-5 sm:px-6">
+      <div className="grid gap-1">
+        <p className="lead">{labels.subtitle}</p>
+        <p className="t-body-sm text-[var(--hf-ink-faint)]">
           {mode === "demo" ? labels.demoHint : labels.liveHint}
         </p>
-      </header>
+      </div>
 
-      {error ? <p className="text-sm text-[var(--hf-danger)]">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="t-body-sm text-[var(--hf-error)]">
+          {error}
+        </p>
+      ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-[14rem_1fr]">
-        <aside className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-3">
-          <p className="mb-2 text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
+      <div className="grid gap-3 lg:grid-cols-[13rem_1fr]">
+        <nav aria-label={labels.channels} className="panel p-2">
+          <p className="t-label px-2 py-1 text-[var(--hf-ink-faint)]">
             {labels.channels}
           </p>
-          <ul className="space-y-1">
-            {visibleChannels.map((channel) => (
-              <li key={channel.id}>
-                <button
-                  type="button"
-                  onClick={() => selectChannel(channel.id)}
-                  className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                    channel.id === currentChannelId
-                      ? "bg-[var(--hf-brand-soft)] text-[var(--hf-brand-strong)]"
-                      : "hover:bg-[var(--hf-surface-2)]"
-                  }`}
-                >
-                  #{channel.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </aside>
+          <ul className="grid gap-0.5">
+            {visibleChannels.map((channel) => {
+              const active = channel.id === currentChannelId;
 
-        <section className="flex min-h-[28rem] flex-col rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)]">
-          <div className="border-b border-[var(--hf-border)] px-4 py-3">
-            <p className="font-medium">
-              #
-              {visibleChannels.find((item) => item.id === currentChannelId)?.name ??
-                "general"}
+              return (
+                <li key={channel.id}>
+                  <button
+                    type="button"
+                    onClick={() => selectChannel(channel.id)}
+                    aria-current={active ? "true" : undefined}
+                    className={cn(
+                      "t-mono relative flex min-h-9 w-full items-center rounded-[var(--radius-sm)]",
+                      "px-2 text-left transition-colors duration-[var(--motion-feedback)]",
+                      active
+                        ? "bg-[var(--hf-accent-quiet)] text-[var(--hf-accent-hover)]"
+                        : "text-[var(--hf-ink-muted)] hover:bg-[var(--hf-ground-3)] hover:text-[var(--hf-ink)]",
+                    )}
+                  >
+                    #{channel.name}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <section
+          aria-label={currentChannelName}
+          className="panel flex min-h-[28rem] flex-col"
+        >
+          <div className="flex items-baseline gap-3 border-b border-[var(--hf-rule)] px-4 py-2.5">
+            <p className="t-mono font-medium text-[var(--hf-ink)]">
+              #{currentChannelName}
             </p>
-            <p className="text-xs text-[var(--hf-fg-muted)]">{labels.messages}</p>
+            <p className="t-body-sm text-[var(--hf-ink-faint)]">{labels.messages}</p>
           </div>
-          <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+
+          <div className="flex-1 overflow-y-auto bg-[var(--hf-ground-1)] px-4 py-3">
             {visibleMessages.length === 0 ? (
-              <p className="text-sm text-[var(--hf-fg-muted)]">{labels.emptyMessages}</p>
+              <p className="t-body text-[var(--hf-ink-muted)]">{labels.emptyMessages}</p>
             ) : (
-              visibleMessages.map((message) => (
-                <article
-                  key={message.id}
-                  className="rounded-xl bg-[var(--hf-surface-2)] px-3 py-2"
-                >
-                  <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <Badge>{message.authorId.slice(0, 8)}</Badge>
-                    <span className="font-[family-name:var(--font-mono)] text-[10px] text-[var(--hf-fg-muted)]">
-                      {new Date(message.createdAt).toLocaleString()}
-                    </span>
-                  </div>
-                  <p className="whitespace-pre-wrap text-sm">{message.body}</p>
-                </article>
-              ))
+              <ol className="grid gap-3">
+                {visibleMessages.map((message) => (
+                  <li key={message.id}>
+                    {/* Attribution as a drawn margin, so the message body stays
+                        the widest thing on the line. */}
+                    <article className="border-l border-[var(--hf-rule)] pl-3">
+                      <div className="flex flex-wrap items-baseline gap-2">
+                        <span className="t-mono-sm font-medium text-[var(--hf-ink)]">
+                          {message.authorId.slice(0, 8)}
+                        </span>
+                        <time
+                          dateTime={message.createdAt}
+                          className="t-mono-sm text-[var(--hf-ink-faint)]"
+                          data-tabular
+                        >
+                          {new Date(message.createdAt).toLocaleString()}
+                        </time>
+                      </div>
+                      <p className="t-body whitespace-pre-wrap text-[var(--hf-ink)]">
+                        {message.body}
+                      </p>
+                    </article>
+                  </li>
+                ))}
+              </ol>
             )}
             <div ref={bottomRef} />
           </div>
+
           <form
-            className="flex gap-2 border-t border-[var(--hf-border)] p-3"
+            className="flex gap-2 border-t border-[var(--hf-rule)] p-2"
             onSubmit={(event) => {
               event.preventDefault();
               send();
@@ -337,7 +359,7 @@ export function ChatPanel({
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               placeholder={labels.placeholder}
-              className="h-11 flex-1 rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+              className="input flex-1"
               disabled={pending || !currentChannelId}
             />
             <Button type="submit" disabled={pending || !draft.trim()}>

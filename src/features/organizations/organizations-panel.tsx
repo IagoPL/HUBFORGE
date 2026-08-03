@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
+import { cn } from "@/lib/utils";
 
 export function OrganizationsPanel({
   labels,
@@ -30,69 +31,72 @@ export function OrganizationsPanel({
   const [name, setName] = useState("");
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-          {labels.title}
-        </h1>
-        <p className="max-w-2xl text-[var(--hf-fg-muted)]">{labels.subtitle}</p>
-        <p className="text-xs text-[var(--hf-fg-muted)]">
+    <div className="grid gap-5 px-4 py-5 sm:px-6">
+      <div className="grid gap-1">
+        <p className="lead">{labels.subtitle}</p>
+        <p className="t-body-sm text-[var(--hf-ink-faint)]">
           {mode === "live" ? labels.liveHint : labels.switchHint}
         </p>
-      </header>
+      </div>
 
-      <section className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5">
-        <p className="mb-2 text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
-          {labels.current}
-        </p>
-        <p className="font-medium">{activeOrganization?.name ?? "—"}</p>
-      </section>
+      <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+        {state.organizations.map((organization) => {
+          const active = organization.id === activeOrganization?.id;
 
-      <ul className="grid gap-3 md:grid-cols-2">
-        {state.organizations.map((organization) => (
-          <li key={organization.id}>
-            <button
-              type="button"
-              onClick={() => setActiveOrganization(organization.id)}
-              className="w-full rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-4 text-left transition-colors hover:bg-[var(--hf-surface-2)]"
-            >
-              <div className="mb-2 flex items-center gap-2">
-                <p className="font-medium">{organization.name}</p>
-                {organization.id === activeOrganization?.id ? (
-                  <Badge tone="brand">{labels.current}</Badge>
-                ) : null}
-              </div>
-              <p className="font-[family-name:var(--font-mono)] text-xs text-[var(--hf-fg-muted)]">
-                {organization.slug}
-              </p>
-            </button>
-          </li>
-        ))}
+          return (
+            <li key={organization.id}>
+              <button
+                type="button"
+                onClick={() => setActiveOrganization(organization.id)}
+                aria-current={active ? "true" : undefined}
+                className={cn(
+                  "panel w-full p-4 text-left transition-colors",
+                  "duration-[var(--motion-feedback)] hover:bg-[var(--hf-ground-3)]",
+                  active && "bg-[var(--hf-accent-quiet)]",
+                )}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="t-body font-medium text-[var(--hf-ink)]">
+                    {organization.name}
+                  </span>
+                  {active ? <Badge tone="brand">{labels.current}</Badge> : null}
+                </span>
+                <span className="t-mono-sm mt-1 block text-[var(--hf-ink-faint)]">
+                  {organization.slug}
+                </span>
+              </button>
+            </li>
+          );
+        })}
       </ul>
 
       <form
-        className="max-w-lg space-y-3 rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5"
+        className="panel grid max-w-lg gap-3 p-5"
         onSubmit={(event) => {
           event.preventDefault();
           if (!name.trim() || pending) return;
           void addOrganization(name).then(() => setName(""));
         }}
       >
-        <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold">
-          {labels.create}
-        </h2>
-        <label className="block space-y-2 text-sm">
-          <span className="font-medium">{labels.name}</span>
+        <h2 className="t-display-sm text-[var(--hf-ink)]">{labels.create}</h2>
+        <label className="grid gap-1.5">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.name}
+          </span>
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+            className="input"
             required
             disabled={pending}
           />
         </label>
-        {error ? <p className="text-sm text-[var(--hf-danger)]">{error}</p> : null}
-        <Button type="submit" disabled={pending}>
+        {error ? (
+          <p role="alert" className="t-body-sm text-[var(--hf-error)]">
+            {error}
+          </p>
+        ) : null}
+        <Button type="submit" disabled={pending} className="justify-self-start">
           {labels.create}
         </Button>
       </form>

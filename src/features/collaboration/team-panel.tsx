@@ -14,6 +14,7 @@ import { initialsFromName } from "@/features/collaboration/mapping";
 import { useWorkspace } from "@/features/organizations/workspace-provider";
 import { getDemoWorkspace } from "@/data/demo-workspace";
 import { memberRoleSchema, type AccessRole, type Member } from "@/lib/domain/types";
+import { cn } from "@/lib/utils";
 
 const accessLabels: Record<AccessRole, string> = {
   organization_owner: "Org Owner",
@@ -191,43 +192,46 @@ export function TeamPanel({
   }
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-          {labels.title}
-        </h1>
-        <p className="max-w-2xl text-[var(--hf-fg-muted)]">{labels.subtitle}</p>
-      </header>
+    <div className="grid gap-5 px-4 py-5 sm:px-6">
+      <p className="lead">{labels.subtitle}</p>
 
-      {error ? <p className="text-sm text-[var(--hf-danger)]">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="t-body-sm text-[var(--hf-error)]">
+          {error}
+        </p>
+      ) : null}
 
       <form
-        className="grid max-w-3xl gap-3 rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5 md:grid-cols-2"
+        className="panel grid max-w-3xl gap-3 p-5 md:grid-cols-2"
         onSubmit={(event) => {
           event.preventDefault();
           invite();
         }}
       >
-        <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold md:col-span-2">
+        <h2 className="t-display-sm text-[var(--hf-ink)] md:col-span-2">
           {labels.invite}
         </h2>
-        <label className="block space-y-2 text-sm">
-          <span className="font-medium">{labels.email}</span>
+        <label className="grid gap-1.5">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.email}
+          </span>
           <input
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+            className="input"
             required
             disabled={pending || !organizationId}
           />
         </label>
-        <label className="block space-y-2 text-sm">
-          <span className="font-medium">{labels.accessRole}</span>
+        <label className="grid gap-1.5">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.accessRole}
+          </span>
           <select
             value={accessRole}
             onChange={(event) => setAccessRole(event.target.value as AccessRole)}
-            className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+            className="input"
             disabled={pending || !organizationId}
           >
             {roleOptions.map((role) => (
@@ -237,35 +241,37 @@ export function TeamPanel({
             ))}
           </select>
         </label>
-        <label className="block space-y-2 text-sm md:col-span-2">
-          <span className="font-medium">{labels.functionalRole}</span>
+        <label className="grid gap-1.5 md:col-span-2">
+          <span className="t-body-sm font-medium text-[var(--hf-ink)]">
+            {labels.functionalRole}
+          </span>
           <input
             value={functionalRole}
             onChange={(event) => setFunctionalRole(event.target.value)}
-            className="h-11 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-3"
+            className="input"
             disabled={pending || !organizationId}
           />
         </label>
-        <div className="md:col-span-2">
-          <Button type="submit" disabled={pending || !organizationId}>
-            {labels.invite}
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          disabled={pending || !organizationId}
+          className="justify-self-start md:col-span-2"
+        >
+          {labels.invite}
+        </Button>
       </form>
 
       {invitations.length > 0 ? (
-        <section className="space-y-3">
-          <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold">
-            {labels.pending}
-          </h2>
-          <ul className="grid gap-3 md:grid-cols-2">
+        <section className="grid gap-2">
+          <h2 className="t-display-sm text-[var(--hf-ink)]">{labels.pending}</h2>
+          <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
             {invitations.map((invitation) => (
-              <li
-                key={invitation.id}
-                className="rounded-2xl border border-dashed border-[var(--hf-border)] bg-[var(--hf-surface)] p-4"
-              >
-                <p className="font-medium">{invitation.email}</p>
-                <div className="mt-2 flex flex-wrap gap-2">
+              /* Dashed rule: drawn but not yet built. */
+              <li key={invitation.id} className="panel border-dashed p-4">
+                <p className="t-body font-medium text-[var(--hf-ink)]">
+                  {invitation.email}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
                   <Badge tone="brand">{accessLabels[invitation.accessRole]}</Badge>
                   <Badge>{invitation.functionalRole || "Contributor"}</Badge>
                 </div>
@@ -276,67 +282,74 @@ export function TeamPanel({
       ) : null}
 
       {members.length === 0 ? (
-        <p className="text-sm text-[var(--hf-fg-muted)]">{labels.empty}</p>
+        <p className="t-body text-[var(--hf-ink-muted)]">{labels.empty}</p>
       ) : (
-        <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
           {members.map((member) => (
-            <li
-              key={member.id}
-              className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5"
-            >
-              <div className="mb-4 flex items-center gap-3">
-                <span className="inline-flex size-11 items-center justify-center rounded-full bg-[var(--hf-brand-soft)] text-sm font-semibold text-[var(--hf-brand-strong)]">
+            <li key={member.id} className="panel grid gap-3 p-4">
+              <div className="flex items-center gap-3">
+                <span
+                  className={cn(
+                    "t-mono-sm grid size-9 shrink-0 place-items-center rounded-full",
+                    "bg-[var(--hf-accent-quiet)] font-medium text-[var(--hf-accent-hover)]",
+                  )}
+                  aria-hidden
+                >
                   {member.avatarInitials}
                 </span>
-                <div>
-                  <p className="font-medium">{member.name}</p>
-                  <p className="text-sm text-[var(--hf-fg-muted)]">{member.email}</p>
+                <div className="min-w-0">
+                  <p className="t-body truncate font-medium text-[var(--hf-ink)]">
+                    {member.name}
+                  </p>
+                  <p className="t-body-sm truncate text-[var(--hf-ink-muted)]">
+                    {member.email}
+                  </p>
                 </div>
               </div>
-              <div className="space-y-3">
-                <label className="block space-y-1 text-sm">
-                  <span className="text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
-                    {labels.accessRole}
-                  </span>
-                  <select
-                    value={member.accessRole}
-                    onChange={(event) =>
-                      updateDraft(member.id, {
-                        accessRole: event.target.value as AccessRole,
-                      })
-                    }
-                    className="h-10 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-2"
-                    disabled={pending}
-                  >
-                    {roleOptions.map((role) => (
-                      <option key={role} value={role}>
-                        {accessLabels[role]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="block space-y-1 text-sm">
-                  <span className="text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
-                    {labels.functionalRole}
-                  </span>
-                  <input
-                    value={member.functionalRole}
-                    onChange={(event) =>
-                      updateDraft(member.id, { functionalRole: event.target.value })
-                    }
-                    className="h-10 w-full rounded-md border border-[var(--hf-border)] bg-[var(--hf-bg)] px-2"
-                    disabled={pending}
-                  />
-                </label>
-                <Button
-                  type="button"
-                  variant="secondary"
+              <label className="grid gap-1">
+                <span className="t-label text-[var(--hf-ink-faint)]">
+                  {labels.accessRole}
+                </span>
+                <select
+                  value={member.accessRole}
+                  onChange={(event) =>
+                    updateDraft(member.id, {
+                      accessRole: event.target.value as AccessRole,
+                    })
+                  }
+                  className="input"
                   disabled={pending}
-                  onClick={() => saveMember(member)}
                 >
-                  {labels.saveRoles}
-                </Button>
-              </div>
+                  {roleOptions.map((role) => (
+                    <option key={role} value={role}>
+                      {accessLabels[role]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="grid gap-1">
+                <span className="t-label text-[var(--hf-ink-faint)]">
+                  {labels.functionalRole}
+                </span>
+                <input
+                  value={member.functionalRole}
+                  onChange={(event) =>
+                    updateDraft(member.id, { functionalRole: event.target.value })
+                  }
+                  className="input"
+                  disabled={pending}
+                />
+              </label>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={pending}
+                onClick={() => saveMember(member)}
+                className="justify-self-start"
+              >
+                {labels.saveRoles}
+              </Button>
             </li>
           ))}
         </ul>

@@ -1,16 +1,19 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { BriefingSurface } from "@/components/operations/briefing-surface";
+import { changeSummary, openWorkSummary } from "@/components/operations/labels";
 import { NotificationsPanel } from "@/features/availability/notifications-panel";
 import { getCurrentUser } from "@/features/authentication/get-current-user";
 import { listMembersAction, listTasksAction } from "@/features/collaboration/actions";
 import { getWorkspaceSnapshot } from "@/features/organizations/get-workspace";
-import { getDemoWorkspace } from "@/data/demo-workspace";
+import { buildLiveAttention, getDemoOperations } from "@/data/demo-operations";
 import { getDictionary, getLocale } from "@/i18n/get-dictionary";
+import type { Member } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
-  title: "Overview",
+  title: "Briefing",
 };
 
 export default async function AppOverviewPage() {
@@ -21,12 +24,16 @@ export default async function AppOverviewPage() {
     ? await getWorkspaceSnapshot()
     : { mode: "demo" as const, state: undefined };
 
+  const notificationLabels = {
+    title: t.app.latestNotifications,
+    markRead: t.notifications.markRead,
+    empty: t.notifications.empty,
+    unread: t.app.unread,
+    isNew: t.app.new,
+  };
+
   if (workspace.mode === "live") {
     const state = workspace.state;
-    const project =
-      state.projects.find((item) => item.id === state.activeProjectId) ??
-      state.projects[0] ??
-      null;
     const organization =
       state.organizations.find((item) => item.id === state.activeOrganizationId) ??
       state.organizations[0] ??
@@ -34,35 +41,28 @@ export default async function AppOverviewPage() {
 
     if (!organization) {
       return (
-        <div className="space-y-4">
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-            {t.onboarding.title}
-          </h1>
-          <p className="max-w-2xl text-[var(--hf-fg-muted)]">{t.onboarding.body}</p>
-          <Link
-            href="/app/organizations"
-            className={cn(buttonVariants({ variant: "primary" }), "inline-flex")}
-          >
-            {t.organizations.create}
-          </Link>
-        </div>
+        <Onboarding
+          title={t.onboarding.title}
+          body={t.onboarding.body}
+          href="/app/organizations"
+          action={t.organizations.create}
+        />
       );
     }
 
+    const project =
+      state.projects.find((item) => item.id === state.activeProjectId) ??
+      state.projects[0] ??
+      null;
+
     if (!project) {
       return (
-        <div className="space-y-4">
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-            {organization.name}
-          </h1>
-          <p className="max-w-2xl text-[var(--hf-fg-muted)]">{t.projects.emptyHint}</p>
-          <Link
-            href="/app/projects"
-            className={cn(buttonVariants({ variant: "primary" }), "inline-flex")}
-          >
-            {t.projects.create}
-          </Link>
-        </div>
+        <Onboarding
+          title={organization.name}
+          body={t.projects.emptyHint}
+          href="/app/projects"
+          action={t.projects.create}
+        />
       );
     }
 
@@ -72,147 +72,129 @@ export default async function AppOverviewPage() {
     ]);
     const members = membersResult.ok ? membersResult.data : [];
     const tasks = tasksResult.ok ? tasksResult.data : [];
-    const openTasks = tasks.filter((task) => task.status !== "done").length;
+    const open = tasks.filter((task) => task.status !== "done").length;
 
     return (
-      <div className="space-y-8">
-        <header className="space-y-2">
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-            {project.name}
-          </h1>
-          <p className="max-w-2xl text-[var(--hf-fg-muted)]">{project.description}</p>
-        </header>
-
-        <section aria-label="Workspace summary" className="grid gap-4 sm:grid-cols-3">
-          {[
-            { label: t.app.openTasks, value: String(openTasks) },
-            { label: t.app.members, value: String(members.length) },
-            { label: t.app.unread, value: "—" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-4"
-            >
-              <p className="text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
-                {stat.label}
-              </p>
-              <p className="mt-2 font-[family-name:var(--font-display)] text-3xl font-semibold">
-                {stat.value}
-              </p>
-            </div>
-          ))}
-        </section>
-
-        <section className="grid gap-4 lg:grid-cols-2">
-          <NotificationsPanel
-            labels={{
-              title: t.app.latestNotifications,
-              markRead: t.notifications.markRead,
-              empty: t.notifications.empty,
-              unread: t.app.unread,
-            }}
-          />
-          <div className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5">
-            <h2 className="mb-4 font-[family-name:var(--font-display)] text-lg font-semibold">
-              {t.app.teamPresence}
-            </h2>
-            {members.length === 0 ? (
-              <p className="text-sm text-[var(--hf-fg-muted)]">{t.team.empty}</p>
-            ) : (
-              <ul className="space-y-3">
-                {members.map((member) => (
-                  <li key={member.id} className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex size-9 items-center justify-center rounded-full bg-[var(--hf-brand-soft)] text-xs font-semibold text-[var(--hf-brand-strong)]">
-                        {member.avatarInitials}
-                      </span>
-                      <div>
-                        <p className="text-sm font-medium">{member.name}</p>
-                        <p className="text-xs text-[var(--hf-fg-muted)]">
-                          {member.functionalRole}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge tone={member.presence === "online" ? "success" : "neutral"}>
-                      {member.presence}
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </section>
-      </div>
+      <>
+        {/* No task history exists yet, so the briefing states the present
+            instead of claiming to know what changed. */}
+        <BriefingSurface
+          summary={openWorkSummary(open, tasks.length, t.operations)}
+          attention={buildLiveAttention(tasks)}
+          members={members}
+          now={new Date().toISOString()}
+          locale={locale}
+          labels={t.operations}
+        />
+        <Aside
+          notificationLabels={notificationLabels}
+          presenceTitle={t.app.teamPresence}
+          emptyLabel={t.team.empty}
+          members={members}
+        />
+      </>
     );
   }
 
-  const { project, members, tasks } = getDemoWorkspace();
-  const openTasks = tasks.filter((task) => task.status !== "done").length;
+  const snapshot = getDemoOperations();
 
   return (
-    <div className="space-y-8">
-      <header className="space-y-2">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">
-          {project.name}
-        </h1>
-        <p className="max-w-2xl text-[var(--hf-fg-muted)]">{project.description}</p>
-      </header>
+    <>
+      <BriefingSurface
+        summary={changeSummary(snapshot.changeCounts, t.operations)}
+        attention={snapshot.attention}
+        members={snapshot.members}
+        now={snapshot.nowAt}
+        locale={locale}
+        labels={t.operations}
+      />
+      <Aside
+        notificationLabels={notificationLabels}
+        presenceTitle={t.app.teamPresence}
+        emptyLabel={t.team.empty}
+        members={snapshot.members}
+      />
+    </>
+  );
+}
 
-      <section aria-label="Workspace summary" className="grid gap-4 sm:grid-cols-3">
-        {[
-          { label: t.app.openTasks, value: String(openTasks) },
-          { label: t.app.members, value: String(members.length) },
-          { label: t.app.unread, value: "—" },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-4"
-          >
-            <p className="text-xs uppercase tracking-wide text-[var(--hf-fg-muted)]">
-              {stat.label}
-            </p>
-            <p className="mt-2 font-[family-name:var(--font-display)] text-3xl font-semibold">
-              {stat.value}
-            </p>
-          </div>
-        ))}
-      </section>
+function Aside({
+  notificationLabels,
+  presenceTitle,
+  emptyLabel,
+  members,
+}: {
+  notificationLabels: React.ComponentProps<typeof NotificationsPanel>["labels"];
+  presenceTitle: string;
+  emptyLabel: string;
+  members: Member[];
+}) {
+  return (
+    <div className="grid gap-3 px-4 pb-6 sm:px-6 lg:grid-cols-2">
+      <NotificationsPanel labels={notificationLabels} />
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <NotificationsPanel
-          labels={{
-            title: t.app.latestNotifications,
-            markRead: t.notifications.markRead,
-            empty: t.notifications.empty,
-            unread: t.app.unread,
-          }}
-        />
-        <div className="rounded-2xl border border-[var(--hf-border)] bg-[var(--hf-surface)] p-5">
-          <h2 className="mb-4 font-[family-name:var(--font-display)] text-lg font-semibold">
-            {t.app.teamPresence}
-          </h2>
-          <ul className="space-y-3">
+      <section aria-labelledby="presence-heading" className="panel p-4">
+        <h2 id="presence-heading" className="t-display-sm mb-3 text-[var(--hf-ink)]">
+          {presenceTitle}
+        </h2>
+        {members.length === 0 ? (
+          <p className="t-body text-[var(--hf-ink-muted)]">{emptyLabel}</p>
+        ) : (
+          <ul className="grid gap-2">
             {members.map((member) => (
               <li key={member.id} className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex size-9 items-center justify-center rounded-full bg-[var(--hf-brand-soft)] text-xs font-semibold text-[var(--hf-brand-strong)]">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "t-mono-sm grid size-8 shrink-0 place-items-center rounded-full",
+                      "bg-[var(--hf-ground-3)] text-[var(--hf-ink-muted)]",
+                    )}
+                  >
                     {member.avatarInitials}
                   </span>
-                  <div>
-                    <p className="text-sm font-medium">{member.name}</p>
-                    <p className="text-xs text-[var(--hf-fg-muted)]">
+                  <span className="min-w-0">
+                    <span className="t-body block truncate font-medium text-[var(--hf-ink)]">
+                      {member.name}
+                    </span>
+                    <span className="t-body-sm block truncate text-[var(--hf-ink-muted)]">
                       {member.functionalRole}
-                    </p>
-                  </div>
-                </div>
+                    </span>
+                  </span>
+                </span>
                 <Badge tone={member.presence === "online" ? "success" : "neutral"}>
                   {member.presence}
                 </Badge>
               </li>
             ))}
           </ul>
-        </div>
+        )}
       </section>
+    </div>
+  );
+}
+
+function Onboarding({
+  title,
+  body,
+  href,
+  action,
+}: {
+  title: string;
+  body: string;
+  href: string;
+  action: string;
+}) {
+  return (
+    <div className="grid max-w-xl gap-3 px-4 py-5 sm:px-6">
+      <h2 className="t-display text-[var(--hf-ink)]">{title}</h2>
+      <p className="lead">{body}</p>
+      <Link
+        href={href}
+        className={cn(buttonVariants({ variant: "primary" }), "justify-self-start")}
+      >
+        {action}
+      </Link>
     </div>
   );
 }
