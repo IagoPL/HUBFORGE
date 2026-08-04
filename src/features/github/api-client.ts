@@ -29,6 +29,16 @@ export type GitHubApiCommit = {
   author?: { login?: string } | null;
 };
 
+export class GitHubRateLimitError extends Error {
+  constructor(
+    message: string,
+    readonly resetAt: string | null,
+  ) {
+    super(message);
+    this.name = "GitHubRateLimitError";
+  }
+}
+
 async function githubGet<T>(token: string, path: string): Promise<T> {
   const response = await fetch(`${GITHUB_API}${path}`, {
     headers: {
@@ -39,6 +49,16 @@ async function githubGet<T>(token: string, path: string): Promise<T> {
     },
     cache: "no-store",
   });
+
+  if (response.status === 403 || response.status === 429) {
+    const remaining = response.headers.get("x-ratelimit-remaining");
+    if (remaining === "0" || response.status === 429) {
+      throw new GitHubRateLimitError(
+        `GitHub API rate limited (${response.status})`,
+        response.headers.get("x-ratelimit-reset"),
+      );
+    }
+  }
 
   if (!response.ok) {
     const body = await response.text();
@@ -84,4 +104,60 @@ export async function listRepositoryCommits(
   const path = `/repos/${encodeRepo(fullName)}/commits?per_page=${Math.min(limit, 100)}`;
   const rows = await githubGet<GitHubApiCommit[]>(token, path);
   return rows.slice(0, limit);
+}
+
+export type GitHubApiCheckRun = {
+  id: number;
+  name: string;
+  status: string;
+  conclusion: string | null;
+  html_url: string | null;
+  head_sha: string;
+  completed_at: string | null;
+  updated_at: string | null;
+  pull_requests?: { number: number }[];
+};
+
+/**
+ * Paginates check runs for a commit SHA (or HEAD). Caps at `limit` total rows.
+ * Stops early on rate limit and returns what was collected.
+ */
+export async function listRepositoryCheckRuns(
+  token: string,
+  fullName: string,
+  options: { ref?: string; limit?: number; perPage?: number } = {},
+): Promise<{ runs: GitHubApiCheckRun[]; rateLimited: boolean; pages: number }> {
+  const limit = options.limit ?? 40;
+  const perPage = Math.min(options.perPage ?? 30, 100);
+  const commitRef = options.ref?.trim() || "HEAD";
+  const runs: GitHubApiCheckRun[] = [];
+  let page = 1;
+  let rateLimited = false;
+
+  while (runs.length < limit && page <= 5) {
+    const listPath = `/repos/${encodeRepo(fullName)}/commits/${encodeURIComponent(commitRef)}/check-runs?per_page=${perPage}&page=${page}`;
+
+    try {
+      const payload = await githubGet<{
+        check_runs: GitHubApiCheckRun[];
+        total_count: number;
+      }>(token, listPath);
+      const batch = payload.check_runs ?? [];
+      if (batch.length === 0) break;
+      for (const run of batch) {
+        runs.push(run);
+        if (runs.length >= limit) break;
+      }
+      if (batch.length < perPage) break;
+      page += 1;
+    } catch (error) {
+      if (error instanceof GitHubRateLimitError) {
+        rateLimited = true;
+        break;
+      }
+      throw error;
+    }
+  }
+
+  return { runs: runs.slice(0, limit), rateLimited, pages: page };
 }

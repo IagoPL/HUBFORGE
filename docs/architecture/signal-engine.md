@@ -63,9 +63,13 @@ Constantes: `PRIORITY_FORMULA` en `src/lib/signals/prioritize.ts`.
 
 ## CI / check runs
 
-Tabla aditiva `github_synced_check_runs` (migración `20260804120000_…`). Sin filas → sin `ci_failed` en espacios reales. La demo inyecta fixtures etiquetados `source: demo`.
+Tabla aditiva `github_synced_check_runs` (migración `20260804120000_…`). RLS: solo `SELECT` para miembros; escrituras service-role/webhook.
 
-El webhook todavía no persiste check runs; el adaptador lee la tabla cuando exista.
+Webhooks: `check_run` (persistencia directa) y `check_suite` (fetch de runs por `head_sha`). Idempotencia por `github_webhook_deliveries.delivery_id`. Fuera de orden: se ignora si el evento es más antiguo que el estado almacenado.
+
+`ci_failed` solo si el **último** check por `(name, head_sha)` tiene `status=completed` y `conclusion=failure`. No fallan señales: `cancelled`, `skipped`, `neutral`, `timed_out`, `action_required`, incompletos. Un success posterior elimina el fallo.
+
+Backfill opcional en Sync now / link repo; errores de checks son parciales y no bloquean issues/PRs.
 
 ## Capacidad
 

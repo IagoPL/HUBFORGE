@@ -4,6 +4,7 @@ import { listAvailabilityAction } from "@/features/availability/actions";
 import {
   listMembersAction,
   listOperationsTasksAction,
+  listTaskEventsSinceAction,
 } from "@/features/collaboration/actions";
 import {
   listLinkedRepositoryAction,
@@ -31,17 +32,32 @@ export async function loadProjectEvidence(input: {
 }): Promise<LoadEvidenceResult> {
   const warnings: string[] = [];
 
-  const [ops, members, availability, repo, issues, pullRequests, commits, checkRuns] =
-    await Promise.all([
-      listOperationsTasksAction(input.projectId),
-      listMembersAction(input.organizationId),
-      listAvailabilityAction(input.organizationId),
-      listLinkedRepositoryAction(input.projectId),
-      listSyncedIssuesAction(input.projectId),
-      listSyncedPullRequestsAction(input.projectId),
-      listSyncedCommitsAction(input.projectId),
-      listSyncedCheckRunsAction(input.projectId),
-    ]);
+  const nowIso = input.now ?? new Date().toISOString();
+  const eventsSince =
+    input.lastVisitAt ??
+    new Date(Date.parse(nowIso) - 14 * 24 * 60 * 60 * 1000).toISOString();
+
+  const [
+    ops,
+    members,
+    availability,
+    repo,
+    issues,
+    pullRequests,
+    commits,
+    checkRuns,
+    events,
+  ] = await Promise.all([
+    listOperationsTasksAction(input.projectId),
+    listMembersAction(input.organizationId),
+    listAvailabilityAction(input.organizationId),
+    listLinkedRepositoryAction(input.projectId),
+    listSyncedIssuesAction(input.projectId),
+    listSyncedPullRequestsAction(input.projectId),
+    listSyncedCommitsAction(input.projectId),
+    listSyncedCheckRunsAction(input.projectId),
+    listTaskEventsSinceAction(input.projectId, eventsSince),
+  ]);
 
   if (!ops.ok) return { ok: false, error: ops.error };
   if (!members.ok) {
@@ -64,6 +80,9 @@ export async function loadProjectEvidence(input: {
   }
   if (!checkRuns.ok) {
     warnings.push(checkRuns.error);
+  }
+  if (!events.ok) {
+    warnings.push(events.error);
   }
 
   const tasks = ops.data.map((task) => ({
@@ -90,7 +109,17 @@ export async function loadProjectEvidence(input: {
     lastVisitAt: input.lastVisitAt,
     tasks,
     dependencies,
-    events: [],
+    events: events.ok
+      ? events.data.map((event) => ({
+          taskId: event.taskId,
+          kind: event.kind,
+          summary: event.summary,
+          fromValue: event.fromValue,
+          toValue: event.toValue,
+          createdAt: event.createdAt,
+          actorId: event.actorId,
+        }))
+      : [],
     pullRequests: pullRequests.ok
       ? pullRequests.data.map((pr) => ({
           id: pr.id,
@@ -141,7 +170,7 @@ export async function loadProjectEvidence(input: {
         }))
       : [],
     config: {
-      now: input.now ?? new Date().toISOString(),
+      now: nowIso,
       demo: false,
     },
   });

@@ -1,11 +1,15 @@
 import {
+  GitHubRateLimitError,
+  listRepositoryCheckRuns,
   listRepositoryCommits,
   listRepositoryIssues,
   listRepositoryPullRequests,
 } from "@/features/github/api-client";
 import { createInstallationAccessToken } from "@/features/github/app-auth";
+import { parseCheckRunPayload } from "@/features/github/check-run-normalize";
 import { isGitHubAppConfigured } from "@/features/github/config";
 import {
+  persistSyncedCheckRun,
   persistSyncedCommits,
   persistSyncedIssue,
   persistSyncedPullRequest,
@@ -17,13 +21,23 @@ export type BackfillCounts = {
   issues: number;
   pullRequests: number;
   commits: number;
+  checkRuns: number;
 };
+
+export type BackfillResult =
+  | {
+      ok: true;
+      counts: BackfillCounts;
+      partialErrors: string[];
+      rateLimited: boolean;
+    }
+  | { ok: false; error: string };
 
 export async function backfillLinkedRepository(input: {
   fullName: string;
   installationId: number;
   linked: LinkedRepositoryRow;
-}): Promise<{ ok: true; counts: BackfillCounts } | { ok: false; error: string }> {
+}): Promise<BackfillResult> {
   if (!isGitHubAppConfigured()) {
     return { ok: false, error: "GitHub App is not configured." };
   }
@@ -35,6 +49,15 @@ export async function backfillLinkedRepository(input: {
 
   const tokenResult = await createInstallationAccessToken(input.installationId);
   if (!tokenResult.ok) return tokenResult;
+
+  const partialErrors: string[] = [];
+  let rateLimited = false;
+  const counts: BackfillCounts = {
+    issues: 0,
+    pullRequests: 0,
+    commits: 0,
+    checkRuns: 0,
+  };
 
   try {
     const [issues, pullRequests, commits] = await Promise.all([
@@ -51,6 +74,7 @@ export async function backfillLinkedRepository(input: {
         state: issue.state === "closed" ? "closed" : "open",
         html_url: issue.html_url,
       });
+      counts.issues += 1;
     }
 
     for (const pr of pullRequests) {
@@ -63,6 +87,7 @@ export async function backfillLinkedRepository(input: {
         html_url: pr.html_url,
         author_login: pr.user?.login,
       });
+      counts.pullRequests += 1;
     }
 
     await persistSyncedCommits(
@@ -76,19 +101,50 @@ export async function backfillLinkedRepository(input: {
         committed_at: commit.commit.author?.date ?? null,
       })),
     );
-
-    return {
-      ok: true,
-      counts: {
-        issues: issues.length,
-        pullRequests: pullRequests.length,
-        commits: commits.length,
-      },
-    };
+    counts.commits = commits.length;
   } catch (error) {
+    if (error instanceof GitHubRateLimitError) {
+      return {
+        ok: true,
+        counts,
+        partialErrors: ["Rate limited while syncing issues/PRs/commits."],
+        rateLimited: true,
+      };
+    }
     return {
       ok: false,
       error: error instanceof Error ? error.message : "GitHub backfill failed.",
     };
   }
+
+  // Check runs are best-effort and must not fail the primary sync.
+  try {
+    const headSha = (await listRepositoryCommits(tokenResult.token, input.fullName, 1))[0]
+      ?.sha;
+    const listed = await listRepositoryCheckRuns(tokenResult.token, input.fullName, {
+      ref: headSha,
+      limit: 40,
+      perPage: 30,
+    });
+    rateLimited = listed.rateLimited;
+
+    for (const run of listed.runs) {
+      const parsed = parseCheckRunPayload(run as unknown as Record<string, unknown>);
+      if (!parsed) continue;
+      await persistSyncedCheckRun(admin, input.linked, parsed);
+      counts.checkRuns += 1;
+    }
+
+    if (listed.rateLimited) {
+      partialErrors.push("Rate limited while syncing check runs; partial results kept.");
+    }
+  } catch (error) {
+    partialErrors.push(
+      error instanceof Error
+        ? `Check run sync failed: ${error.message}`
+        : "Check run sync failed.",
+    );
+  }
+
+  return { ok: true, counts, partialErrors, rateLimited };
 }
