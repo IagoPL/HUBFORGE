@@ -240,6 +240,7 @@ export type SyncedPullRequestSummary = {
   merged: boolean;
   htmlUrl: string;
   authorLogin: string;
+  updatedAt: string | null;
 };
 
 export type SyncedCommitSummary = {
@@ -259,7 +260,7 @@ export async function listSyncedPullRequestsAction(
 
   const { data, error } = await gate.supabase
     .from("github_synced_pull_requests")
-    .select("id, number, title, state, merged, html_url, author_login")
+    .select("id, number, title, state, merged, html_url, author_login, updated_at")
     .eq("project_id", projectId)
     .order("number", { ascending: false })
     .limit(40);
@@ -275,6 +276,7 @@ export async function listSyncedPullRequestsAction(
       merged: row.merged,
       htmlUrl: row.html_url,
       authorLogin: row.author_login,
+      updatedAt: row.updated_at ?? null,
     })),
   };
 }
