@@ -1,8 +1,8 @@
-# Error tracking (Sentry)
+# Seguimiento de errores (Sentry)
 
-HubForge reports runtime errors through `@sentry/nextjs` when a DSN is set.
+HubForge reporta errores en runtime mediante `@sentry/nextjs` cuando hay un DSN configurado.
 
-## Environment
+## Entorno
 
 ```bash
 NEXT_PUBLIC_SENTRY_DSN=https://…@….ingest.sentry.io/…
@@ -13,9 +13,9 @@ SENTRY_ORG=
 SENTRY_PROJECT=
 ```
 
-Without a DSN, the SDK stays disabled. App Router `error.tsx` / `global-error.tsx` still show a recovery UI.
+Sin DSN, el SDK permanece deshabilitado. App Router `error.tsx` / `global-error.tsx` siguen mostrando una UI de recuperación.
 
-## Surfaces
+## Superficies
 
 - `src/instrumentation-client.ts` — browser
 - `sentry.server.config.ts` / `sentry.edge.config.ts` — Node / Edge

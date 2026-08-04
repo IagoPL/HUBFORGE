@@ -14,6 +14,20 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
   },
+  async redirects() {
+    return [
+      {
+        source: "/app/chat",
+        destination: "/app?notice=chat-retired",
+        permanent: false,
+      },
+      {
+        source: "/app/chat/:path*",
+        destination: "/app?notice=chat-retired",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {

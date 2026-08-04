@@ -1,28 +1,28 @@
-# GitHub App setup (repository sync)
+# Configuración de GitHub App (sincronización de repositorios)
 
-HubForge syncs issues, pull requests, and commits through a **GitHub App** (not personal access tokens). Auth login remains Supabase GitHub OAuth and is separate.
+HubForge sincroniza issues, pull requests y commits mediante una **GitHub App** (no personal access tokens). El login de auth sigue siendo Supabase GitHub OAuth y es independiente.
 
-Sync paths:
+Rutas de sincronización:
 
-1. **Webhooks** — incremental updates when GitHub events fire
-2. **API backfill** — after linking (or via **Sync now**), HubForge uses the App JWT + installation token to import recent issues (~50), PRs (~40), and commits (~40)
+1. **Webhooks** — actualizaciones incrementales cuando GitHub dispara eventos
+2. **API backfill** — tras vincular (o mediante **Sync now**), HubForge usa el JWT de la App + installation token para importar issues recientes (~50), PRs (~40) y commits (~40)
 
-## 1. Create the GitHub App
+## 1. Crear la GitHub App
 
-1. Open https://github.com/settings/apps/new
-2. Homepage URL: production app URL (`https://hubforge-six.vercel.app`) or `http://localhost:3000` while testing
-3. Setup URL: `https://hubforge-six.vercel.app/api/github/setup` (stores `installation_id`; pass `state=<organizationId>` from HubForge)
+1. Abrir https://github.com/settings/apps/new
+2. Homepage URL: URL de producción de la app (`https://hubforge-six.vercel.app`) o `http://localhost:3000` mientras pruebas
+3. Setup URL: `https://hubforge-six.vercel.app/api/github/setup` (almacena `installation_id`; pasa `state=<organizationId>` desde HubForge)
 4. Webhook URL: `https://hubforge-six.vercel.app/api/github/webhooks`
-5. Webhook secret: generate a long random string
+5. Webhook secret: genera una cadena aleatoria larga
 6. Permissions (Repository):
    - Issues: Read & write
    - Metadata: Read-only
    - Pull requests: Read-only
    - Contents: Read-only (commit metadata)
 7. Subscribe to events: `Issues`, `Pull request`, `Push`, `Installation`, `Installation repositories`
-8. Create the app and note App ID, Client ID, Client secret, and generate a private key
+8. Crear la app y anotar App ID, Client ID, Client secret; generar una private key
 
-## 2. Environment
+## 2. Entorno
 
 ```bash
 GITHUB_APP_ID=
@@ -34,23 +34,23 @@ GITHUB_APP_SLUG=your-app-slug
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` is required for webhook idempotency writes and API backfill persistence. Never expose it with `NEXT_PUBLIC_`.
+`SUPABASE_SERVICE_ROLE_KEY` es necesaria para escrituras idempotentes de webhooks y persistencia del API backfill. Nunca la expongas con `NEXT_PUBLIC_`.
 
-## 3. Database
+## 3. Base de datos
 
-Apply `supabase/migrations/20260728240000_github_app_sync.sql` and
+Aplica `supabase/migrations/20260728240000_github_app_sync.sql` y
 `supabase/migrations/20260803200000_operations_history_deps_github_activity.sql`
-after the earlier HubForge migrations.
+después de las migraciones anteriores de HubForge.
 
-## 4. Link a repository
+## 4. Vincular un repositorio
 
-1. Install the app on the org/user that owns the repo
-2. Open HubForge → GitHub
-3. Link `owner/repo` to the active project **with the installation id** (from the setup callback or GitHub App settings)
-4. On link (when App env + installation id are present), HubForge backfills recent activity via the GitHub API
-5. Use **Sync now** anytime to re-fetch; webhooks keep data fresh afterward
-6. Open/close an issue on GitHub; HubForge upserts `github_synced_issues` and mirrors a HubForge task
-7. Open or update a pull request; HubForge upserts `github_synced_pull_requests`
-8. Push commits; HubForge upserts rows in `github_synced_commits`
+1. Instala la app en la org/usuario propietario del repo
+2. Abre HubForge → GitHub
+3. Vincula `owner/repo` al proyecto activo **con el installation id** (desde el callback de setup o la configuración de GitHub App)
+4. Al vincular (cuando env de App + installation id están presentes), HubForge hace backfill de actividad reciente vía GitHub API
+5. Usa **Sync now** cuando quieras para volver a obtener datos; los webhooks mantienen los datos actualizados después
+6. Abre/cierra un issue en GitHub; HubForge hace upsert en `github_synced_issues` y refleja una tarea de HubForge
+7. Abre o actualiza un pull request; HubForge hace upsert en `github_synced_pull_requests`
+8. Haz push de commits; HubForge hace upsert de filas en `github_synced_commits`
 
-Without App credentials or an installation id, you can still link a repository for display, but API backfill and **Sync now** stay disabled until both are configured.
+Sin credenciales de App o un installation id, aún puedes vincular un repositorio para mostrarlo, pero el API backfill y **Sync now** permanecen deshabilitados hasta que ambos estén configurados.

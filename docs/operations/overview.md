@@ -1,27 +1,27 @@
-# Operations notes
+# Notas de operaciones
 
-## Environments
+## Entornos
 
-| Environment | Purpose                                      |
-| ----------- | -------------------------------------------- |
-| Local       | `pnpm dev` + `.env.local`                    |
-| Preview     | Vercel PR previews (project `hubforge`)      |
-| Production  | `https://hubforge-six.vercel.app` + Supabase |
+| Entorno    | Propósito                                      |
+| ---------- | ---------------------------------------------- |
+| Local      | `pnpm dev` + `.env.local`                      |
+| Preview    | Previews de PR en Vercel (proyecto `hubforge`) |
+| Production | `https://hubforge-six.vercel.app` + Supabase   |
 
-Production readiness: [production-checklist.md](./production-checklist.md). Probe: `GET /api/ready`.
+Preparación para producción: [production-checklist.md](./production-checklist.md). Sonda: `GET /api/ready`.
 
-## Secrets
+## Secretos
 
-Store only in environment providers (Vercel/Supabase/GitHub Actions). Never in Git.
+Almacénalos solo en los proveedores de entorno (Vercel/Supabase/GitHub Actions). Nunca en Git.
 
-## Observability
+## Observabilidad
 
-Optional Sentry — see [error-tracking.md](./error-tracking.md).
+Sentry opcional — consulta [error-tracking.md](./error-tracking.md).
 
-## Packaging
+## Empaquetado
 
-Free soft caps (abuse guards) — see [packaging-limits.md](./packaging-limits.md). No Stripe while the product stays free.
+Límites suaves gratuitos (protección contra abuso) — consulta [packaging-limits.md](./packaging-limits.md). Sin Stripe mientras el producto siga siendo gratuito.
 
 ## Email
 
-Optional Resend for member invites — see [email-setup.md](./email-setup.md).
+Resend opcional para invitaciones de miembros — consulta [email-setup.md](./email-setup.md).

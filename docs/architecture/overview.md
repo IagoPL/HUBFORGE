@@ -1,28 +1,29 @@
-# Architecture overview
+# Visión general de arquitectura
 
-HubForge is a **modular monolith**: one Next.js application with managed Supabase services.
+HubForge es un **monolito modular**: una aplicación Next.js con servicios gestionados de Supabase.
 
 ```text
 src/
-  app/                 # routes (landing, auth preview, app shell pages)
-  components/          # ui + shared + shell + landing
-  data/                # reserved; domain data lives in Supabase
-  lib/                 # utils, domain types, supabase clients
-  server/              # reserved for privileged server modules (auth, github, security)
+  app/                 # rutas (landing, auth, app shell, APIs)
+  components/          # UI compartida, shell, operaciones, landing
+  features/            # dominios con código real
+  lib/                 # utilidades, dominio, operaciones, señales, supabase
 ```
 
-## Boundaries
+## Fronteras
 
-| Concern      | Rule                                                          |
-| ------------ | ------------------------------------------------------------- |
-| Presentation | No direct privileged Supabase access from visual components   |
-| Domain types | Zod schemas in `lib/domain`                                   |
-| Data         | Supabase Postgres with RLS                                    |
-| Secrets      | Env only; never logged                                        |
-| Multi-tenant | Every project entity must resolve to org + project; RLS later |
+| Preocupación     | Regla                                                              |
+| ---------------- | ------------------------------------------------------------------ |
+| Presentación     | Sin acceso privilegiado a Supabase desde componentes visuales      |
+| Tipos de dominio | Schemas Zod en `lib/domain` (y señales deterministas comprobables) |
+| Datos            | Postgres Supabase con RLS                                          |
+| Secretos         | Solo en entorno; nunca en logs                                     |
+| Multi-tenant     | Toda entidad de proyecto resuelve a org + proyecto                 |
 
-## Near-term domains
+## Dominios cercanos (producto)
 
-Authentication → Organizations → Projects → Members/Roles → Tasks → Availability → Notifications → GitHub integration → Chat
+Authentication → Organizations (infra) → Teams → GitHub → Work → Dependencies → Briefing → Attention → Capacity → Signals
 
-Only create feature folders when they contain real code.
+Chat queda fuera del MVP de producto (ADR 0006); el código/schema pueden permanecer en soft-retire.
+
+Solo se crean carpetas de feature cuando contienen código real. Ver [domain-model.md](./domain-model.md) y [signal-engine.md](./signal-engine.md).

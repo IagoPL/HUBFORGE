@@ -1,66 +1,66 @@
-# Production checklist (MVP usable with env)
+# Checklist de producción (MVP usable con env)
 
-Target production domain: `https://hubforge-six.vercel.app`  
-Supabase project: `pnpkgfhpwvdkhbncfwqz` (eu-west-1) — schema/migrations already applied.
+Dominio de producción objetivo: `https://hubforge-six.vercel.app`  
+Proyecto Supabase: `pnpkgfhpwvdkhbncfwqz` (eu-west-1) — esquema/migraciones ya aplicadas.
 
-## Current status (local snapshot)
+## Estado actual (instantánea local)
 
-| Piece                                                  | Status                         |
+| Pieza                                                  | Estado                         |
 | ------------------------------------------------------ | ------------------------------ |
-| Supabase Postgres + RLS tables                         | Done                           |
-| Local `NEXT_PUBLIC_SUPABASE_*` + `NEXT_PUBLIC_APP_URL` | Present in `.env.local`        |
-| `SUPABASE_SERVICE_ROLE_KEY`                            | Missing locally                |
-| GitHub App env (`GITHUB_APP_*`, webhook secret)        | Missing locally                |
-| Vercel project `hubforge`                              | Linked; production domain live |
-| Resend / Sentry                                        | Optional                       |
+| Supabase Postgres + tablas RLS                         | Hecho                          |
+| `NEXT_PUBLIC_SUPABASE_*` + `NEXT_PUBLIC_APP_URL` local | Presentes en `.env.local`      |
+| `SUPABASE_SERVICE_ROLE_KEY`                            | Ausente localmente             |
+| Env de GitHub App (`GITHUB_APP_*`, webhook secret)     | Ausente localmente             |
+| Proyecto Vercel `hubforge`                             | Vinculado; dominio prod activo |
+| Resend / Sentry                                        | Opcional                       |
 
-Run locally:
+Ejecutar localmente:
 
 ```bash
 pnpm verify:env
 curl -s http://localhost:3000/api/ready
 ```
 
-## 1. Auth (required for usable MVP)
+## 1. Auth (requerido para un MVP usable)
 
-1. Supabase → Authentication → Providers → GitHub enabled with OAuth App credentials
+1. Supabase → Authentication → Providers → GitHub habilitado con credenciales de OAuth App
 2. URL Configuration:
    - Site URL: `https://hubforge-six.vercel.app`
-   - Redirect URLs include:
+   - Redirect URLs incluyen:
      - `http://localhost:3000/auth/callback`
      - `https://hubforge-six.vercel.app/auth/callback`
-3. `.env.local` / Vercel env:
+3. `.env.local` / env de Vercel:
    - `NEXT_PUBLIC_SUPABASE_URL=https://pnpkgfhpwvdkhbncfwqz.supabase.co`
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=…`
-   - `NEXT_PUBLIC_APP_URL=https://hubforge-six.vercel.app` (prod) or `http://localhost:3000` (local)
-4. Verify: sign in at `/login` → land on `/app`
+   - `NEXT_PUBLIC_APP_URL=https://hubforge-six.vercel.app` (prod) o `http://localhost:3000` (local)
+4. Verificar: iniciar sesión en `/login` → aterrizar en `/app`
 
-## 2. GitHub sync (required for full MVP capability #8)
+## 2. Sincronización con GitHub (requerido para la capacidad MVP completa #8)
 
-1. Create GitHub App — `docs/operations/github-app-setup.md`
+1. Crear GitHub App — `docs/operations/github-app-setup.md`
 2. Webhook URL: `https://hubforge-six.vercel.app/api/github/webhooks`
 3. Setup URL: `https://hubforge-six.vercel.app/api/github/setup`
-4. Set in `.env.local` **and** Vercel (Production + Preview):
+4. Configurar en `.env.local` **y** Vercel (Production + Preview):
    - `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Project Settings → API)
    - `GITHUB_APP_ID`, `GITHUB_APP_CLIENT_ID`, `GITHUB_APP_CLIENT_SECRET`
-   - `GITHUB_APP_PRIVATE_KEY` (PEM with `\n` escapes or multiline secret)
+   - `GITHUB_APP_PRIVATE_KEY` (PEM con escapes `\n` o secreto multilínea)
    - `GITHUB_APP_SLUG`, `GITHUB_WEBHOOK_SECRET`
-5. Verify: link `owner/repo` with installation id → **Sync now** fills issues/PRs/commits
+5. Verificar: vincular `owner/repo` con installation id → **Sync now** rellena issues/PRs/commits
 
-## 3. Optional
+## 3. Opcional
 
-- Invite email: `docs/operations/email-setup.md`
+- Email de invitación: `docs/operations/email-setup.md`
 - Sentry: `docs/operations/error-tracking.md`
 
-## 4. Ship
+## 4. Desplegar
 
-1. Merge PR with readiness work
-2. Confirm Vercel Production env matches the list above
-3. Redeploy if env was added after the last deploy
-4. Smoke: `/` → `/login` → `/app` → create task → Team invite link → GitHub Sync now
+1. Fusionar PR con el trabajo de preparación
+2. Confirmar que el env de Vercel Production coincide con la lista anterior
+3. Redesplegar si se añadió env después del último deploy
+4. Smoke: `/` → `/login` → `/app` → crear tarea → enlace de invitación en Team → GitHub Sync now
 
-## Done when
+## Listo cuando
 
-- `pnpm verify:env` exits 0 for auth flags
-- `/api/ready` returns `"authReady": true` in the deployed environment
-- GitHub sync flags true if repository sync is in scope for the launch
+- `pnpm verify:env` termina con código 0 para los flags de auth
+- `/api/ready` devuelve `"authReady": true` en el entorno desplegado
+- Los flags de sincronización con GitHub son true si la sync de repositorios está en el alcance del lanzamiento

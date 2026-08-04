@@ -1,52 +1,33 @@
-# Implementation plan
+# Plan de implementación (histórico + puente)
 
-## Phase 0 — Audit (this iteration)
+Este documento conserva el historial de fases técnicas tempranas. La definición de producto vigente está en:
 
-- Environment, GitHub auth (`IagoPL`), empty repo bootstrap
-- Skills audit + Ponytail local install policy
-- ADRs + Cursor rules (local/gitignored)
-- Git identity verification script + local hook
+- [`docs/product/vision.md`](../product/vision.md)
+- [`docs/product/mvp.md`](../product/mvp.md)
+- [`docs/roadmap.md`](../roadmap.md)
 
-## Phase 1 — Bootstrap tooling
+## Fases 0–2 (hechas)
 
-- Next.js app, strict TS, lint/format, Tailwind tokens
-- Supabase clients without secrets
-- Vitest + Playwright smoke + CI
+Bootstrap, tooling, shell visual y verticales iniciales (auth, orgs, tasks, availability, GitHub webhooks, chat Realtime).
 
-## Phase 2 — Visual experience
+## GitHub API backfill (hecho)
 
-- Landing, login, app shell
-- Live overview / projects / team / tasks / calendar (Supabase-backed)
-- Light/dark + responsive + reduced motion
+`feat/github-api-backfill` integrado en `main`: JWT de App, backfill, Sync now, command palette, `pnpm verify:env`, `GET /api/ready`.
 
-## Planned PR sequence
+## Reposicionamiento de producto (en curso)
 
-1. `chore/bootstrap-hubforge` — foundation (this PR)
-2. `feat/authentication` — Supabase GitHub OAuth
-3. `feat/organizations-projects` — Postgres CRUD + RLS
-4. `feat/members-roles-tasks` — invitations, roles, tasks board
-5. `feat/availability-notifications` — calendar + internal alerts
-6. `feat/github-app-sync` — GitHub App link + signed webhooks (done)
-7. `feat/chat-realtime` — project channels + Realtime messages (done)
-8. `feat/github-api-backfill` — App JWT, installation token, Sync now / link backfill (done)
+Rama de trabajo: `refactor/product-positioning`.
 
-Trunk-based: short feature branches into `main`. No `develop` unless coordination pain appears.
+1. Documentación de producto en español (esta oleada).
+2. IA, microcopy, landing, soft-retire de chat en UI.
+3. Motor de señales, briefing visit-scoped, Atención, dependencias, capacidad.
+4. Modo demostración indie.
+5. Pruebas y limpieza de contradicciones restantes en la app.
 
-## Phase 3 — Live ops
+## Ops en vivo (manual)
 
-Infra already exists (Supabase project + Vercel `hubforge` + domain `hubforge-six.vercel.app`).
-Remaining work is **secrets + provider config** — see `docs/operations/production-checklist.md`.
+Sigue siendo necesario cablear OAuth, GitHub App y secretos. Ver [`docs/operations/production-checklist.md`](../operations/production-checklist.md).
 
-1. Confirm GitHub OAuth in Supabase + redirect allow list for prod/local
-2. Set `NEXT_PUBLIC_SUPABASE_*`, `NEXT_PUBLIC_APP_URL` in `.env.local` / Vercel (auth core)
-3. Add `SUPABASE_SERVICE_ROLE_KEY` + GitHub App env for sync (`docs/operations/github-app-setup.md`)
-4. Optional: Resend (`docs/operations/email-setup.md`), Sentry (`docs/operations/error-tracking.md`)
-5. Verify with `pnpm verify:env` and `GET /api/ready`
+## Post-MVP
 
-## Phase 4 — Post-MVP (later)
-
-- AI assistant for planning / triage
-- Sprints, roadmap, and workload analytics
-- PWA / push notifications
-- Richer chat (threads, reactions) — still no E2E encryption in near term
-- Billing stays deferred while the product remains free
+Discord (no chat propio), mejoras de señales, posible IA opcional. Sin compromiso de fechas.

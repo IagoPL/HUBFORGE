@@ -1,11 +1,11 @@
 # ADR 0004 — GitHub synchronization strategy
 
-- Status: Accepted
+- Status: Accepted (parcialmente supersedido por ADR 0006 respecto al chat)
 - Date: 2026-07-28
 
 ## Context
 
-Issues/PRs originate on GitHub; HubForge owns availability, chat, functional roles, and internal planning fields.
+Issues/PRs originate on GitHub; HubForge owns availability, functional roles, and internal planning fields. Chat was listed historically and is no longer an MVP product surface (ADR 0006).
 
 ## Decision
 

@@ -26,7 +26,9 @@ export function SiteHeader({
           {(
             [
               ["#problem", t.nav.problem],
-              ["#product", t.nav.product],
+              ["#how", t.nav.how],
+              ["#signals", t.nav.signals],
+              ["#audience", t.nav.audience],
               ["#security", t.nav.security],
             ] as const
           ).map(([href, label]) => (
@@ -51,19 +53,19 @@ export function SiteHeader({
           />
           <ThemeToggle />
           <Link
-            href="/login"
+            href="/demo"
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
               "hidden sm:inline-flex",
             )}
           >
-            {t.common.signIn}
+            {t.landing.ctaDemo}
           </Link>
           <Link
             href="/login"
             className={cn(buttonVariants({ size: "sm" }), "hidden sm:inline-flex")}
           >
-            {t.common.openWorkspace}
+            {t.landing.ctaConnect}
           </Link>
           <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "sm:hidden")}>
             {t.common.open}

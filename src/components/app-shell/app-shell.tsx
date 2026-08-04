@@ -1,27 +1,30 @@
 "use client";
 
 import {
+  AlertTriangle,
   Building2,
   CalendarDays,
   ChevronRight,
   Ellipsis,
   FolderGit,
   FolderKanban,
+  GitBranch,
   LayoutDashboard,
   ListTodo,
-  MessageSquare,
   Search,
+  Settings,
   Users,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { CommandPalette } from "@/components/app-shell/command-palette";
 import { DensityToggle } from "@/components/operations/density-toggle";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { useWorkspace } from "@/features/organizations/workspace-provider";
+import { useOptionalDemoWorkspace } from "@/features/demo/demo-provider";
+import { useOptionalWorkspace } from "@/features/organizations/workspace-provider";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
@@ -34,13 +37,15 @@ type ShellLabels = {
   appNav: string;
   mobileNav: string;
   overview: string;
-  projects: string;
-  tasks: string;
+  attention: string;
+  work: string;
+  dependencies: string;
   team: string;
-  calendar: string;
+  capacity: string;
+  settings: string;
+  projects: string;
   organizations: string;
   github: string;
-  chat: string;
   more: string;
   skipToContent: string;
   commandPalette: string;
@@ -57,33 +62,36 @@ type Destination = {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
-  /** Phones carry four destinations; the rest live behind "More". */
   onPhone: boolean;
 };
 
 /**
  * Global chrome: a rail of destinations and a title block that declares where
  * you are and how current the data is.
- *
- * The surface name comes from the route, so the block can never disagree with
- * the rail's active state.
  */
 export function AppShell({
   locale,
   labels,
   userSlot,
   children,
+  basePath = "/app",
+  banner,
 }: {
   locale: Locale;
   labels: ShellLabels;
-  userSlot?: React.ReactNode;
-  children: React.ReactNode;
+  userSlot?: ReactNode;
+  children: ReactNode;
+  basePath?: string;
+  banner?: ReactNode;
 }) {
   const pathname = usePathname();
-  const { activeOrganization, activeProject } = useWorkspace();
+  const demo = useOptionalDemoWorkspace();
+  const workspace = useOptionalWorkspace();
   const moreRef = useRef<HTMLDialogElement>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [paletteKey, setPaletteKey] = useState(0);
+  const root = basePath.replace(/\/$/, "") || "/app";
+  const isDemo = Boolean(demo) || root === "/demo";
 
   function openPalette() {
     setPaletteKey((key) => key + 1);
@@ -105,36 +113,83 @@ export function AppShell({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const destinations: Destination[] = [
-    { href: "/app", label: labels.overview, icon: LayoutDashboard, onPhone: true },
-    { href: "/app/tasks", label: labels.tasks, icon: ListTodo, onPhone: true },
-    { href: "/app/team", label: labels.team, icon: Users, onPhone: true },
-    { href: "/app/chat", label: labels.chat, icon: MessageSquare, onPhone: true },
-    {
-      href: "/app/organizations",
-      label: labels.organizations,
-      icon: Building2,
-      onPhone: false,
-    },
-    { href: "/app/projects", label: labels.projects, icon: FolderKanban, onPhone: false },
-    { href: "/app/calendar", label: labels.calendar, icon: CalendarDays, onPhone: false },
-    { href: "/app/github", label: labels.github, icon: FolderGit, onPhone: false },
-  ];
+  const destinations: Destination[] = isDemo
+    ? [
+        { href: root, label: labels.overview, icon: LayoutDashboard, onPhone: true },
+        {
+          href: `${root}/attention`,
+          label: labels.attention,
+          icon: AlertTriangle,
+          onPhone: true,
+        },
+        { href: `${root}/tasks`, label: labels.work, icon: ListTodo, onPhone: true },
+        {
+          href: `${root}/dependencies`,
+          label: labels.dependencies,
+          icon: GitBranch,
+          onPhone: false,
+        },
+        { href: `${root}/team`, label: labels.team, icon: Users, onPhone: true },
+      ]
+    : [
+        { href: root, label: labels.overview, icon: LayoutDashboard, onPhone: true },
+        {
+          href: `${root}/attention`,
+          label: labels.attention,
+          icon: AlertTriangle,
+          onPhone: true,
+        },
+        { href: `${root}/tasks`, label: labels.work, icon: ListTodo, onPhone: true },
+        {
+          href: `${root}/dependencies`,
+          label: labels.dependencies,
+          icon: GitBranch,
+          onPhone: false,
+        },
+        { href: `${root}/team`, label: labels.team, icon: Users, onPhone: true },
+        { href: `${root}/github`, label: labels.github, icon: FolderGit, onPhone: false },
+        {
+          href: `${root}/settings`,
+          label: labels.settings,
+          icon: Settings,
+          onPhone: false,
+        },
+        {
+          href: `${root}/organizations`,
+          label: labels.organizations,
+          icon: Building2,
+          onPhone: false,
+        },
+        {
+          href: `${root}/projects`,
+          label: labels.projects,
+          icon: FolderKanban,
+          onPhone: false,
+        },
+        {
+          href: `${root}/calendar`,
+          label: labels.capacity,
+          icon: CalendarDays,
+          onPhone: false,
+        },
+      ];
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) =>
+    href === root
+      ? pathname === href
+      : pathname === href || pathname.startsWith(`${href}/`);
   const current = destinations.find((destination) => isActive(destination.href));
   const overflow = destinations.filter((destination) => !destination.onPhone);
   const overflowActive = overflow.some((destination) => isActive(destination.href));
 
-  // Only context that is actually known reaches the crumb trail.
-  const crumbs = [activeOrganization?.name, activeProject?.name].filter(
-    (value): value is string => Boolean(value),
-  );
+  const crumbs = demo
+    ? [demo.organizationName, demo.projectName]
+    : [workspace?.activeOrganization?.name, workspace?.activeProject?.name].filter(
+        (value): value is string => Boolean(value),
+      );
 
   return (
     <div className="flex min-h-dvh flex-col bg-[var(--hf-ground-0)] text-[var(--hf-ink)] lg:pl-14">
-      {/* First in tab order, so it cannot live inside the header. Its own
-          landmark keeps it from reading as content adrift of one. */}
       <nav aria-label={labels.skipToContent}>
         <a
           href="#app-content"
@@ -180,25 +235,25 @@ export function AppShell({
           />
         ))}
 
-        {/* Phones reach the remaining destinations through a sheet rather than
-            a cramped eight-cell bar. */}
-        <button
-          type="button"
-          onClick={() => moreRef.current?.showModal()}
-          className={cn(
-            "group relative flex flex-1 flex-col items-center justify-center gap-1",
-            "text-[var(--hf-ink-muted)] transition-colors duration-[var(--motion-feedback)]",
-            "hover:text-[var(--hf-ink)] focus-visible:outline-2",
-            "focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--hf-accent)]",
-            overflowActive && "text-[var(--hf-accent)]",
-            "sm:hidden",
-          )}
-        >
-          <Ellipsis className="size-[1.125rem] shrink-0" aria-hidden />
-          <span className="t-label text-[0.5625rem] tracking-[0.06em]">
-            {labels.more}
-          </span>
-        </button>
+        {overflow.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => moreRef.current?.showModal()}
+            className={cn(
+              "group relative flex flex-1 flex-col items-center justify-center gap-1",
+              "text-[var(--hf-ink-muted)] transition-colors duration-[var(--motion-feedback)]",
+              "hover:text-[var(--hf-ink)] focus-visible:outline-2",
+              "focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--hf-accent)]",
+              overflowActive && "text-[var(--hf-accent)]",
+              "sm:hidden",
+            )}
+          >
+            <Ellipsis className="size-[1.125rem] shrink-0" aria-hidden />
+            <span className="t-label text-[0.5625rem] tracking-[0.06em]">
+              {labels.more}
+            </span>
+          </button>
+        ) : null}
       </nav>
 
       <MoreSheet
@@ -208,6 +263,8 @@ export function AppShell({
         isActive={isActive}
         onClose={() => moreRef.current?.close()}
       />
+
+      {banner}
 
       <header
         className={cn(
@@ -285,6 +342,8 @@ export function AppShell({
         key={paletteKey}
         open={paletteOpen}
         onOpenChange={setPaletteOpen}
+        basePath={isDemo ? root : "/app"}
+        demo={isDemo}
         labels={{
           title: labels.commandPalette,
           placeholder: labels.commandPlaceholder,
@@ -295,13 +354,15 @@ export function AppShell({
           empty: labels.commandEmpty,
           openHint: labels.commandOpenHint,
           overview: labels.overview,
-          projects: labels.projects,
-          tasks: labels.tasks,
+          attention: labels.attention,
+          work: labels.work,
+          dependencies: labels.dependencies,
           team: labels.team,
-          calendar: labels.calendar,
+          capacity: labels.capacity,
+          settings: labels.settings,
           organizations: labels.organizations,
+          projects: labels.projects,
           github: labels.github,
-          chat: labels.chat,
         }}
       />
     </div>
@@ -335,7 +396,6 @@ function RailLink({
         hiddenOnPhone && "hidden sm:flex",
       )}
     >
-      {/* Selection is a drawn edge, not a filled block. */}
       <span
         aria-hidden
         className={cn(
@@ -380,7 +440,6 @@ function MoreSheet({
 }) {
   const pathname = usePathname();
 
-  // Navigating away should not leave the sheet open behind the new surface.
   useEffect(() => {
     ref.current?.close();
   }, [pathname, ref]);

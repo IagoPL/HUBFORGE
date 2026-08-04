@@ -12,9 +12,9 @@ El logotipo se mantiene fuerte en el primer viewport de la superficie de marketi
 
 ## Declaración de posicionamiento
 
-HubForge es el centro operativo de un proyecto de software. No gana por tener mejores tareas ni mejores documentos; gana eliminando la fragmentación que obliga a un equipo pequeño a mantener GitHub, documentación, chat y gestión de tareas abiertos a la vez.
+HubForge es la capa operativa sobre GitHub para equipos indie multidisciplinares. No gana por tener un mejor tablero ni un chat propio; gana traduciendo actividad de GitHub, dependencias y capacidad en un briefing que todo el equipo entiende.
 
-La medida del éxito son los cambios de contexto eliminados, no las funcionalidades añadidas.
+La medida del éxito es el contexto recuperado y los bloqueos resueltos, no las funcionalidades añadidas.
 
 ## Personalidad
 
@@ -24,7 +24,7 @@ Cinco rasgos, en orden de prioridad. Cuando dos entran en conflicto, gana el ant
 2. **Calma.** Nunca ansiosa, nunca saturada, nunca insinuando que hay cientos de cosas atrasadas. El producto filtra antes de presentar.
 3. **Precisión.** Cada número, estado y etiqueta es exacto. La vaguedad se lee como descuido.
 4. **Velocidad.** La velocidad percibida es un atributo de marca, no un detalle de ingeniería.
-5. **Honestidad sobre el oficio.** Una herramienta hecha por gente que escribe software, para gente que escribe software. Respeta el oficio sin disfrazarse de él.
+5. **Honestidad sobre el oficio.** Hecha para equipos que construyen con GitHub, incluidos perfiles no técnicos. Respeta el oficio sin exigir que todo el mundo viva en la terminal.
 
 ## Contrato emocional
 
