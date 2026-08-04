@@ -74,6 +74,16 @@ pnpm test:e2e
 
 En Windows, `format:check` puede fallar por CRLF si el worktree convierte finales de línea. CI/Linux con LF es la referencia; no ejecutes `git add --renormalize .` sin revisar el impacto.
 
+## Asignación pendiente (persona aún no en GitHub)
+
+Cuando debas asignar trabajo a alguien que todavía no es miembro/colaborador del repositorio:
+
+1. No inventes usernames ni elijas a alguien “parecido”.
+2. No asignes temporalmente a IagoPL ni a otro integrante.
+3. Crea la tarea/issue **sin assignee**.
+4. Añade la nota de asignación pendiente (sin duplicarla si ya existe). Ver [`docs/operations/work-assignment.md`](./docs/operations/work-assignment.md).
+5. La asignación definitiva la hace Iago manualmente cuando la persona entre al repositorio.
+
 ## Producto
 
 Lee [`docs/product/vision.md`](./docs/product/vision.md) y [`docs/product/mvp.md`](./docs/product/mvp.md) antes de proponer features. HubForge no es un Kanban genérico ni un chat que compita con Discord.

@@ -515,6 +515,9 @@ export async function createTaskAction(input: {
   description: string;
   priority: Task["priority"];
   assigneeIds: string[];
+  /** Person not yet on GitHub — never invent a username; leave unassigned + note. */
+  pendingAssigneeName?: string;
+  pendingAssigneeRole?: string;
 }): Promise<ActionResult<Task>> {
   const gate = await requireLive();
   if (!gate.ok) return gate;
@@ -522,12 +525,23 @@ export async function createTaskAction(input: {
   const title = input.title.trim();
   if (!title) return { ok: false, error: "Task title is required." };
 
+  let description = input.description.trim();
+  if (input.pendingAssigneeName?.trim() && input.assigneeIds.length === 0) {
+    const { appendPendingAssignmentIfNeeded } =
+      await import("@/features/collaboration/pending-assignment");
+    description = appendPendingAssignmentIfNeeded(description, {
+      personName: input.pendingAssigneeName,
+      functionalRole: input.pendingAssigneeRole,
+      needsToStartBeforeJoin: true,
+    });
+  }
+
   const { data, error } = await gate.supabase
     .from("tasks")
     .insert({
       project_id: input.projectId,
       title,
-      description: input.description.trim(),
+      description,
       priority: input.priority,
       created_by: gate.user.id,
       status: "backlog",
