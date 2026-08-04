@@ -183,6 +183,8 @@ export const en = {
     briefing: "Briefing",
     sinceLastVisit: "Since your last visit, {facts}.",
     nothingChanged: "Nothing changed while you were away.",
+    firstVisitHint:
+      "First visit — open problems appear under Attention. This briefing fills in after you return.",
     factCompletedOne: "1 task completed",
     factCompletedOther: "{n} tasks completed",
     factBlockedOne: "1 blocker appeared",

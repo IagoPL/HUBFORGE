@@ -7,11 +7,11 @@ import { NotificationsPanel } from "@/features/availability/notifications-panel"
 import {
   getProjectLastVisitAction,
   listMembersAction,
-  listOperationsTasksAction,
   touchProjectVisitAction,
 } from "@/features/collaboration/actions";
+import { loadProjectEvidence } from "@/features/signals/load-project-evidence";
 import { getWorkspaceSnapshot } from "@/features/organizations/get-workspace";
-import { buildLiveAttention, changeCountsFromTasks } from "@/lib/operations";
+import { briefingFactCounts, runSignalEngine } from "@/lib/signals";
 import { getDictionary, getLocale } from "@/i18n/get-dictionary";
 import type { Member } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
@@ -36,6 +36,21 @@ export default async function AppOverviewPage({
     empty: t.notifications.empty,
     unread: t.app.unread,
     isNew: t.app.new,
+  };
+
+  const attentionLabels = {
+    title: t.attention.title,
+    empty: t.attention.empty,
+    fact: t.attention.fact,
+    inference: t.attention.inference,
+    evidence: t.attention.evidence,
+    why: t.attention.why,
+    action: t.attention.action,
+    origin: t.attention.origin,
+    simulatedOrigin: t.attention.simulatedOrigin,
+    severityHigh: t.attention.severityHigh,
+    severityMedium: t.attention.severityMedium,
+    severityLow: t.attention.severityLow,
   };
 
   const steps = [
@@ -90,15 +105,39 @@ export default async function AppOverviewPage({
     getProjectLastVisitAction(project.id),
   ]);
   const lastVisitAt = visitResult.ok ? visitResult.data : null;
-  const opsResult = await listOperationsTasksAction(project.id, lastVisitAt ?? undefined);
-  void touchProjectVisitAction(project.id);
-  const members = membersResult.ok ? membersResult.data : [];
-  const opsTasks = opsResult.ok ? opsResult.data : [];
-  const open = opsTasks.filter((task) => task.status !== "done").length;
 
-  const summary = lastVisitAt
-    ? changeSummary(changeCountsFromTasks(opsTasks, lastVisitAt), t.operations)
-    : openWorkSummary(open, opsTasks.length, t.operations);
+  const evidenceResult = await loadProjectEvidence({
+    projectId: project.id,
+    organizationId: organization.id,
+    lastVisitAt,
+  });
+
+  // Touch after the visit window was captured for this render.
+  void touchProjectVisitAction(project.id);
+
+  const members = membersResult.ok ? membersResult.data : [];
+
+  if (!evidenceResult.ok) {
+    return (
+      <div className="grid gap-3 px-4 py-5 sm:px-6">
+        <p className="t-body text-[var(--hf-error)]">{evidenceResult.error}</p>
+      </div>
+    );
+  }
+
+  const partition = runSignalEngine(evidenceResult.data);
+  const open = evidenceResult.data.tasks.filter((task) => task.status !== "done").length;
+  const counts = briefingFactCounts(partition.sinceLastVisit);
+  const summary = partition.firstVisit
+    ? openWorkSummary(open, evidenceResult.data.tasks.length, t.operations)
+    : changeSummary(
+        {
+          completed: counts.completed,
+          blocked: counts.blocked,
+          needsReview: counts.needsReview,
+        },
+        t.operations,
+      );
 
   return (
     <>
@@ -110,13 +149,20 @@ export default async function AppOverviewPage({
           {t.app.chatRetiredNotice}
         </p>
       ) : null}
+      {evidenceResult.warnings.length > 0 ? (
+        <p
+          role="status"
+          className="border-b border-[var(--hf-rule)] px-4 py-2 t-body-sm text-[var(--hf-ink-faint)] sm:px-6"
+        >
+          {evidenceResult.warnings[0]}
+        </p>
+      ) : null}
       <BriefingSurface
         summary={summary}
-        attention={buildLiveAttention(opsTasks)}
-        members={members}
-        now={new Date().toISOString()}
-        locale={locale}
-        labels={t.operations}
+        sinceLastVisit={partition.sinceLastVisit}
+        firstVisitHint={partition.firstVisit ? t.operations.firstVisitHint : undefined}
+        labels={{ briefing: t.operations.briefing }}
+        attentionLabels={attentionLabels}
       />
       <Aside
         notificationLabels={notificationLabels}
