@@ -1,11 +1,16 @@
 import { createHash } from "node:crypto";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createInstallationAccessToken } from "@/features/github/app-auth";
+import { parseCheckRunPayload } from "@/features/github/check-run-normalize";
+import { listRepositoryCheckRuns } from "@/features/github/api-client";
 import {
+  isAuthorizedInstallation,
+  persistSyncedCheckRun,
   persistSyncedCommits,
   persistSyncedIssue,
   persistSyncedPullRequest,
   resolveLinkedRepository,
 } from "@/features/github/sync-persist";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type SyncedIssue = {
   id: string;
@@ -23,6 +28,7 @@ type IssuePayload = {
   title: string;
   state: "open" | "closed";
   html_url?: string;
+  assignees?: { login?: string }[];
 };
 
 type PullRequestPayload = {
@@ -56,22 +62,25 @@ export async function processGitHubWebhook(input: {
 
   const digest = createHash("sha256").update(JSON.stringify(input.payload)).digest("hex");
 
+  const installationId =
+    typeof (input.payload.installation as { id?: number } | undefined)?.id === "number"
+      ? (input.payload.installation as { id: number }).id
+      : null;
+
+  const repositoryFullName =
+    typeof (input.payload.repository as { full_name?: string } | undefined)?.full_name ===
+    "string"
+      ? (input.payload.repository as { full_name: string }).full_name
+      : null;
+
   const { error: insertDeliveryError } = await admin
     .from("github_webhook_deliveries")
     .insert({
       delivery_id: input.deliveryId,
       event: input.event,
       action: input.action,
-      installation_id:
-        typeof (input.payload.installation as { id?: number } | undefined)?.id ===
-        "number"
-          ? (input.payload.installation as { id: number }).id
-          : null,
-      repository_full_name:
-        typeof (input.payload.repository as { full_name?: string } | undefined)
-          ?.full_name === "string"
-          ? (input.payload.repository as { full_name: string }).full_name
-          : null,
+      installation_id: installationId,
+      repository_full_name: repositoryFullName,
       payload_digest: digest,
     });
 
@@ -98,6 +107,23 @@ export async function processGitHubWebhook(input: {
     await upsertCommitsFromWebhook(admin, input.payload);
   }
 
+  if (
+    input.event === "check_run" &&
+    input.payload.check_run &&
+    input.payload.repository
+  ) {
+    await upsertCheckRunFromWebhook(admin, input.payload);
+  }
+
+  if (
+    input.event === "check_suite" &&
+    input.payload.check_suite &&
+    input.payload.repository &&
+    installationId != null
+  ) {
+    await upsertCheckSuiteFromWebhook(admin, input.payload, installationId);
+  }
+
   return { ok: true as const, duplicate: false };
 }
 
@@ -111,8 +137,22 @@ async function upsertIssueFromWebhook(
 
   const linked = await resolveLinkedRepository(admin, repository.full_name);
   if (!linked) return;
+  if (!isAuthorizedInstallation(linked, installationIdFromPayload(payload))) return;
 
-  await persistSyncedIssue(admin, linked, issue);
+  // Never invent HubForge assignees from GitHub logins (no login→member map yet).
+  await persistSyncedIssue(admin, linked, {
+    id: issue.id,
+    number: issue.number,
+    title: issue.title,
+    state: issue.state,
+    html_url: issue.html_url,
+  });
+}
+
+function installationIdFromPayload(payload: Record<string, unknown>): number | null {
+  return typeof (payload.installation as { id?: number } | undefined)?.id === "number"
+    ? (payload.installation as { id: number }).id
+    : null;
 }
 
 async function upsertPullRequestFromWebhook(
@@ -125,6 +165,7 @@ async function upsertPullRequestFromWebhook(
 
   const linked = await resolveLinkedRepository(admin, repository.full_name);
   if (!linked) return;
+  if (!isAuthorizedInstallation(linked, installationIdFromPayload(payload))) return;
 
   await persistSyncedPullRequest(admin, linked, {
     id: pullRequest.id,
@@ -147,6 +188,7 @@ async function upsertCommitsFromWebhook(
 
   const linked = await resolveLinkedRepository(admin, repository.full_name);
   if (!linked) return;
+  if (!isAuthorizedInstallation(linked, installationIdFromPayload(payload))) return;
 
   await persistSyncedCommits(
     admin,
@@ -159,4 +201,59 @@ async function upsertCommitsFromWebhook(
       committed_at: commit.timestamp ?? null,
     })),
   );
+}
+
+async function upsertCheckRunFromWebhook(
+  admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  payload: Record<string, unknown>,
+) {
+  const repository = payload.repository as { full_name?: string };
+  if (!repository.full_name) return;
+
+  const linked = await resolveLinkedRepository(admin, repository.full_name);
+  if (!linked) return;
+  if (!isAuthorizedInstallation(linked, installationIdFromPayload(payload))) return;
+
+  const checkRun = payload.check_run;
+  if (!checkRun || typeof checkRun !== "object") return;
+
+  const parsed = parseCheckRunPayload(checkRun as Record<string, unknown>);
+  if (!parsed) return;
+
+  await persistSyncedCheckRun(admin, linked, parsed);
+}
+
+/**
+ * check_suite does not include individual runs — fetch recent runs for head_sha
+ * when the suite completes (or is requested) for a linked repository.
+ */
+async function upsertCheckSuiteFromWebhook(
+  admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  payload: Record<string, unknown>,
+  installationId: number,
+) {
+  const repository = payload.repository as { full_name?: string };
+  const suite = payload.check_suite as {
+    head_sha?: string;
+    status?: string;
+  };
+  if (!repository.full_name || !suite?.head_sha) return;
+
+  const linked = await resolveLinkedRepository(admin, repository.full_name);
+  if (!linked) return;
+  if (!isAuthorizedInstallation(linked, installationId)) return;
+
+  const tokenResult = await createInstallationAccessToken(installationId);
+  if (!tokenResult.ok) return;
+
+  const listed = await listRepositoryCheckRuns(tokenResult.token, repository.full_name, {
+    ref: suite.head_sha,
+    limit: 40,
+  });
+
+  for (const run of listed.runs) {
+    const parsed = parseCheckRunPayload(run as unknown as Record<string, unknown>);
+    if (!parsed) continue;
+    await persistSyncedCheckRun(admin, linked, parsed);
+  }
 }

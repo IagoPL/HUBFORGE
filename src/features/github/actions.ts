@@ -6,6 +6,11 @@ import {
   backfillLinkedRepository,
   type BackfillCounts,
 } from "@/features/github/backfill";
+
+export type BackfillSyncResult = BackfillCounts & {
+  partialErrors: string[];
+  rateLimited: boolean;
+};
 import { isGitHubAppConfigured } from "@/features/github/config";
 import { isValidRepoFullName, normalizeRepoFullName } from "@/features/github/repo-utils";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -177,7 +182,7 @@ export async function linkRepositoryAction(input: {
 
 export async function backfillRepositorySyncAction(
   projectId: string,
-): Promise<ActionResult<BackfillCounts>> {
+): Promise<ActionResult<BackfillSyncResult>> {
   const gate = await requireLive();
   if (!gate.ok) return gate;
 
@@ -213,7 +218,14 @@ export async function backfillRepositorySyncAction(
   if (!result.ok) return result;
 
   revalidatePath("/app", "layout");
-  return { ok: true, data: result.counts };
+  return {
+    ok: true,
+    data: {
+      ...result.counts,
+      partialErrors: result.partialErrors,
+      rateLimited: result.rateLimited,
+    },
+  };
 }
 
 export async function unlinkRepositoryAction(
