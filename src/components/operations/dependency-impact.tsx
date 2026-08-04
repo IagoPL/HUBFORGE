@@ -1,6 +1,6 @@
 "use client";
 
-import type { DemoDependencyEdge } from "@/features/demo/types";
+import type { DependencyImpactRow } from "@/lib/signals/dependency-impact";
 
 export type DependencyImpactLabels = {
   title: string;
@@ -18,7 +18,7 @@ export function DependencyImpactList({
   edges,
   labels,
 }: {
-  edges: DemoDependencyEdge[];
+  edges: DependencyImpactRow[];
   labels: DependencyImpactLabels;
 }) {
   if (edges.length === 0) {

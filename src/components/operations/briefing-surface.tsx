@@ -1,42 +1,43 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import type { AttentionItem } from "@/lib/operations";
-import type { Locale } from "@/i18n/config";
-import type { Member } from "@/lib/domain/types";
-import { Briefing } from "./briefing";
-import type { OperationsLabels } from "./labels";
+import {
+  AttentionQueue,
+  type AttentionQueueLabels,
+} from "@/components/operations/attention-queue";
+import type { PrioritizedSignal } from "@/lib/signals/types";
 
 /**
- * Client edge of the briefing: acting on an item is real navigation to the work
- * surface with that task open, so the move is linkable and reversible.
+ * Briefing surface: visit-scoped signals only. Persistent problems live on /attention.
  */
 export function BriefingSurface({
   summary,
-  attention,
-  members,
-  now,
-  locale,
+  sinceLastVisit,
+  firstVisitHint,
   labels,
+  attentionLabels,
+  demo = false,
 }: {
   summary: string;
-  attention: AttentionItem[];
-  members: Member[];
-  now: string;
-  locale: Locale;
-  labels: OperationsLabels;
+  sinceLastVisit: PrioritizedSignal[];
+  firstVisitHint?: string;
+  labels: { briefing: string };
+  attentionLabels: AttentionQueueLabels;
+  demo?: boolean;
 }) {
-  const router = useRouter();
-
   return (
-    <Briefing
-      summary={summary}
-      attention={attention}
-      members={members}
-      now={now}
-      locale={locale}
-      labels={labels}
-      onOpen={(taskId) => router.push(`/app/tasks?task=${encodeURIComponent(taskId)}`)}
-    />
+    <div className="grid gap-6 px-4 py-5 sm:px-6">
+      <section className="panel grid gap-3 p-4">
+        <p className="t-label text-[var(--hf-ink-faint)]">{labels.briefing}</p>
+        <p className="t-body text-[var(--hf-ink)]">{summary}</p>
+        {firstVisitHint ? (
+          <p className="t-body-sm text-[var(--hf-ink-muted)]">{firstVisitHint}</p>
+        ) : null}
+      </section>
+
+      <section className="grid gap-3">
+        <h2 className="t-display-sm text-[var(--hf-ink)]">{attentionLabels.title}</h2>
+        <AttentionQueue signals={sinceLastVisit} labels={attentionLabels} demo={demo} />
+      </section>
+    </div>
   );
 }
