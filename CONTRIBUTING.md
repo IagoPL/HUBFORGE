@@ -72,7 +72,7 @@ pnpm build
 pnpm test:e2e
 ```
 
-En Windows, `format:check` puede fallar por CRLF si el worktree convierte finales de línea. CI/Linux con LF es la referencia; no ejecutes `git add --renormalize .` sin revisar el impacto.
+Finales de línea: el repo usa **LF** (`.gitattributes`, `.editorconfig`, Prettier `endOfLine: "lf"`). En Windows configura `git config --local core.autocrlf false` y lee [`docs/operations/line-endings.md`](./docs/operations/line-endings.md). No ejecutes `git add --renormalize .` sin autorización.
 
 ## Asignación pendiente (persona aún no en GitHub)
 
