@@ -1,3 +1,4 @@
+import { latestChecksByNameSha } from "@/features/github/check-run-normalize";
 import { validatedSourceUrl } from "@/lib/signals/urls";
 import type {
   EvidenceBundle,
@@ -282,7 +283,8 @@ export function generateSignals(bundle: EvidenceBundle): OperationalSignal[] {
     }
   }
 
-  for (const check of bundle.checkRuns) {
+  // Only the latest check per name+SHA counts — recovery clears prior failures.
+  for (const check of latestChecksByNameSha(bundle.checkRuns)) {
     if (check.status !== "completed" || check.conclusion !== "failure") continue;
     signals.push(
       base(bundle, {
@@ -293,7 +295,8 @@ export function generateSignals(bundle: EvidenceBundle): OperationalSignal[] {
         subjectId: check.id,
         subjectType: "check_run",
         headline: `CI failed: ${check.name}`,
-        explanation: "Synced check run completed with conclusion failure.",
+        explanation:
+          "Latest synced check run for this name and head SHA completed with conclusion failure. Cancelled, skipped, neutral, timed_out, and incomplete checks do not emit ci_failed.",
         occurredAt: check.completedAt ?? bundle.config.now,
         severity: "high",
         confidence: 1,
@@ -372,9 +375,10 @@ export function generateSignals(bundle: EvidenceBundle): OperationalSignal[] {
     );
   }
 
-  // work_changed from events
+  // work_changed from events (skip completions already covered by work_completed)
   for (const event of bundle.events) {
     if (event.kind === "created" || event.kind === "dependency_added") continue;
+    if (event.kind === "status_changed" && event.toValue === "done") continue;
     const task = tasks.get(event.taskId);
     if (!task || task.status === "done") continue;
     signals.push(
