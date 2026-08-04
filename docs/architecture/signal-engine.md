@@ -6,30 +6,30 @@ Transformar eventos y estado (GitHub + HubForge) en elementos de atención deter
 
 ## Contrato de una señal
 
-| Campo | Descripción |
-| --- | --- |
-| `type` | Identificador estable (`work_blocked`, `review_waiting`, …) |
-| `origin` | Sistema de origen (`github` \| `hubforge`) |
-| `evidence` | Datos mínimos que justifican la señal |
-| `occurredAt` | Fecha del hecho o de la detección |
-| `projectId` / `repository` | Contexto multi-tenant |
-| `subject` | Issue, PR, tarea u otro elemento afectado |
-| `severity` | Ordenación dentro de la cola |
-| `recommendedAction` | Qué hacer a continuación |
-| `href` | Enlace al origen (GitHub o ruta interna) |
-| `kind` | `fact` o `inference` |
+| Campo                      | Descripción                                                 |
+| -------------------------- | ----------------------------------------------------------- |
+| `type`                     | Identificador estable (`work_blocked`, `review_waiting`, …) |
+| `origin`                   | Sistema de origen (`github` \| `hubforge`)                  |
+| `evidence`                 | Datos mínimos que justifican la señal                       |
+| `occurredAt`               | Fecha del hecho o de la detección                           |
+| `projectId` / `repository` | Contexto multi-tenant                                       |
+| `subject`                  | Issue, PR, tarea u otro elemento afectado                   |
+| `severity`                 | Ordenación dentro de la cola                                |
+| `recommendedAction`        | Qué hacer a continuación                                    |
+| `href`                     | Enlace al origen (GitHub o ruta interna)                    |
+| `kind`                     | `fact` o `inference`                                        |
 
 ## Tipos iniciales
 
-| Tipo | Naturaleza típica |
-| --- | --- |
-| `work_blocked` | Hecho (dependencia o bloqueo declarado) |
-| `review_waiting` | Hecho (PR abierta sin merge) |
-| `ci_failed` | Hecho cuando exista evidencia de check; si no, no inventar |
-| `work_stale` | Inferencia o hecho según umbral documentado |
-| `unassigned_critical` | Hecho (prioridad alta sin responsable) |
-| `dependency_released` | Hecho (dependencia resuelta desde la visita) |
-| `completed_since_visit` | Hecho (cierre/completado desde `lastVisitAt`) |
+| Tipo                    | Naturaleza típica                                          |
+| ----------------------- | ---------------------------------------------------------- |
+| `work_blocked`          | Hecho (dependencia o bloqueo declarado)                    |
+| `review_waiting`        | Hecho (PR abierta sin merge)                               |
+| `ci_failed`             | Hecho cuando exista evidencia de check; si no, no inventar |
+| `work_stale`            | Inferencia o hecho según umbral documentado                |
+| `unassigned_critical`   | Hecho (prioridad alta sin responsable)                     |
+| `dependency_released`   | Hecho (dependencia resuelta desde la visita)               |
+| `completed_since_visit` | Hecho (cierre/completado desde `lastVisitAt`)              |
 
 ## Reglas
 

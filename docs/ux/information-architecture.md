@@ -14,14 +14,14 @@ Organizaciones y proyectos son infraestructura: accesibles desde Ajustes (y onbo
 
 ## Superficies y trabajo
 
-| Superficie | Pregunta que responde |
-| --- | --- |
-| Briefing | ¿Qué debo saber al volver? |
-| Atención | ¿Qué merece acción ahora? |
-| Trabajo | ¿Cómo ejecuto o actualizo el trabajo? |
-| Dependencias | ¿Qué frena qué, y con qué impacto? |
-| Equipo / Capacidad | ¿Quién puede encargarse? |
-| GitHub | ¿Está conectada la fuente de verdad? |
+| Superficie         | Pregunta que responde                 |
+| ------------------ | ------------------------------------- |
+| Briefing           | ¿Qué debo saber al volver?            |
+| Atención           | ¿Qué merece acción ahora?             |
+| Trabajo            | ¿Cómo ejecuto o actualizo el trabajo? |
+| Dependencias       | ¿Qué frena qué, y con qué impacto?    |
+| Equipo / Capacidad | ¿Quién puede encargarse?              |
+| GitHub             | ¿Está conectada la fuente de verdad?  |
 
 ## Jerarquía en Trabajo
 
