@@ -16,6 +16,7 @@ Guías públicas y para contribuidores sobre despliegue, integraciones y políti
 | [branch-protection.md](./branch-protection.md)       | Reglas de protección de `main`               |
 | [commit-signing.md](./commit-signing.md)             | Firma de commits SSH (opcional)              |
 | [work-assignment.md](./work-assignment.md)           | Asignaciones pendientes y sincronización CI  |
+| [line-endings.md](./line-endings.md)                 | Política LF / Windows y renormalización      |
 
 ## Puede permanecer en inglés
 
