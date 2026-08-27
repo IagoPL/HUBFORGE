@@ -7,14 +7,12 @@ Gracias por ayudar a construir HubForge.
 1. No subas secretos (`.env`, claves, tokens).
 2. No desarrolles ni hagas commits directamente en `main`.
 3. Usa ramas de vida corta y Pull Requests.
-4. La configuración de agentes/IA es local: `.cursor/`, `AGENTS.md`, etc. están en `.gitignore`.
+4. No versiones configuración privada del entorno de desarrollo.
 5. Verifica la identidad Git antes de hacer commit (`pnpm verify:git-identity`).
-6. Autoría: commits solo como IagoPL en este repositorio; sin coautores de herramientas de IA.
+6. Los commits deben conservar exclusivamente la identidad configurada para este repositorio y no añadir trailers automáticos de coautoría.
 7. Dependabot mantiene la autoría de sus propios commits.
 
-## Política permanente de ramas
-
-Obligatoria para humanos y agentes:
+## Política obligatoria de contribución
 
 1. Nunca modificar ni hacer commits directamente sobre `main`.
 2. Antes de tocar archivos, comprobar: repositorio, rama actual, estado del worktree, SHA de la base e identidad Git (`pnpm verify:git-identity`).
@@ -26,9 +24,9 @@ Obligatoria para humanos y agentes:
 8. No hacer push, abrir PR, mergear o desplegar sin autorización expresa.
 9. Antes de cada commit, ejecutar `pnpm verify:git-identity`.
 10. Autor y committer exclusivamente: `Iago Prieto Lamas <50492345+IagoPL@users.noreply.github.com>`.
-11. No añadir `Co-authored-by` de Cursor, Codex, Claude ni ninguna IA.
+11. No añadir trailers automáticos de coautoría.
 12. Si el worktree contiene cambios ajenos, detenerse y explicar su procedencia antes de continuar.
-13. No versionar configuraciones privadas de Cursor u otras herramientas de agente.
+13. No versionar configuración privada del entorno de desarrollo.
 
 ## Nombres de rama
 
@@ -51,7 +49,7 @@ fix(webhooks): prevent duplicate issue events
 docs(product): redefinir visión operativa sobre GitHub
 ```
 
-Usa `node scripts/commit-clean.mjs "title" "body"` para evitar trailers inyectados por el IDE.
+Usa `node scripts/commit-clean.mjs "title" "body"` para evitar trailers inyectados por el entorno de desarrollo.
 
 ## Configuración local
 

@@ -1,6 +1,6 @@
 # Documentación de operaciones
 
-Guías públicas y para contribuidores sobre despliegue, integraciones y políticas del repositorio. **Están en español**, salvo las excepciones indicadas abajo.
+Guías públicas y para contribuidores sobre despliegue, integraciones y políticas del repositorio. **Están en español**.
 
 ## En español
 
@@ -17,12 +17,3 @@ Guías públicas y para contribuidores sobre despliegue, integraciones y políti
 | [commit-signing.md](./commit-signing.md)             | Firma de commits SSH (opcional)              |
 | [work-assignment.md](./work-assignment.md)           | Asignaciones pendientes y sincronización CI  |
 | [line-endings.md](./line-endings.md)                 | Política LF / Windows y renormalización      |
-
-## Puede permanecer en inglés
-
-La documentación interna de agentes de ingeniería no forma parte de este directorio y puede seguir en inglés:
-
-- [`docs/engineering/agent-setup.md`](../engineering/agent-setup.md) — configuración de agentes Cursor/Codex
-- [`docs/engineering/skills-audit.md`](../engineering/skills-audit.md) — auditoría de skills
-
-Es tooling interno para agentes, no guías operativas para desplegar HubForge.

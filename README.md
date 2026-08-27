@@ -113,7 +113,7 @@ Ver [SECURITY.md](./SECURITY.md). Nunca subas secretos. Las service role keys so
 
 ## Contribuir
 
-Ver [CONTRIBUTING.md](./CONTRIBUTING.md). La configuración de agentes/IA está fuera de Git (`.gitignore`).
+Ver [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Licencia
 
