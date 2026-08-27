@@ -124,5 +124,4 @@ Un componente está terminado cuando:
 - Sus datos llegan por props o server actions, sin acceso privilegiado desde la presentación.
 - `pnpm lint`, `pnpm typecheck` y `pnpm test` pasan.
 - La pasada de axe está limpia, y se ha hecho una pasada manual con teclado: las herramientas automáticas solo detectan una parte de lo que importa.
-- El detector de Impeccable no reporta hallazgos: `node .cursor/skills/impeccable/scripts/detect.mjs <ruta>`.
 - Se han comprobado ambos modos de movimiento.

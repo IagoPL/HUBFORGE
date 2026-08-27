@@ -53,22 +53,3 @@ supabase/.branches
 .git-bundles/
 scripts/rebuild-feature-branches.mjs
 scripts/rebuild-redated-history.mjs
-
-# AI / agent configuration (local only — do not publish)
-AGENTS.md
-.cursor/
-.claude/
-.codex/
-.windsurf/
-.clinerules/
-.kiro/
-.qoder/
-.agent/
-.agents/
-.mcp.json
-.github/copilot-instructions.md
-*.local.mdc
-.aider*
-.continue/
-.swarm/
-.opencode/

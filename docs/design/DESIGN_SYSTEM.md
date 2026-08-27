@@ -115,6 +115,5 @@ Todo cambio de token se comprueba contra:
 
 - Ratios de contraste en modo oscuro, claro y forced-colors.
 - `pnpm test` y la suite de `@axe-core/playwright`.
-- El detector de Impeccable: `node .cursor/skills/impeccable/scripts/detect.mjs <ruta>`.
 
-Un token nunca se añade para silenciar un hallazgo del detector. Se gana su sitio por el mundo y por la legibilidad.
+Un token nunca se añade para silenciar un hallazgo automático. Se gana su sitio por el mundo y por la legibilidad.

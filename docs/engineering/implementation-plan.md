@@ -19,7 +19,7 @@ Bootstrap, tooling, shell visual y verticales iniciales (auth, orgs, tasks, avai
 Rama de trabajo: `refactor/product-positioning`.
 
 1. Documentación de producto en español (esta oleada).
-2. IA, microcopy, landing, soft-retire de chat en UI.
+2. Arquitectura de información, microcopy, landing, soft-retire de chat en UI.
 3. Motor de señales, briefing visit-scoped, Atención, dependencias, capacidad.
 4. Modo demostración indie.
 5. Pruebas y limpieza de contradicciones restantes en la app.

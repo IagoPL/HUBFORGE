@@ -16,7 +16,6 @@
     "test:e2e": "playwright test",
     "verify:git-identity": "node scripts/verify-git-identity.mjs",
     "verify:env": "node scripts/verify-env.mjs",
-    "setup:agent-rules": "node scripts/setup-local-agent-rules.mjs",
     "prepare": "node scripts/install-git-hooks.mjs"
   },
   "engines": {

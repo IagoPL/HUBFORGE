@@ -2,9 +2,8 @@
 
 <!-- Mundo visual de referencia de HubForge. PRODUCT.md tiene la verdad de producto. -->
 <!-- Los encabezados H2 Overview / Colors / Typography / Elevation / Components / -->
-<!-- Do's and Don'ts se mantienen en inglés a propósito: el parser de Impeccable -->
-<!-- (lib/design-parser.mjs) los busca por nombre literal y en español no coinciden, -->
-<!-- lo que dejaría al panel de diseño sin guía normativa. El contenido va en español. -->
+<!-- Do's and Don'ts se mantienen en inglés: son el esquema normativo del documento. -->
+<!-- El contenido va en español. -->
 <!-- Los tokens marcados como provisionales se fijan en la primera implementación. -->
 
 ## Overview
@@ -99,7 +98,7 @@ Tres cortes, cada uno con un trabajo definido. Ninguno es decorativo.
 
 La aplicación no debe adoptar una estética de plano técnico literal ni convertir la tipografía en un recurso temático excesivo. La referencia se siente en la gramática —alineación, notación, jerarquía—, no en una imitación superficial.
 
-IBM Plex figura en la lista de caras por defecto de entrenamiento de Impeccable. Se conserva deliberadamente, por razones que ninguna otra cara satisface aquí: ya está integrada en todo el código, transmite honestamente el carácter técnico del producto, sus versiones Sans y Mono son hermanas métricamente relacionadas —de modo que los datos de máquina se alinean dentro de la prosa— y su legibilidad en sesiones largas está probada. Archivo sustituye a Sora como display para dar al sistema un punto de vista que IBM Plex por sí sola no aporta. Inter está prohibida.
+IBM Plex se conserva deliberadamente: ya está integrada en todo el código, transmite honestamente el carácter técnico del producto, sus versiones Sans y Mono son hermanas métricamente relacionadas —de modo que los datos de máquina se alinean dentro de la prosa— y su legibilidad en sesiones largas está probada. Archivo sustituye a Sora como display para dar al sistema un punto de vista que IBM Plex por sí sola no aporta. Inter está prohibida.
 
 La mono es un elemento de identidad estructural, no un acento: cualquier valor producido por la máquina va en mono, lo que hace que la escritura humana y la verdad del sistema sean visualmente separables en todas partes.
 

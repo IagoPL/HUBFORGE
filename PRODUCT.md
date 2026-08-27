@@ -1,9 +1,7 @@
 # Producto
 
-<!-- impeccable:product-schema 1 -->
-<!-- Los encabezados H2 se mantienen en inglés a propósito: Impeccable los lee -->
-<!-- como señal de esquema (PRODUCT_V4_SECTIONS). El contenido va en español. -->
-<!-- No traducir los encabezados ni el valor de Platform. -->
+<!-- Encabezados H2 en inglés: esquema de producto (Platform, Users, …). -->
+<!-- El contenido va en español. No traducir los encabezados ni el valor de Platform. -->
 
 ## Platform
 
