@@ -76,8 +76,9 @@ O pega estos archivos en el editor SQL, en orden:
 5. `supabase/migrations/20260728240000_github_app_sync.sql`
 6. `supabase/migrations/20260728250000_chat_realtime.sql`
 7. `supabase/migrations/20260803200000_operations_history_deps_github_activity.sql`
+8. `supabase/migrations/20260804120000_github_synced_check_runs.sql` (presente en el repo; aplicación remota no verificada en la auditoría de staging)
 
-Consulta también `docs/operations/github-app-setup.md` y `docs/operations/production-checklist.md`.
+Consulta también `docs/operations/github-app-setup.md` y `docs/operations/production-checklist.md`. No apliques migraciones remotas hasta que se autorice.
 
 ## 7. Verificar
 
@@ -88,4 +89,4 @@ Consulta también `docs/operations/github-app-setup.md` y `docs/operations/produ
 5. Aterriza en `/app` con tu nombre en la cabecera
 6. Sign out
 
-Sin variables de entorno de Supabase, el botón de inicio de sesión permanece deshabilitado y `/app` redirige a `/login`. No hay workspace demo offline.
+Sin Auth configurada, `/login` muestra un estado neutro (“no disponible temporalmente”), el botón de GitHub permanece deshabilitado y `/app` redirige a `/login`. La UI pública no debe mostrar nombres de variables ni detalles de Supabase. No hay workspace demo offline.

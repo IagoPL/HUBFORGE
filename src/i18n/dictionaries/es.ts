@@ -110,10 +110,15 @@ export const es = {
   },
   login: {
     title: "Iniciar sesión",
-    body: "Continúa con GitHub mediante Supabase Auth. Las sesiones van en cookies y se renuevan con el proxy de Next.js.",
+    body: "Continúa con GitHub para acceder a HubForge.",
     continueGithub: "Continuar con GitHub",
-    configWarning:
-      "Supabase aún no está configurado. Añade NEXT_PUBLIC_SUPABASE_URL y una clave publishable/anon en .env.local y activa el proveedor de GitHub.",
+    connectingGithub: "Conectando con GitHub…",
+    unavailable:
+      "El inicio de sesión no está disponible temporalmente. Inténtalo de nuevo más tarde.",
+    error: "No hemos podido iniciar sesión con GitHub. Inténtalo de nuevo.",
+    failedTitle: "No se pudo iniciar sesión",
+    backToSignIn: "Volver a iniciar sesión",
+    home: "Inicio",
   },
   app: {
     openTasks: "Trabajo abierto",

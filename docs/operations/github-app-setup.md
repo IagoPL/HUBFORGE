@@ -1,11 +1,13 @@
 # Configuración de GitHub App (sincronización de repositorios)
 
-HubForge sincroniza issues, pull requests y commits mediante una **GitHub App** (no personal access tokens). El login de auth sigue siendo Supabase GitHub OAuth y es independiente.
+HubForge sincroniza issues, pull requests, commits y check runs mediante una **GitHub App** (no personal access tokens).
+
+Eso es independiente del **login de usuarios**: el inicio de sesión usa una OAuth App de GitHub configurada en Supabase Authentication. Credenciales, callbacks y eventos no se comparten entre ambos sistemas.
 
 Rutas de sincronización:
 
 1. **Webhooks** — actualizaciones incrementales cuando GitHub dispara eventos
-2. **API backfill** — tras vincular (o mediante **Sync now**), HubForge usa el JWT de la App + installation token para importar issues recientes (~50), PRs (~40) y commits (~40)
+2. **API backfill** — tras vincular (o mediante **Sync now**), HubForge usa el JWT de la App + installation token para importar issues recientes (~50), PRs (~40), commits (~40) y check runs (best-effort)
 
 ## 1. Crear la GitHub App
 
@@ -19,8 +21,11 @@ Rutas de sincronización:
    - Metadata: Read-only
    - Pull requests: Read-only
    - Contents: Read-only (commit metadata)
-7. Subscribe to events: `Issues`, `Pull request`, `Push`, `Installation`, `Installation repositories`
+   - Checks: Read-only (check runs / check suites)
+7. Subscribe to events: `Issues`, `Pull request`, `Push`, `Installation`, `Installation repositories`, `Check run`, `Check suite`
 8. Crear la app y anotar App ID, Client ID, Client secret; generar una private key
+
+El estado live de eventos y permisos de la App **no está verificado** en esta auditoría. No la modifiques todavía.
 
 ## 2. Entorno
 
@@ -38,9 +43,13 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 ## 3. Base de datos
 
-Aplica `supabase/migrations/20260728240000_github_app_sync.sql` y
-`supabase/migrations/20260803200000_operations_history_deps_github_activity.sql`
-después de las migraciones anteriores de HubForge.
+Aplica, en orden y solo cuando se autorice, las migraciones de GitHub App:
+
+1. `supabase/migrations/20260728240000_github_app_sync.sql`
+2. `supabase/migrations/20260803200000_operations_history_deps_github_activity.sql`
+3. `supabase/migrations/20260804120000_github_synced_check_runs.sql`
+
+La migración `20260804120000_github_synced_check_runs.sql` está en el repositorio. **No está confirmada en el proyecto remoto** hasta listarla con la CLI de Supabase autenticada. No la apliques en esta fase de auditoría.
 
 ## 4. Vincular un repositorio
 
@@ -52,5 +61,6 @@ después de las migraciones anteriores de HubForge.
 6. Abre/cierra un issue en GitHub; HubForge hace upsert en `github_synced_issues` y refleja una tarea de HubForge
 7. Abre o actualiza un pull request; HubForge hace upsert en `github_synced_pull_requests`
 8. Haz push de commits; HubForge hace upsert de filas en `github_synced_commits`
+9. Tras aplicar la migración de check runs y suscribir `Check run` / `Check suite`, HubForge hace upsert en `github_synced_check_runs` (best-effort; un fallo no tumba el resto de la sync)
 
 Sin credenciales de App o un installation id, aún puedes vincular un repositorio para mostrarlo, pero el API backfill y **Sync now** permanecen deshabilitados hasta que ambos estén configurados.

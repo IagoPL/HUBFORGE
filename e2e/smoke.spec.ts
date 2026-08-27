@@ -26,9 +26,25 @@ test.describe("smoke", () => {
     await expect(
       page.getByRole("heading", { name: /Sign in|Iniciar sesión/i }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /Continue with GitHub|Continuar con GitHub/i }),
-    ).toBeVisible();
+    const github = page.getByRole("button", {
+      name: /Continue with GitHub|Continuar con GitHub/i,
+    });
+    await expect(github).toBeVisible();
+    const body = await page.locator("main").innerText();
+    expect(body).not.toMatch(
+      /NEXT_PUBLIC_SUPABASE|Supabase Auth|proxy de Next\.js|anon key/i,
+    );
+    if (!(await github.isEnabled())) {
+      await expect(
+        page
+          .getByRole("status")
+          .or(
+            page.getByText(
+              /Sign in is temporarily unavailable|El inicio de sesión no está disponible temporalmente/i,
+            ),
+          ),
+      ).toBeVisible();
+    }
   });
 
   test("language switcher is available on landing", async ({ page }) => {

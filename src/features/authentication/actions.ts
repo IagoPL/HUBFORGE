@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { PUBLIC_SIGN_IN_ERROR } from "@/features/authentication/sign-in-errors";
 import { safeRedirectPath } from "@/features/authentication/safe-redirect";
 
 function appOrigin() {
@@ -11,12 +12,18 @@ function appOrigin() {
 
 export async function signInWithGitHub(formData: FormData) {
   if (!isSupabaseConfigured()) {
-    redirect("/login?error=supabase-not-configured");
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Auth environment is incomplete.");
+    }
+    redirect("/login");
   }
 
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
-    redirect("/login?error=supabase-not-configured");
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Auth environment is incomplete.");
+    }
+    redirect("/login");
   }
 
   const next = safeRedirectPath(String(formData.get("next") ?? "/app"));
@@ -29,7 +36,7 @@ export async function signInWithGitHub(formData: FormData) {
   });
 
   if (error || !data.url) {
-    redirect("/auth/error?reason=oauth-start");
+    redirect(`/login?error=${PUBLIC_SIGN_IN_ERROR}`);
   }
 
   redirect(data.url);

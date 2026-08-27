@@ -111,10 +111,14 @@ export const en = {
   },
   login: {
     title: "Sign in",
-    body: "Continue with GitHub through Supabase Auth. Sessions are cookie-based and refreshed by the Next.js proxy.",
+    body: "Continue with GitHub to access HubForge.",
     continueGithub: "Continue with GitHub",
-    configWarning:
-      "Supabase is not configured yet. Add NEXT_PUBLIC_SUPABASE_URL and a publishable/anon key to .env.local, then enable the GitHub provider.",
+    connectingGithub: "Connecting to GitHub…",
+    unavailable: "Sign in is temporarily unavailable. Please try again later.",
+    error: "We couldn't sign you in with GitHub. Please try again.",
+    failedTitle: "Sign-in failed",
+    backToSignIn: "Back to sign in",
+    home: "Home",
   },
   app: {
     openTasks: "Open work",
