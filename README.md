@@ -25,15 +25,15 @@ HubForge convierte issues, pull requests, dependencias y disponibilidad en un br
 
 **En desarrollo.** Hay código de autenticación, sincronización GitHub (webhooks + backfill), visitas, dependencias y superficies de briefing, pero el producto se está reposicionando. No está listo para producción como capa operativa completa mientras falten señales unificadas, navegación/copy alineados, modo demo y configuración real de OAuth / GitHub App.
 
-| Área | Estado |
-| --- | --- |
-| Auth GitHub (Supabase) | Implementado (requiere env) |
-| Sync GitHub (webhooks + API backfill) | Implementado (requiere GitHub App) |
-| Visitas, eventos, dependencias | Base implementada |
-| Briefing / Atención / motor de señales | En reposicionamiento |
-| Modo demostración indie | Pendiente |
-| Chat en producto | Retirado del MVP (soft-retire técnico) |
-| Documentación de producto | Actualizada (ES) |
+| Área                                   | Estado                                 |
+| -------------------------------------- | -------------------------------------- |
+| Auth GitHub (Supabase)                 | Implementado (requiere env)            |
+| Sync GitHub (webhooks + API backfill)  | Implementado (requiere GitHub App)     |
+| Visitas, eventos, dependencias         | Base implementada                      |
+| Briefing / Atención / motor de señales | En reposicionamiento                   |
+| Modo demostración indie                | Pendiente                              |
+| Chat en producto                       | Retirado del MVP (soft-retire técnico) |
+| Documentación de producto              | Actualizada (ES)                       |
 
 Documentación de producto: [`docs/product/vision.md`](./docs/product/vision.md) · [`docs/product/mvp.md`](./docs/product/mvp.md) · [`docs/roadmap.md`](./docs/roadmap.md)
 
@@ -71,14 +71,14 @@ HubForge no sustituye GitHub ni Discord. Actúa como capa de interpretación:
 
 ## Stack
 
-| Pieza | Uso |
-| --- | --- |
-| Next.js (App Router) + React + TypeScript | Aplicación |
-| Tailwind CSS | UI |
-| Zod | Validación en fronteras |
-| Supabase | Auth, Postgres RLS, Realtime (legado chat) |
-| Vitest + Playwright + axe | Calidad |
-| Vercel | Despliegue (cuando el entorno está cableado) |
+| Pieza                                     | Uso                                          |
+| ----------------------------------------- | -------------------------------------------- |
+| Next.js (App Router) + React + TypeScript | Aplicación                                   |
+| Tailwind CSS                              | UI                                           |
+| Zod                                       | Validación en fronteras                      |
+| Supabase                                  | Auth, Postgres RLS, Realtime (legado chat)   |
+| Vitest + Playwright + axe                 | Calidad                                      |
+| Vercel                                    | Despliegue (cuando el entorno está cableado) |
 
 Arquitectura: monolito modular. Ver [`docs/architecture/overview.md`](./docs/architecture/overview.md).
 
