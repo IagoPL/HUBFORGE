@@ -4,6 +4,7 @@ const config = {
   singleQuote: false,
   trailingComma: "all",
   printWidth: 90,
+  endOfLine: "lf",
   plugins: [],
 };
 
