@@ -30,12 +30,12 @@ export function plural(
 
 /** The briefing sentence for a workspace that records what changed. */
 export function changeSummary(
-  counts: { merged: number; blocked: number; needsReview: number },
+  counts: { completed: number; blocked: number; needsReview: number },
   labels: OperationsLabels,
 ) {
   const facts = [
-    counts.merged > 0 &&
-      plural(counts.merged, labels.factMergedOne, labels.factMergedOther),
+    counts.completed > 0 &&
+      plural(counts.completed, labels.factCompletedOne, labels.factCompletedOther),
     counts.blocked > 0 &&
       plural(counts.blocked, labels.factBlockedOne, labels.factBlockedOther),
     counts.needsReview > 0 &&

@@ -1,8 +1,8 @@
-# Invite email (optional Resend)
+# Email de invitación (Resend opcional)
 
-HubForge invites work without email. When `RESEND_API_KEY` is unset, creating an invite still returns a copyable accept URL in the Team UI.
+Las invitaciones de HubForge funcionan sin email. Cuando `RESEND_API_KEY` no está configurada, crear una invitación sigue devolviendo una URL de aceptación copiable en la UI de Team.
 
-## Environment
+## Entorno
 
 ```bash
 RESEND_API_KEY=
@@ -10,13 +10,13 @@ RESEND_FROM_EMAIL=HubForge <onboarding@resend.dev>
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-`NEXT_PUBLIC_APP_URL` is used to build `/invite?token=…` links. Use your public host in production.
+`NEXT_PUBLIC_APP_URL` se usa para construir enlaces `/invite?token=…`. Usa tu host público en producción.
 
-## Behaviour
+## Comportamiento
 
-1. Owner/admin invites a member from Team
-2. HubForge stores the invitation row and token
-3. If Resend is configured, it sends the invite email
-4. If not, the UI shows the link to copy (`emailDelivered: false`)
+1. Owner/admin invita a un miembro desde Team
+2. HubForge almacena la fila de invitación y el token
+3. Si Resend está configurado, envía el email de invitación
+4. Si no, la UI muestra el enlace para copiar (`emailDelivered: false`)
 
-No Stripe or paid email plan is required for the free MVP.
+No se requiere Stripe ni un plan de email de pago para el MVP gratuito.

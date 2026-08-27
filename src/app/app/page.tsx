@@ -20,10 +20,15 @@ export const metadata = {
   title: "Briefing",
 };
 
-export default async function AppOverviewPage() {
+export default async function AppOverviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ notice?: string }>;
+}) {
   const locale = await getLocale();
   const t = await getDictionary(locale);
   const state = await getWorkspaceSnapshot();
+  const { notice } = await searchParams;
 
   const notificationLabels = {
     title: t.app.latestNotifications,
@@ -32,6 +37,17 @@ export default async function AppOverviewPage() {
     unread: t.app.unread,
     isNew: t.app.new,
   };
+
+  const steps = [
+    t.onboarding.step1,
+    t.onboarding.step2,
+    t.onboarding.step3,
+    t.onboarding.step4,
+    t.onboarding.step5,
+    t.onboarding.step6,
+    t.onboarding.step7,
+    t.onboarding.step8,
+  ];
 
   const organization =
     state.organizations.find((item) => item.id === state.activeOrganizationId) ??
@@ -45,6 +61,8 @@ export default async function AppOverviewPage() {
         body={t.onboarding.body}
         href="/app/organizations"
         action={t.organizations.create}
+        steps={steps}
+        activeStep={2}
       />
     );
   }
@@ -61,6 +79,8 @@ export default async function AppOverviewPage() {
         body={t.projects.emptyHint}
         href="/app/projects"
         action={t.projects.create}
+        steps={steps}
+        activeStep={2}
       />
     );
   }
@@ -82,6 +102,14 @@ export default async function AppOverviewPage() {
 
   return (
     <>
+      {notice === "chat-retired" ? (
+        <p
+          role="status"
+          className="border-b border-[var(--hf-rule)] bg-[var(--hf-ground-2)] px-4 py-2 t-body-sm text-[var(--hf-ink-muted)] sm:px-6"
+        >
+          {t.app.chatRetiredNotice}
+        </p>
+      ) : null}
       <BriefingSurface
         summary={summary}
         attention={buildLiveAttention(opsTasks)}
@@ -161,16 +189,50 @@ function Onboarding({
   body,
   href,
   action,
+  steps,
+  activeStep,
 }: {
   title: string;
   body: string;
   href: string;
   action: string;
+  steps: string[];
+  activeStep: number;
 }) {
   return (
-    <div className="grid max-w-xl gap-3 px-4 py-5 sm:px-6">
-      <h2 className="t-display text-[var(--hf-ink)]">{title}</h2>
-      <p className="lead">{body}</p>
+    <div className="grid max-w-xl gap-4 px-4 py-5 sm:px-6">
+      <div className="grid gap-2">
+        <h2 className="t-display text-[var(--hf-ink)]">{title}</h2>
+        <p className="lead">{body}</p>
+      </div>
+      <ol className="grid gap-2 border-t border-[var(--hf-rule)] pt-4">
+        {steps.map((step, index) => {
+          const n = index + 1;
+          const current = n === activeStep;
+          return (
+            <li
+              key={step}
+              className={cn(
+                "t-body flex gap-3",
+                current ? "text-[var(--hf-ink)]" : "text-[var(--hf-ink-muted)]",
+              )}
+            >
+              <span
+                className="t-mono-sm shrink-0 text-[var(--hf-ink-faint)]"
+                data-tabular
+              >
+                {String(n).padStart(2, "0")}
+              </span>
+              <span>
+                {step}
+                {current ? (
+                  <span className="t-mono-sm ml-2 text-[var(--hf-accent)]">←</span>
+                ) : null}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
       <Link
         href={href}
         className={cn(buttonVariants({ variant: "primary" }), "justify-self-start")}

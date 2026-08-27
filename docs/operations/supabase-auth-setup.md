@@ -1,21 +1,21 @@
-# Supabase Auth setup (GitHub OAuth)
+# Configuración de Supabase Auth (GitHub OAuth)
 
-HubForge uses Supabase Auth with GitHub as the first provider and Next.js `proxy.ts` for session refresh.
+HubForge usa Supabase Auth con GitHub como primer proveedor y Next.js `proxy.ts` para refrescar la sesión.
 
-## 1. Create a Supabase project
+## 1. Crear un proyecto Supabase
 
-1. Create a project at https://supabase.com/dashboard
-2. Copy Project URL and publishable (or anon) key
+1. Crea un proyecto en https://supabase.com/dashboard
+2. Copia Project URL y publishable (o anon) key
 
-HubForge production currently uses project ref `pnpkgfhpwvdkhbncfwqz`.
+HubForge en producción usa actualmente el project ref `pnpkgfhpwvdkhbncfwqz`.
 
-## 2. Local environment
+## 2. Entorno local
 
 ```bash
 cp .env.example .env.local
 ```
 
-Set:
+Configura:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
@@ -23,14 +23,14 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable-or-anon-key>
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-For production on Vercel, set `NEXT_PUBLIC_APP_URL` to the public domain
-(e.g. `https://hubforge-six.vercel.app`).
+Para producción en Vercel, configura `NEXT_PUBLIC_APP_URL` con el dominio público
+(p. ej. `https://hubforge-six.vercel.app`).
 
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` is still accepted as a fallback.
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` sigue aceptándose como fallback.
 
-Never put the service role key in `NEXT_PUBLIC_*` variables.
+Nunca pongas la service role key en variables `NEXT_PUBLIC_*`.
 
-Check readiness without printing secrets:
+Comprueba la preparación sin imprimir secretos:
 
 ```bash
 pnpm verify:env
@@ -38,36 +38,36 @@ pnpm verify:env
 
 ## 3. GitHub OAuth App
 
-1. Create an OAuth App at https://github.com/settings/developers
-2. Homepage URL: `http://localhost:3000` (and later your production URL)
+1. Crea una OAuth App en https://github.com/settings/developers
+2. Homepage URL: `http://localhost:3000` (y más tarde tu URL de producción)
 3. Authorization callback URL: `https://<project-ref>.supabase.co/auth/v1/callback`
-4. Copy Client ID and generate a Client Secret
+4. Copia Client ID y genera un Client Secret
 
-## 4. Enable GitHub in Supabase
+## 4. Habilitar GitHub en Supabase
 
 Dashboard → Authentication → Providers → GitHub:
 
 - Enable provider
-- Paste Client ID / Secret
+- Pega Client ID / Secret
 - Save
 
-## 5. Redirect allow list
+## 5. Lista de redirecciones permitidas
 
 Dashboard → Authentication → URL Configuration:
 
-- Site URL: production origin (e.g. `https://hubforge-six.vercel.app`)
+- Site URL: origen de producción (p. ej. `https://hubforge-six.vercel.app`)
 - Additional Redirect URLs:
   - `http://localhost:3000/auth/callback`
   - `https://hubforge-six.vercel.app/auth/callback`
 
-## 6. Apply migrations
+## 6. Aplicar migraciones
 
 ```bash
-# After linking the project with Supabase CLI
+# Tras vincular el proyecto con Supabase CLI
 npx supabase db push
 ```
 
-Or paste these files in the SQL editor, in order:
+O pega estos archivos en el editor SQL, en orden:
 
 1. `supabase/migrations/20260728190000_profiles.sql`
 2. `supabase/migrations/20260728210000_organizations_projects.sql`
@@ -77,15 +77,15 @@ Or paste these files in the SQL editor, in order:
 6. `supabase/migrations/20260728250000_chat_realtime.sql`
 7. `supabase/migrations/20260803200000_operations_history_deps_github_activity.sql`
 
-See also `docs/operations/github-app-setup.md` and `docs/operations/production-checklist.md`.
+Consulta también `docs/operations/github-app-setup.md` y `docs/operations/production-checklist.md`.
 
-## 7. Verify
+## 7. Verificar
 
-1. `pnpm verify:env` (auth flags OK)
+1. `pnpm verify:env` (flags de auth OK)
 2. `pnpm dev`
-3. Open `/login`
+3. Abre `/login`
 4. Continue with GitHub
-5. Land on `/app` with your name in the header
+5. Aterriza en `/app` con tu nombre en la cabecera
 6. Sign out
 
-Without Supabase env vars, the sign-in button stays disabled and `/app` redirects to `/login`. There is no offline demo workspace.
+Sin variables de entorno de Supabase, el botón de inicio de sesión permanece deshabilitado y `/app` redirige a `/login`. No hay workspace demo offline.

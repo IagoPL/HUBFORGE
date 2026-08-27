@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-07-28
+- Note (2026-08-04): el alcance de producto ya no incluye chat en el MVP; ver ADR 0006. La decisión de monolito modular se mantiene.
 
 ## Context
 

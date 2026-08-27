@@ -1,6 +1,6 @@
-# SSH commit signing (optional)
+# Firma de commits SSH (opcional)
 
-If an SSH key is already registered on GitHub for `IagoPL`:
+Si ya tienes una clave SSH registrada en GitHub para `IagoPL`:
 
 ```bash
 git config --local gpg.format ssh
@@ -8,6 +8,6 @@ git config --local user.signingkey ~/.ssh/<your-key>.pub
 git config --local commit.gpgsign true
 ```
 
-Do not generate or publish private keys from automation.
+No generes ni publiques claves privadas desde automatización.
 
-Bootstrap continues without signing when author name/email are correctly set.
+El bootstrap continúa sin firma cuando el nombre/email del autor están configurados correctamente.

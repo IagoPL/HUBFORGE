@@ -1,104 +1,120 @@
+<div align="center">
+
 # HubForge
 
-Collaborative project workspace with GitHub synchronization, team availability, roles, planning, communication and real-time notifications.
+**Capa operativa sobre GitHub para equipos indie multidisciplinares**
 
-> Build together without losing context.
+[![CI](https://github.com/IagoPL/HUBFORGE/actions/workflows/ci.yml/badge.svg)](https://github.com/IagoPL/HUBFORGE/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-## Problem
+<br />
 
-Small technical and creative teams scatter planning, availability, ownership, chat, and GitHub activity across tools. Context gets lost; blockers stay invisible; the next right task is unclear.
+<img src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind,supabase,vercel,github&theme=dark" alt="Next.js, React, TypeScript, Tailwind, Supabase, Vercel, GitHub" width="336" height="48" />
 
-## Solution
+<br />
 
-HubForge centralizes planning, availability, responsibilities, communication, and technical activity so teams know what to do, who can do it, and what is blocking progress.
+Descubre qué está frenando vuestro proyecto antes de la próxima reunión.
 
-## Status
+HubForge convierte issues, pull requests, dependencias y disponibilidad en un briefing operativo que todo el equipo puede entender.
 
-**MVP code complete** — free to use (soft abuse caps, no billing). Sign in needs Supabase + GitHub OAuth env; repository sync needs a GitHub App.
+</div>
 
-| Area                                                                | Status                                      |
-| ------------------------------------------------------------------- | ------------------------------------------- |
-| Landing + app shell + i18n (EN/ES)                                  | Implemented                                 |
-| Organizations + projects (Postgres + RLS)                           | Implemented                                 |
-| Members, access/functional roles, task board                        | Implemented                                 |
-| Availability calendar + internal notifications                      | Implemented                                 |
-| Project chat channels + Realtime messages                           | Implemented                                 |
-| GitHub App link, webhooks, API backfill (issues/PRs/commits)        | Implemented (requires App + env)            |
-| GitHub OAuth via Supabase Auth                                      | Implemented (requires env + provider setup) |
-| Soft free-tier packaging limits                                     | Implemented (no Stripe)                     |
-| Quality tooling (lint, format, typecheck, vitest, playwright smoke) | Implemented                                 |
-| CI + branch protection on `main`                                    | Implemented                                 |
+---
+
+## Estado
+
+**En desarrollo.** Hay código de autenticación, sincronización GitHub (webhooks + backfill), visitas, dependencias y superficies de briefing, pero el producto se está reposicionando. No está listo para producción como capa operativa completa mientras falten señales unificadas, navegación/copy alineados, modo demo y configuración real de OAuth / GitHub App.
+
+| Área                                   | Estado                                 |
+| -------------------------------------- | -------------------------------------- |
+| Auth GitHub (Supabase)                 | Implementado (requiere env)            |
+| Sync GitHub (webhooks + API backfill)  | Implementado (requiere GitHub App)     |
+| Visitas, eventos, dependencias         | Base implementada                      |
+| Briefing / Atención / motor de señales | En reposicionamiento                   |
+| Modo demostración indie                | Pendiente                              |
+| Chat en producto                       | Retirado del MVP (soft-retire técnico) |
+| Documentación de producto              | Actualizada (ES)                       |
+
+Documentación de producto: [`docs/product/vision.md`](./docs/product/vision.md) · [`docs/product/mvp.md`](./docs/product/mvp.md) · [`docs/roadmap.md`](./docs/roadmap.md)
+
+---
+
+## Problema
+
+GitHub concentra actividad, pero no ofrece contexto comprensible para un equipo indie con programación, arte, diseño, guion, producción y sonido. Tras unos días fuera, cuesta saber qué cambió, qué está bloqueado y cuál es la siguiente acción.
+
+## Solución
+
+HubForge no sustituye GitHub ni Discord. Actúa como capa de interpretación:
+
+1. Conectas el repositorio.
+2. Analiza actividad y dependencias.
+3. Entregas un briefing priorizado desde tu última visita.
+4. Actúas sobre lo que impide avanzar.
+
+---
+
+## Para quién es
+
+- Equipos indie de 3 a 15 personas.
+- Estudios pequeños multidisciplinares.
+- Proyectos que ya viven en GitHub.
+- Equipos distribuidos o a tiempo parcial.
+
+## Para quién no es
+
+- Grandes corporaciones.
+- Equipos que no usan GitHub.
+- Quienes buscan sustituir Jira por completo.
+
+---
 
 ## Stack
 
-- Next.js (App Router) + React + TypeScript (strict)
-- Tailwind CSS
-- Zod
-- Supabase (Auth, Postgres RLS, Realtime)
-- Vitest + Playwright + axe
-- Vercel-ready deployment
+| Pieza                                     | Uso                                          |
+| ----------------------------------------- | -------------------------------------------- |
+| Next.js (App Router) + React + TypeScript | Aplicación                                   |
+| Tailwind CSS                              | UI                                           |
+| Zod                                       | Validación en fronteras                      |
+| Supabase                                  | Auth, Postgres RLS, Realtime (legado chat)   |
+| Vitest + Playwright + axe                 | Calidad                                      |
+| Vercel                                    | Despliegue (cuando el entorno está cableado) |
 
-## Architecture
+Arquitectura: monolito modular. Ver [`docs/architecture/overview.md`](./docs/architecture/overview.md).
 
-Modular monolith: one Next.js app with domain-oriented folders under `src/`. Signed-in sessions use Supabase with RLS.
+---
 
-See `docs/architecture/` for ADRs and boundaries. Product scope: `docs/product/mvp.md`.
-
-## Local setup
+## Desarrollo local
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Copy `.env.example` to `.env.local` and fill Supabase (and optional GitHub App) values. Without Supabase configured, `/app` redirects to login — there is no offline demo workspace.
+Copia `.env.example` a `.env.local`. Sin Supabase configurado, `/app` redirige a login.
 
 ```bash
-pnpm verify:env   # reports missing env flags (no secret values)
+pnpm verify:env
+pnpm lint
+pnpm format:check
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm test:e2e
 ```
 
-Production checklist: `docs/operations/production-checklist.md` (domain `hubforge-six.vercel.app`).
+Guías ops: [`docs/operations/supabase-auth-setup.md`](./docs/operations/supabase-auth-setup.md) · [`docs/operations/github-app-setup.md`](./docs/operations/github-app-setup.md) · [`docs/operations/production-checklist.md`](./docs/operations/production-checklist.md)
 
-- Auth: `docs/operations/supabase-auth-setup.md`
-- GitHub App sync: `docs/operations/github-app-setup.md`
-- Invite email (optional): `docs/operations/email-setup.md`
-- Soft limits: `docs/operations/packaging-limits.md`
+---
 
-### Scripts
+## Seguridad
 
-| Script                              | Purpose             |
-| ----------------------------------- | ------------------- |
-| `pnpm dev`                          | Local development   |
-| `pnpm lint`                         | ESLint              |
-| `pnpm format` / `pnpm format:check` | Prettier            |
-| `pnpm typecheck`                    | TypeScript          |
-| `pnpm test`                         | Unit tests          |
-| `pnpm test:e2e`                     | Playwright smoke    |
-| `pnpm build`                        | Production build    |
-| `pnpm verify:git-identity`          | Commit author gate  |
-| `pnpm verify:env`                   | Env readiness flags |
+Ver [SECURITY.md](./SECURITY.md). Nunca subas secretos. Las service role keys solo viven en el servidor.
 
-## Testing
+## Contribuir
 
-- Unit: domain schemas, GitHub helpers (webhooks, App JWT, backfill gates), workspace mapping
-- E2E smoke: landing, login CTA, i18n, legal pages, unauthenticated `/app` redirect, axe on landing
+Ver [CONTRIBUTING.md](./CONTRIBUTING.md). La configuración de agentes/IA está fuera de Git (`.gitignore`).
 
-## Roadmap
+## Licencia
 
-**Done (MVP):** auth wiring, orgs/projects, members/roles/tasks, availability/notifications, GitHub App webhooks + API backfill, chat Realtime, free soft limits.
-
-**Next (ops):** configure live OAuth + GitHub App, optional Vercel deployment.
-
-**Post-MVP:** AI assistant, sprints/analytics, PWA/push, richer chat. Billing remains deferred while the product stays free.
-
-## Security
-
-See [SECURITY.md](./SECURITY.md). Never commit secrets. Service role keys stay server-side only.
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md). AI/agent configuration is intentionally excluded from Git (see `.gitignore`).
-
-## License
-
-MIT — see [LICENSE](./LICENSE).
+MIT — [LICENSE](./LICENSE).

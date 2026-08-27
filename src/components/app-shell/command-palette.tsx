@@ -1,14 +1,16 @@
 "use client";
 
 import {
+  AlertTriangle,
   Building2,
   CalendarDays,
   FolderGit,
   FolderKanban,
+  GitBranch,
   LayoutDashboard,
   ListTodo,
-  MessageSquare,
   Rows3,
+  Settings,
   Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -42,23 +44,29 @@ export type CommandPaletteLabels = {
   empty: string;
   openHint: string;
   overview: string;
-  projects: string;
-  tasks: string;
+  attention: string;
+  work: string;
+  dependencies: string;
   team: string;
-  calendar: string;
+  capacity: string;
+  settings: string;
   organizations: string;
+  projects: string;
   github: string;
-  chat: string;
 };
 
 export function CommandPalette({
   labels,
   open,
   onOpenChange,
+  basePath = "/app",
+  demo = false,
 }: {
   labels: CommandPaletteLabels;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  basePath?: string;
+  demo?: boolean;
 }) {
   const router = useRouter();
   const density = useDensity();
@@ -77,64 +85,88 @@ export function CommandPalette({
       close();
       router.push(href);
     };
+    const root = basePath.replace(/\/$/, "") || "/app";
 
-    return [
+    const navigate: PaletteItem[] = [
       {
         id: "nav-overview",
         label: labels.overview,
         group: "navigate",
         icon: LayoutDashboard,
-        run: () => go("/app"),
+        run: () => go(root),
       },
       {
-        id: "nav-tasks",
-        label: labels.tasks,
+        id: "nav-attention",
+        label: labels.attention,
+        group: "navigate",
+        icon: AlertTriangle,
+        run: () => go(`${root}/attention`),
+      },
+      {
+        id: "nav-work",
+        label: labels.work,
         group: "navigate",
         icon: ListTodo,
-        run: () => go("/app/tasks"),
+        run: () => go(`${root}/tasks`),
+      },
+      {
+        id: "nav-dependencies",
+        label: labels.dependencies,
+        group: "navigate",
+        icon: GitBranch,
+        run: () => go(`${root}/dependencies`),
       },
       {
         id: "nav-team",
         label: labels.team,
         group: "navigate",
         icon: Users,
-        run: () => go("/app/team"),
+        run: () => go(`${root}/team`),
       },
-      {
-        id: "nav-chat",
-        label: labels.chat,
-        group: "navigate",
-        icon: MessageSquare,
-        run: () => go("/app/chat"),
-      },
-      {
-        id: "nav-orgs",
-        label: labels.organizations,
-        group: "navigate",
-        icon: Building2,
-        run: () => go("/app/organizations"),
-      },
-      {
-        id: "nav-projects",
-        label: labels.projects,
-        group: "navigate",
-        icon: FolderKanban,
-        run: () => go("/app/projects"),
-      },
-      {
-        id: "nav-calendar",
-        label: labels.calendar,
-        group: "navigate",
-        icon: CalendarDays,
-        run: () => go("/app/calendar"),
-      },
-      {
-        id: "nav-github",
-        label: labels.github,
-        group: "navigate",
-        icon: FolderGit,
-        run: () => go("/app/github"),
-      },
+    ];
+
+    if (!demo) {
+      navigate.push(
+        {
+          id: "nav-capacity",
+          label: labels.capacity,
+          group: "navigate",
+          icon: CalendarDays,
+          run: () => go(`${root}/calendar`),
+        },
+        {
+          id: "nav-github",
+          label: labels.github,
+          group: "navigate",
+          icon: FolderGit,
+          run: () => go(`${root}/github`),
+        },
+        {
+          id: "nav-settings",
+          label: labels.settings,
+          group: "navigate",
+          icon: Settings,
+          run: () => go(`${root}/settings`),
+        },
+        {
+          id: "nav-orgs",
+          label: labels.organizations,
+          group: "navigate",
+          icon: Building2,
+          run: () => go(`${root}/organizations`),
+        },
+        {
+          id: "nav-projects",
+          label: labels.projects,
+          group: "navigate",
+          icon: FolderKanban,
+          run: () => go(`${root}/projects`),
+        },
+      );
+    }
+
+    return [
+      ...navigate,
       {
         id: "pref-comfortable",
         label: labels.densityComfortable,
@@ -156,9 +188,8 @@ export function CommandPalette({
         },
       },
     ];
-    // close closes over onOpenChange; include it so actions stay current.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- close is a stable render helper
-  }, [labels, onOpenChange, router]);
+  }, [labels, onOpenChange, router, basePath, demo]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

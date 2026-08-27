@@ -256,3 +256,7 @@ export function useWorkspace() {
   }
   return value;
 }
+
+export function useOptionalWorkspace() {
+  return useContext(WorkspaceContext);
+}
