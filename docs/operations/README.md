@@ -15,6 +15,7 @@ Guías públicas y para contribuidores sobre despliegue, integraciones y políti
 | [error-tracking.md](./error-tracking.md)             | Sentry (opcional)                            |
 | [branch-protection.md](./branch-protection.md)       | Reglas de protección de `main`               |
 | [commit-signing.md](./commit-signing.md)             | Firma de commits SSH (opcional)              |
+| [work-assignment.md](./work-assignment.md)           | Asignaciones pendientes y sincronización CI  |
 
 ## Puede permanecer en inglés
 

@@ -150,7 +150,12 @@ export function GitHubSyncPanel({
           return;
         }
         setStatus(
-          `${labels.syncSuccess} ${result.data.issues} issues · ${result.data.pullRequests} PRs · ${result.data.commits} commits`,
+          [
+            `${labels.syncSuccess} ${result.data.issues} issues · ${result.data.pullRequests} PRs · ${result.data.commits} commits · ${result.data.checkRuns} checks`,
+            ...(result.data.partialErrors ?? []),
+          ]
+            .filter(Boolean)
+            .join(" "),
         );
         void refreshLists(projectId);
       });
