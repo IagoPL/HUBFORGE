@@ -5,11 +5,30 @@ Gracias por ayudar a construir HubForge.
 ## Reglas básicas
 
 1. No subas secretos (`.env`, claves, tokens).
-2. No desarrolles directamente en `main`.
+2. No desarrolles ni hagas commits directamente en `main`.
 3. Usa ramas de vida corta y Pull Requests.
 4. La configuración de agentes/IA es local: `.cursor/`, `AGENTS.md`, etc. están en `.gitignore`.
 5. Verifica la identidad Git antes de hacer commit (`pnpm verify:git-identity`).
 6. Autoría: commits solo como IagoPL en este repositorio; sin coautores de herramientas de IA.
+7. Dependabot mantiene la autoría de sus propios commits.
+
+## Política permanente de ramas
+
+Obligatoria para humanos y agentes:
+
+1. Nunca modificar ni hacer commits directamente sobre `main`.
+2. Antes de tocar archivos, comprobar: repositorio, rama actual, estado del worktree, SHA de la base e identidad Git (`pnpm verify:git-identity`).
+3. Cada funcionalidad, corrección, refactorización o bloque documental va en una rama dedicada.
+4. Nombres descriptivos: `feat/`, `fix/`, `refactor/`, `docs/`, `test/`, `chore/`.
+5. No mezclar trabajos independientes en una misma rama.
+6. No reutilizar una rama ya integrada para trabajo nuevo.
+7. No hacer force push ni reescribir historial compartido.
+8. No hacer push, abrir PR, mergear o desplegar sin autorización expresa.
+9. Antes de cada commit, ejecutar `pnpm verify:git-identity`.
+10. Autor y committer exclusivamente: `Iago Prieto Lamas <50492345+IagoPL@users.noreply.github.com>`.
+11. No añadir `Co-authored-by` de Cursor, Codex, Claude ni ninguna IA.
+12. Si el worktree contiene cambios ajenos, detenerse y explicar su procedencia antes de continuar.
+13. No versionar configuraciones privadas de Cursor u otras herramientas de agente.
 
 ## Nombres de rama
 
@@ -32,6 +51,8 @@ fix(webhooks): prevent duplicate issue events
 docs(product): redefinir visión operativa sobre GitHub
 ```
 
+Usa `node scripts/commit-clean.mjs "title" "body"` para evitar trailers inyectados por el IDE.
+
 ## Configuración local
 
 1. Node.js 20+ y pnpm 11+.
@@ -50,6 +71,8 @@ pnpm test
 pnpm build
 pnpm test:e2e
 ```
+
+En Windows, `format:check` puede fallar por CRLF si el worktree convierte finales de línea. CI/Linux con LF es la referencia; no ejecutes `git add --renormalize .` sin revisar el impacto.
 
 ## Producto
 

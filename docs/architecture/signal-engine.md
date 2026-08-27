@@ -2,43 +2,71 @@
 
 ## Propósito
 
-Transformar eventos y estado (GitHub + HubForge) en elementos de atención deterministas y comprobables. No es un feed cronológico ni un contador de actividad.
+Transformar evidencia de GitHub y HubForge en elementos de briefing y atención deterministas. No es un feed cronológico ni un contador de actividad.
 
-## Contrato de una señal
+Implementación: `src/lib/signals/` (puro) + adaptadores en `src/features/signals/`.
 
-| Campo                      | Descripción                                                 |
-| -------------------------- | ----------------------------------------------------------- |
-| `type`                     | Identificador estable (`work_blocked`, `review_waiting`, …) |
-| `origin`                   | Sistema de origen (`github` \| `hubforge`)                  |
-| `evidence`                 | Datos mínimos que justifican la señal                       |
-| `occurredAt`               | Fecha del hecho o de la detección                           |
-| `projectId` / `repository` | Contexto multi-tenant                                       |
-| `subject`                  | Issue, PR, tarea u otro elemento afectado                   |
-| `severity`                 | Ordenación dentro de la cola                                |
-| `recommendedAction`        | Qué hacer a continuación                                    |
-| `href`                     | Enlace al origen (GitHub o ruta interna)                    |
-| `kind`                     | `fact` o `inference`                                        |
+## Capas
 
-## Tipos iniciales
+1. **Lectura** — `loadProjectEvidence` / `northlightAuroraEvidence`
+2. **Normalización** — `EvidenceBundle` tipado
+3. **Generación** — `generateSignals` (reglas puras)
+4. **Priorización** — `prioritizeSignals`
+5. **Partición** — `runSignalEngine` (briefing vs atención)
+6. **Presentación** — UI (`AttentionQueue`, `BriefingSurface`)
 
-| Tipo                    | Naturaleza típica                                          |
-| ----------------------- | ---------------------------------------------------------- |
-| `work_blocked`          | Hecho (dependencia o bloqueo declarado)                    |
-| `review_waiting`        | Hecho (PR abierta sin merge)                               |
-| `ci_failed`             | Hecho cuando exista evidencia de check; si no, no inventar |
-| `work_stale`            | Inferencia o hecho según umbral documentado                |
-| `unassigned_critical`   | Hecho (prioridad alta sin responsable)                     |
-| `dependency_released`   | Hecho (dependencia resuelta desde la visita)               |
-| `completed_since_visit` | Hecho (cierre/completado desde `lastVisitAt`)              |
+## Contrato `OperationalSignal`
 
-## Reglas
+Campos: `id`, `kind`, `source`, `evidenceType` (regla), `projectId`, `repositoryId`, `subjectId`, `subjectType`, `headline`, `explanation`, `occurredAt`, `severity`, `confidence`, `classification` (`fact`|`inference`), `actorId`, `assigneeIds`, `blockedCount`, `recommendedAction`, `sourceUrl` (solo http/https validados), `metadata`.
 
-1. Determinista: misma entrada → misma salida (fixtures en tests).
-2. No inventar relaciones que GitHub no justifique; las inferencias se etiquetan.
-3. “Completado” distingue merge/cierre en GitHub de tarea interna marcada como hecha.
-4. La cola de atención ordena por impacto (p. ej. bloqueos que frenan más trabajo) antes que por recencia sola.
-5. El briefing usa `lastVisitAt` real; no sustituirlo por “todo lo vivo ahora” sin decirlo.
+Tras priorizar: `priorityScore`, `priorityReason`.
 
-## Implementación prevista
+## Tipos
 
-Capa pura en `src/lib/` (o dominio `signals`) consumida por Briefing y Atención. Reutilizará `task_events`, `task_dependencies`, `project_visits` y tablas `github_synced_*`. Los adaptadores de demo alimentan el mismo motor con fixtures etiquetados.
+| Tipo                  | Clasificación típica                               |
+| --------------------- | -------------------------------------------------- |
+| `work_blocked`        | fact                                               |
+| `review_waiting`      | fact (solo PR reales)                              |
+| `ci_failed`           | fact (solo con check run sincronizado)             |
+| `work_stale`          | inference (umbral `staleDaysThreshold`, default 5) |
+| `unassigned_critical` | fact / inference (capacidad)                       |
+| `dependency_released` | fact                                               |
+| `work_completed`      | fact (tarea interna)                               |
+| `pull_request_merged` | fact (PR merged en datos GitHub)                   |
+| `work_changed`        | fact / inference (incl. responsable no disponible) |
+
+## Priorización
+
+```
+score =
+  severityWeight * 1000
++ blockedCount * 120
++ subjectPriorityWeight * 80
++ ageDays * 15
++ (sin responsable en kinds críticos ? 100 : 0)
++ (ci_failed ? 200 : 0)
++ (review_waiting ? 150 : 0)
++ (responsable no disponible ? 60 : 0)
+```
+
+Empate: `score` DESC → `occurredAt` DESC → `id` ASC.
+
+Constantes: `PRIORITY_FORMULA` en `src/lib/signals/prioritize.ts`.
+
+## Briefing vs Atención
+
+|                | Briefing                                      | Atención                                 |
+| -------------- | --------------------------------------------- | ---------------------------------------- |
+| Ventana        | Después de `lastVisitAt`                      | Problemas abiertos (pueden ser antiguos) |
+| Primera visita | `sinceLastVisit = []`                         | Cola persistente                         |
+| Visita         | Leer `lastVisitAt` → calcular → luego `touch` | No altera la visita del briefing         |
+
+## CI / check runs
+
+Tabla aditiva `github_synced_check_runs` (migración `20260804120000_…`). Sin filas → sin `ci_failed` en espacios reales. La demo inyecta fixtures etiquetados `source: demo`.
+
+El webhook todavía no persiste check runs; el adaptador lee la tabla cuando exista.
+
+## Capacidad
+
+`availability_entries` alimenta inferencias (`rule.assignee_unavailable`, `rule.critical_without_available_owner`). No hay reasignación automática.

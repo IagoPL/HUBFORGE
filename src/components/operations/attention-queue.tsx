@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import type { DemoSignal } from "@/features/demo/types";
+import type { PrioritizedSignal } from "@/lib/signals/types";
 import { cn } from "@/lib/utils";
 
 export type AttentionQueueLabels = {
@@ -24,7 +24,7 @@ export function AttentionQueue({
   labels,
   demo = false,
 }: {
-  signals: DemoSignal[];
+  signals: PrioritizedSignal[];
   labels: AttentionQueueLabels;
   demo?: boolean;
 }) {
@@ -39,6 +39,7 @@ export function AttentionQueue({
           key={signal.id}
           className="panel grid gap-3 p-4"
           data-severity={signal.severity}
+          data-classification={signal.classification}
         >
           <div className="flex flex-wrap items-center gap-2">
             <Badge tone={signal.severity === "high" ? "warning" : "neutral"}>
@@ -48,23 +49,23 @@ export function AttentionQueue({
                   ? labels.severityMedium
                   : labels.severityLow}
             </Badge>
-            <Badge tone={signal.kind === "fact" ? "success" : "neutral"}>
-              {signal.kind === "fact" ? labels.fact : labels.inference}
+            <Badge tone={signal.classification === "fact" ? "success" : "neutral"}>
+              {signal.classification === "fact" ? labels.fact : labels.inference}
             </Badge>
-            <span className="t-mono-sm text-[var(--hf-ink-faint)]">{signal.type}</span>
+            <span className="t-mono-sm text-[var(--hf-ink-faint)]">{signal.kind}</span>
           </div>
 
           <div className="grid gap-1">
-            <h3 className="t-display-sm text-[var(--hf-ink)]">{signal.title}</h3>
+            <h3 className="t-display-sm text-[var(--hf-ink)]">{signal.headline}</h3>
             <p className="t-body-sm text-[var(--hf-ink-muted)]">
               <span className="font-medium text-[var(--hf-ink)]">
                 {labels.evidence}:{" "}
               </span>
-              {signal.evidence}
+              {signal.explanation}
             </p>
             <p className="t-body-sm text-[var(--hf-ink-muted)]">
               <span className="font-medium text-[var(--hf-ink)]">{labels.why}: </span>
-              {signal.whyItMatters}
+              {signal.priorityReason}
             </p>
             <p className="t-body-sm text-[var(--hf-ink)]">
               <span className="font-medium">{labels.action}: </span>
@@ -76,16 +77,29 @@ export function AttentionQueue({
             <span data-tabular>
               {new Date(signal.occurredAt).toISOString().slice(0, 10)}
             </span>
-            <span>{signal.assigneeLabel}</span>
-            <span
-              className={cn(
-                demo &&
-                  "rounded-[var(--radius-sm)] bg-[var(--hf-caution-quiet)] px-1.5 py-0.5 text-[var(--hf-caution)]",
-              )}
-              title={demo ? labels.simulatedOrigin : undefined}
-            >
-              {labels.origin}: {signal.originRef}
+            <span>
+              {signal.assigneeIds.length > 0 ? signal.assigneeIds.join(", ") : "—"}
             </span>
+            {signal.sourceUrl ? (
+              <a
+                href={signal.sourceUrl}
+                className="underline-offset-2 hover:underline"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {labels.origin}
+              </a>
+            ) : (
+              <span
+                className={cn(
+                  demo &&
+                    "rounded-[var(--radius-sm)] bg-[var(--hf-caution-quiet)] px-1.5 py-0.5 text-[var(--hf-caution)]",
+                )}
+                title={demo ? labels.simulatedOrigin : undefined}
+              >
+                {labels.origin}: {signal.evidenceType}
+              </span>
+            )}
           </div>
         </li>
       ))}

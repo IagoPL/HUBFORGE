@@ -1,17 +1,18 @@
 import { AttentionQueue } from "@/components/operations/attention-queue";
-import { getNorthlightAuroraDemo } from "@/features/demo/northlight-aurora";
+import { northlightAuroraEvidence } from "@/features/signals/demo-evidence";
+import { runSignalEngine } from "@/lib/signals";
 import { getDictionary, getLocale } from "@/i18n/get-dictionary";
 
 export default async function DemoAttentionPage() {
   const locale = await getLocale();
   const t = await getDictionary(locale);
-  const workspace = getNorthlightAuroraDemo();
+  const { persistentAttention } = runSignalEngine(northlightAuroraEvidence());
 
   return (
     <div className="grid gap-4 px-4 py-5 sm:px-6">
       <AttentionQueue
         demo
-        signals={workspace.signals}
+        signals={persistentAttention}
         labels={{
           title: t.attention.title,
           empty: t.demo.emptyAttention,

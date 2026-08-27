@@ -1,7 +1,8 @@
 import { AttentionQueue } from "@/components/operations/attention-queue";
-import { listOperationsTasksAction } from "@/features/collaboration/actions";
-import { attentionSignalsFromTasks } from "@/features/operations/live-adapters";
+import { getProjectLastVisitAction } from "@/features/collaboration/actions";
+import { loadProjectEvidence } from "@/features/signals/load-project-evidence";
 import { getWorkspaceSnapshot } from "@/features/organizations/get-workspace";
+import { runSignalEngine } from "@/lib/signals";
 import { getDictionary, getLocale } from "@/i18n/get-dictionary";
 
 export const metadata = {
@@ -15,6 +16,10 @@ export default async function AttentionPage() {
   const project =
     state.projects.find((item) => item.id === state.activeProjectId) ??
     state.projects[0] ??
+    null;
+  const organization =
+    state.organizations.find((item) => item.id === state.activeOrganizationId) ??
+    state.organizations[0] ??
     null;
 
   const labels = {
@@ -32,7 +37,7 @@ export default async function AttentionPage() {
     severityLow: t.attention.severityLow,
   };
 
-  if (!project) {
+  if (!project || !organization) {
     return (
       <div className="grid gap-3 px-4 py-5 sm:px-6">
         <p className="t-body text-[var(--hf-ink-muted)]">{t.projects.emptyHint}</p>
@@ -40,16 +45,27 @@ export default async function AttentionPage() {
     );
   }
 
-  const opsResult = await listOperationsTasksAction(project.id);
-  const tasks = opsResult.ok ? opsResult.data : [];
-  const signals = attentionSignalsFromTasks(tasks, {
-    unassigned: t.tasks.unassigned,
-    origin: "HubForge",
+  const visitResult = await getProjectLastVisitAction(project.id);
+  const lastVisitAt = visitResult.ok ? visitResult.data : null;
+  const evidenceResult = await loadProjectEvidence({
+    projectId: project.id,
+    organizationId: organization.id,
+    lastVisitAt,
   });
+
+  if (!evidenceResult.ok) {
+    return (
+      <div className="grid gap-3 px-4 py-5 sm:px-6">
+        <p className="t-body text-[var(--hf-error)]">{evidenceResult.error}</p>
+      </div>
+    );
+  }
+
+  const { persistentAttention } = runSignalEngine(evidenceResult.data);
 
   return (
     <div className="grid gap-4 px-4 py-5 sm:px-6">
-      <AttentionQueue signals={signals} labels={labels} />
+      <AttentionQueue signals={persistentAttention} labels={labels} />
     </div>
   );
 }
