@@ -12,13 +12,13 @@ src/
 
 ## Fronteras
 
-| Preocupación | Regla |
-| --- | --- |
-| Presentación | Sin acceso privilegiado a Supabase desde componentes visuales |
+| Preocupación     | Regla                                                              |
+| ---------------- | ------------------------------------------------------------------ |
+| Presentación     | Sin acceso privilegiado a Supabase desde componentes visuales      |
 | Tipos de dominio | Schemas Zod en `lib/domain` (y señales deterministas comprobables) |
-| Datos | Postgres Supabase con RLS |
-| Secretos | Solo en entorno; nunca en logs |
-| Multi-tenant | Toda entidad de proyecto resuelve a org + proyecto |
+| Datos            | Postgres Supabase con RLS                                          |
+| Secretos         | Solo en entorno; nunca en logs                                     |
+| Multi-tenant     | Toda entidad de proyecto resuelve a org + proyecto                 |
 
 ## Dominios cercanos (producto)
 
