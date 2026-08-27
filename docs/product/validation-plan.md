@@ -15,12 +15,12 @@ Los equipos indie multidisciplinares que ya usan GitHub adoptarán una capa de b
 
 ## Métodos
 
-| Método | Cuándo | Muestra |
-| --- | --- | --- |
-| Revisión de landing (5 segundos + 30 segundos) | Tras rewrite de copy | 5–8 personas del perfil indie |
-| Recorrido guiado del modo demo | Tras Fase C/D | 3–5 equipos pequeños |
-| Prueba de briefing con repo real | Cuando App + env estén listos | 2–3 proyectos voluntarios |
-| Checklist a11y + teclado | Cada superficie nueva | Automatizado + pase manual |
+| Método                                         | Cuándo                        | Muestra                       |
+| ---------------------------------------------- | ----------------------------- | ----------------------------- |
+| Revisión de landing (5 segundos + 30 segundos) | Tras rewrite de copy          | 5–8 personas del perfil indie |
+| Recorrido guiado del modo demo                 | Tras Fase C/D                 | 3–5 equipos pequeños          |
+| Prueba de briefing con repo real               | Cuando App + env estén listos | 2–3 proyectos voluntarios     |
+| Checklist a11y + teclado                       | Cada superficie nueva         | Automatizado + pase manual    |
 
 ## Criterio para iterar o pivotar
 
